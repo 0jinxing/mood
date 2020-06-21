@@ -1,0 +1,17 @@
+{
+  "compilerOptions": {
+    "module": "commonjs",
+    "rootDir": ".",
+    "outDir": "build",
+    "target": "ES5",
+    "lib": ["ES2017", "DOM"],
+    "noImplicitAny": true,
+    "strictNullChecks": true,
+    "downlevelIteration": true,
+    "removeComments": true,
+    "preserveConstEnums": true,
+    "sourceMap": true,
+    "baseUrl": "."
+  },
+  "compileOnSave": true
+}
