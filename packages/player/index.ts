@@ -24,7 +24,7 @@ import {
   PlayerEventType,
 } from "./types";
 
-import "./styles/index.scss";
+import "./styles/index.css";
 
 const mitt = (mittProxy as any).default || mittProxy;
 

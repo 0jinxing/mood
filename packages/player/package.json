@@ -1,17 +1,18 @@
 {
   "name": "@traps/player",
-  "version": "1.0.0",
+  "version": "0.0.1",
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "publish": "npm publish --access public"
   },
   "keywords": [],
   "author": "",
-  "license": "ISC",
+  "license": "MIT",
   "dependencies": {
-    "@traps/common": "^1.0.0",
-    "@traps/snapshot": "^1.0.0",
+    "@traps/common": "^0.0.1",
+    "@traps/snapshot": "^0.0.1",
     "@xstate/fsm": "^1.4.0",
     "mitt": "^1.2.0"
   }

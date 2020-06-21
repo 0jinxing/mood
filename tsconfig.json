@@ -2,7 +2,6 @@
   "compilerOptions": {
     "module": "commonjs",
     "rootDir": ".",
-    "outDir": "build",
     "target": "ES5",
     "lib": ["ES2017", "DOM"],
     "noImplicitAny": true,
