@@ -5,6 +5,7 @@
     "bundle": "rollup --config"
   },
   "workspaces": [
+    "service",
     "packages/*"
   ],
   "devDependencies": {
