@@ -4,7 +4,8 @@
   "main": "index.js",
   "license": "MIT",
   "scripts": {
-    "start": "ts-node ./main.ts"
+    "start": "node --inspect=5858 -r ts-node/register main.ts",
+    "start:watch": "nodemon"
   },
   "dependencies": {
     "@nestjs/common": "^7.2.0",
@@ -14,6 +15,7 @@
     "rxjs": "^6.5.5"
   },
   "devDependencies": {
+    "nodemon": "^2.0.4",
     "ts-node": "^8.10.2",
     "typescript": "^3.9.5"
   }
