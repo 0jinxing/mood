@@ -6,6 +6,7 @@
   },
   "workspaces": [
     "service",
+    "client",
     "sdk",
     "packages/*"
   ],
