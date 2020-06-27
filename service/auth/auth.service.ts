@@ -22,10 +22,7 @@ export class AuthService {
         token,
         this.configService.get<string>("JWT_SECRET")
       );
-      
-    } catch (err) {
-
-    }
+    } catch (err) {}
   }
 
   validateUser(username: string, password: string): string {

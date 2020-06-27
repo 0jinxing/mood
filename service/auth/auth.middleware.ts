@@ -1,9 +1,5 @@
-import { NestMiddleware, Injectable } from "@nestjs/common";
+import { NestMiddleware, Injectable, ValidationPipe } from "@nestjs/common";
 import { Response, Request } from "express";
-
-function getToken(authorization: string) {
-  return;
-}
 
 @Injectable()
 class AuthMiddleWare implements NestMiddleware {

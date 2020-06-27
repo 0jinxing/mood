@@ -4,9 +4,10 @@ import { AppController } from "./app.controller";
 import { AppService } from "./app.service";
 
 import configuration from "./config/configuration";
+import { AuthModule } from "./auth/auth.module";
 
 @Module({
-  imports: [ConfigModule.forRoot({ load: [configuration] })],
+  imports: [ConfigModule.forRoot({ load: [configuration] }), AuthModule],
   controllers: [AppController],
   providers: [AppService],
 })
