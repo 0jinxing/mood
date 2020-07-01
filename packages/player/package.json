@@ -11,8 +11,8 @@
   "author": "",
   "license": "MIT",
   "dependencies": {
-    "@traps/common": "^0.0.1",
-    "@traps/snapshot": "^0.0.1",
+    "@traps/common": "0.0.1",
+    "@traps/snapshot": "0.0.1",
     "@xstate/fsm": "^1.4.0",
     "mitt": "^1.2.0"
   }

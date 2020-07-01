@@ -11,6 +11,6 @@
   "author": "",
   "license": "MIT",
   "dependencies": {
-    "@traps/common": "^0.0.1"
+    "@traps/common": "0.0.1"
   }
 }
