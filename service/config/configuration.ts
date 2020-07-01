@@ -4,4 +4,5 @@ export default () => ({
     host: "127.0.0.1",
     port: 5432,
   },
+  MONGO_URI: "mongodb://192.168.31.2/traps",
 });
