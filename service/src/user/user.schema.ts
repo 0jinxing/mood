@@ -1,7 +1,7 @@
 import { Prop, Schema, SchemaFactory } from "@nestjs/mongoose";
 import { Document, Types } from "mongoose";
 
-@Schema()
+@Schema({ timestamps: true })
 export class User extends Document {
   @Prop({ required: true })
   username: string;
@@ -15,16 +15,10 @@ export class User extends Document {
   @Prop({ required: true })
   passwordSalt: string;
 
-  @Prop({ required: true })
-  createAt: number;
-
-  @Prop({ required: true })
-  updateAt: number;
-
-  @Prop({ required: true })
+  @Prop({ required: true, default: false })
   deleted: boolean;
 
-  @Prop([{ type: Types.ObjectId }])
+  @Prop({ type: [Types.ObjectId] })
   instances: Array<Types.ObjectId>;
 }
 

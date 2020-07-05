@@ -1,4 +1,4 @@
-import crypto from "crypto";
+import * as crypto from "crypto";
 
 export function genSalt(len: number = 8) {
   return crypto.randomBytes(Math.ceil(len / 2)).toString("hex");

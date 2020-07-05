@@ -2,16 +2,14 @@ export class CodeDTO {
   email: string;
 }
 
-export class RegisterDTO {
+export class SignUpDTO {
   email: string;
   password: string;
 
   username: string;
-
-  code: string;
 }
 
-export class LoginDTO {
+export class SignInDTO {
   email: string;
   password: string;
 }
