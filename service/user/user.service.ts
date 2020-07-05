@@ -1,13 +1,19 @@
-import { Injectable } from "@nestjs/common";
-import { IUser } from "./user.model";
+import { Injectable, PlainLiteralObject } from "@nestjs/common";
+import { User } from "./user.schema";
+import { hashPassword, genSalt } from "utils/password";
 
 @Injectable()
 export class UserService {
-  queryUser(filter: Partial<IUser>) {}
+  
+  queryUser(filter: Partial<User>) {
+    
+  }
 
-  addUser() {}
+  addUser(username: string, email: string, password: string) {
+    const { hash, salt } = hashPassword(password, genSalt());
+  }
 
-  deleteUser() {}
+  deleteUser(user: User) {}
 
-  updateUser() {}
+  updateUser(user: User) {}
 }

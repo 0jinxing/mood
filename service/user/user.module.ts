@@ -1,10 +1,11 @@
-import { Injectable } from "@nestjs/common";
+import { Module } from "@nestjs/common";
+import { MongoModule } from "mongo/mongo.module";
 
-@Injectable()
-export class UserService {
+@Module({
+  imports: [MongoModule]
+})
+export class UserModule {
   constructor() {}
 
-  async findOne(username: string) {
-    
-  }
+  async findOne(username: string) {}
 }
