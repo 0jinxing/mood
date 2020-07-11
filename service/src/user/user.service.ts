@@ -1,17 +1,22 @@
-import { Injectable, PlainLiteralObject } from "@nestjs/common";
+import { Injectable } from "@nestjs/common";
 import { User } from "./user.schema";
-import { hashPassword, genSalt } from "../utils/password";
+import { hashPass, genSalt } from "../_common/password";
 import { InjectModel } from "@nestjs/mongoose";
-import { Model } from "mongoose";
+import { Model, FilterQuery } from "mongoose";
 
 @Injectable()
 export class UserService {
   constructor(@InjectModel(User.name) private userModel: Model<User>) {}
 
-  queryUser(filter: Partial<User>) {}
+  async query(conditions: FilterQuery<User>) {
+    const query = this.userModel.find(conditions);
+    const result = await query.exec();
 
-  addUser(username: string, email: string, password: string) {
-    const { hash, salt } = hashPassword(password, genSalt());
+    return result;
+  }
+
+  add(username: string, email: string, password: string) {
+    const { hash, salt } = hashPass(password, genSalt());
     const newUser = new this.userModel({
       username,
       email,
@@ -22,7 +27,7 @@ export class UserService {
     return newUser.save();
   }
 
-  deleteUser(user: User) {}
+  delete(user: User) {}
 
-  updateUser(user: User) {}
+  update(user: User) {}
 }

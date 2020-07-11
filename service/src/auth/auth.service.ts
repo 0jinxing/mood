@@ -1,32 +1,33 @@
 import { Injectable } from "@nestjs/common";
-import { Request } from "express";
-import jwt from "jsonwebtoken";
-import { ConfigService } from "@nestjs/config";
+import { UserService } from "../user/user.service";
+import { User } from "../user/user.schema";
+import { JwtService } from "@nestjs/jwt";
+import { validatePass } from "../_common/password";
 
 @Injectable()
 export class AuthService {
-  constructor(private configService: ConfigService) {}
+  constructor(
+    private readonly userService: UserService,
+    private readonly jwtService: JwtService
+  ) {}
 
-  getToken(authorization: string) {
-    const match = authorization.match(/Bearer\s+(\S+)/);
-    if (match) return match[1];
-    return null;
+  async validate(email: string, password: string): Promise<any> {
+    const user = (await this.userService.query({ email }))[0];
+
+    if (
+      !user ||
+      !validatePass(password, user.passwordHash, user.passwordSalt)
+    ) {
+      return null;
+    }
+
+    return user;
   }
 
-  getCurrent(req: Request) {
-    const authorization = req.header("authorization");
-    const token = this.getToken(authorization);
-
-    try {
-      const payload = jwt.verify(
-        token,
-        this.configService.get<string>("JWT_SECRET")
-      );
-    } catch (err) {}
-  }
-
-  validateUser(username: string, password: string): string {
-    // TODO
-    return "token";
+  async sign(user: User) {
+    const payload = { email: user.email, sub: user.id };
+    return {
+      accessToken: this.jwtService.sign(payload),
+    };
   }
 }

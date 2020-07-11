@@ -1,40 +1,19 @@
-import { Controller, Get, Req, Post, Body, HttpCode } from "@nestjs/common";
-import { Request } from "express";
-import { ConfigService } from "@nestjs/config";
-import { UserService } from "../user/user.service";
-import { SignUpDTO } from "./auth.dto";
+import { Controller, Post, UseGuards } from "@nestjs/common";
+import { AuthService } from "./auth.service";
+import { JwtAuthGuard } from "./auth.guard";
 
 @Controller("auth")
 export class AuthController {
-  constructor(
-    private configService: ConfigService,
-    private userService: UserService
-  ) {}
-
-  @Get()
-  getInfo(@Req() request: Request): string {
-    return "hello request";
-  }
-
-  @Get("test")
-  test() {
-    return this.configService.get<string>("JWT_SECRET");
-  }
-
-  @Post("sign-up")
-  @HttpCode(201)
-  async signUp(@Body() signUpDTO: SignUpDTO) {
-    const newUser = await this.userService.addUser(
-      signUpDTO.username,
-      signUpDTO.email,
-      signUpDTO.password
-    );
-    return newUser._id;
-  }
+  constructor(private readonly authService: AuthService) {}
 
   @Post("sign-in")
-  signIn() {}
+  signIn() {
+    return "sign-in";
+  }
 
-  @Post("sign-out")
-  signOut() {}
+  @UseGuards(JwtAuthGuard)
+  @Post("password")
+  passwordReset() {
+    return "password";
+  }
 }
