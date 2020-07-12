@@ -1,4 +1,4 @@
-import { Module } from "@nestjs/common";
+import { Module, Global } from "@nestjs/common";
 import { ConfigModule, ConfigService } from "@nestjs/config";
 import { JwtModule } from "@nestjs/jwt";
 
@@ -6,7 +6,7 @@ import { UserModule } from "../user/user.module";
 import { AuthService } from "./auth.service";
 import { AuthController } from "./auth.controller";
 
-const jwtRegister = JwtModule.registerAsync({
+const JWT = JwtModule.registerAsync({
   imports: [ConfigModule],
   inject: [ConfigService],
 
@@ -16,8 +16,9 @@ const jwtRegister = JwtModule.registerAsync({
   }),
 });
 
+@Global()
 @Module({
-  imports: [ConfigModule, UserModule, jwtRegister],
+  imports: [ConfigModule, UserModule, JWT],
   controllers: [AuthController],
   providers: [AuthService],
   exports: [AuthService],

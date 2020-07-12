@@ -13,6 +13,6 @@ export function hashPass(password: string, salt: string) {
   };
 }
 
-export function validatePass(password: string, hash: string, salt: string) {
+export function verifyPass(password: string, hash: string, salt: string) {
   return hashPass(password, salt).hash === hash;
 }
