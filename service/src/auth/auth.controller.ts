@@ -1,21 +1,22 @@
 import { Controller, Post, UseGuards, Body, HttpCode } from "@nestjs/common";
 import { AuthService } from "./auth.service";
-import { SignInDTO } from "./dto/sign-in.dto";
+import { LoginDTO } from "./dto/login.dto";
 import { AuthGuard } from "./auth.guard";
 
 @Controller("auth")
 export class AuthController {
   constructor(private readonly authService: AuthService) {}
 
-  @Post("sign-in")
+  @Post("login")
   @HttpCode(200)
-  signIn(@Body() payload: SignInDTO) {
+  login(@Body() payload: LoginDTO) {
     return this.authService.sign(payload.email, payload.password);
   }
 
-  @Post("password")
+  @Post("logout")
+  @HttpCode(200)
   @UseGuards(AuthGuard)
-  passwordReset() {
-    return "password";
+  logout() {
+    return "logout";
   }
 }

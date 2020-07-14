@@ -1,6 +1,6 @@
 import { Injectable } from "@nestjs/common";
 import { User } from "./user.schema";
-import { hashPass, genSalt } from "../_common/password";
+import { hashPassword, genSalt } from "../_common/password";
 import { InjectModel } from "@nestjs/mongoose";
 import { Model, FilterQuery } from "mongoose";
 
@@ -16,7 +16,7 @@ export class UserService {
   }
 
   add(username: string, email: string, password: string) {
-    const { hash, salt } = hashPass(password, genSalt());
+    const { hash, salt } = hashPassword(password, genSalt());
     const newUser = new this.userModel({
       username,
       email,
