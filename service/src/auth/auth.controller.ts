@@ -2,6 +2,7 @@ import { Controller, Post, UseGuards, Body, HttpCode } from "@nestjs/common";
 import { AuthService } from "./auth.service";
 import { LoginDTO } from "./dto/login.dto";
 import { AuthGuard } from "./auth.guard";
+import { RegisterDTO } from "./dto/register";
 
 @Controller("auth")
 export class AuthController {
@@ -9,8 +10,8 @@ export class AuthController {
 
   @Post("login")
   @HttpCode(200)
-  login(@Body() payload: LoginDTO) {
-    return this.authService.sign(payload.email, payload.password);
+  login(@Body() { email, password }: LoginDTO) {
+    return this.authService.sign(email, password);
   }
 
   @Post("logout")
@@ -18,5 +19,11 @@ export class AuthController {
   @UseGuards(AuthGuard)
   logout() {
     return "logout";
+  }
+
+  @Post("register")
+  @HttpCode(201)
+  register(@Body() { email, password }: RegisterDTO) {
+    return this.authService.register(email, password);
   }
 }

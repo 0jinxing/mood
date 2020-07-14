@@ -73,6 +73,10 @@ export class AuthService {
     return { accessToken, refreshToken };
   }
 
+  async register(email: string, password: string) {
+    
+  }
+
   getBearerToken() {
     const authorization = this.request.headers.authorization ?? "";
     const [, token] = authorization.match(/bearer\s+(\S+)/) ?? [];
