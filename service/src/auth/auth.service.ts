@@ -1,13 +1,14 @@
 import { Injectable, Inject } from "@nestjs/common";
 import { sign, verify } from "jsonwebtoken";
 
-import { validatePassword } from "../_common/password";
+import { validatePassword, hashPassword } from "../_common/password";
 import { InjectModel } from "@nestjs/mongoose";
 import { User } from "@/user/user.schema";
 import { Model } from "mongoose";
 import { Request } from "express";
 import { REQUEST } from "@nestjs/core";
 import { ConfigService } from "@nestjs/config";
+import { genUID } from "@/_common/uid";
 
 export type BearerPayload = {
   email: string;
@@ -23,9 +24,9 @@ export class AuthService {
   private refreshExpires: string;
 
   constructor(
-    @Inject(REQUEST) private readonly request: Request,
-    @InjectModel(User.name) private readonly userModel: Model<User>,
-    private readonly configService: ConfigService
+    @Inject(REQUEST) private request: Request,
+    @InjectModel(User.name) private userModel: Model<User>,
+    private configService: ConfigService
   ) {
     this.refreshSecret = this.configService.get("JWT_REFRESH_SECRET");
     this.secret = this.configService.get("JWT_SECRET");
@@ -58,7 +59,11 @@ export class AuthService {
       expiresIn: this.refreshExpires,
     });
 
-    return { accessToken, refreshToken };
+    return {
+      email: user.email,
+      accessToken,
+      refreshToken,
+    };
   }
 
   async refresh(token: string) {
@@ -74,7 +79,18 @@ export class AuthService {
   }
 
   async register(email: string, password: string) {
-    
+    const passwordSalt = await genUID();
+    const passwordHash = hashPassword(password, passwordSalt);
+
+    await this.userModel.create({
+      email,
+      username: email,
+      passwordSalt,
+      passwordHash,
+      deleted: false,
+      instances: [],
+    });
+    return this.sign(email, password);
   }
 
   getBearerToken() {

@@ -19,7 +19,7 @@ export class User extends Document {
   deleted: boolean;
 
   @Prop({ type: [Types.ObjectId] })
-  instances: Array<Types.ObjectId>;
+  instances: Array<string>;
 }
 
 export const UserSchema = SchemaFactory.createForClass(User);

@@ -4,7 +4,7 @@ import { Document, Types } from "mongoose";
 @Schema({ timestamps: true })
 export class Instance extends Document {
   @Prop({ required: true })
-  key: string;
+  uid: string;
 
   @Prop({ required: true })
   domain: string;
