@@ -2,9 +2,10 @@ import * as request from "supertest";
 import { Test } from "@nestjs/testing";
 import { INestApplication } from "@nestjs/common";
 import { AppModule } from "@/app.module";
-import { LoginDTO } from "./dto/login.dto";
+import { LoginDTO } from "@/auth/dto/login.dto";
+import { CreateDTO } from "./dto/create.dto";
 
-describe("auth e2e", async () => {
+describe("instance e2e", async () => {
   let app: INestApplication;
 
   beforeEach(async () => {
@@ -16,8 +17,8 @@ describe("auth e2e", async () => {
     await app.init();
   });
 
-  it("unauthorized", () => {
-    return request(app.getHttpServer()).post("/auth/logout").expect(401);
+  afterEach(async () => {
+    app.close();
   });
 
   let accessToken: string;
@@ -35,14 +36,14 @@ describe("auth e2e", async () => {
     accessToken = res.body.accessToken;
   });
 
-  it("Authorized", () => {
+  it("create instance", () => {
+    const createDTO: CreateDTO = {
+      domain: "baidu.com",
+    };
     return request(app.getHttpServer())
-      .get("/user")
+      .post("/instance/create")
       .set("Authorization", `bearer ${accessToken}`)
-      .expect(200);
-  });
-
-  afterEach(async () => {
-    app.close();
+      .send(createDTO)
+      .expect(201);
   });
 });

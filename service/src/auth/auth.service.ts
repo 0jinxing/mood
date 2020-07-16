@@ -1,4 +1,4 @@
-import { Injectable, Inject } from "@nestjs/common";
+import { Injectable, Inject, ForbiddenException } from "@nestjs/common";
 import { sign, verify } from "jsonwebtoken";
 
 import { validatePassword, hashPassword } from "../_common/password";
@@ -81,6 +81,11 @@ export class AuthService {
   async register(email: string, password: string) {
     const passwordSalt = await genUID();
     const passwordHash = hashPassword(password, passwordSalt);
+
+    const exist = await this.userModel.findOne({ email }).exec();
+    if (exist) {
+      throw new ForbiddenException();
+    }
 
     await this.userModel.create({
       email,

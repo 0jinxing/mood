@@ -13,19 +13,23 @@ export class InstanceService {
     private authService: AuthService
   ) {}
 
-  async createInstance(domain: string) {
+  async create(domain: string) {
     const uid = await genUID();
     const session = await this.connection.startSession();
+    const current = await this.authService.getCurrent();
+
     try {
       session.startTransaction();
-      const instance = await this.instanceModel.create({ uid, domain });
 
-      const current = await this.authService.getCurrent();
+      const instance = await this.instanceModel.create({ uid, domain });
       await current.update({ $push: { instances: instance.id } });
+
       await session.commitTransaction();
+
       return instance;
     } catch (err) {
       await session.abortTransaction();
+
       throw err;
     } finally {
       session.endSession();
