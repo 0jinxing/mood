@@ -22,7 +22,7 @@ export class InstanceService {
       session.startTransaction();
 
       const instance = await this.instanceModel.create({ uid, domain });
-      await current.update({ $push: { instances: instance.id } });
+      await current.updateOne({ $push: { instances: instance.id } });
 
       await session.commitTransaction();
 

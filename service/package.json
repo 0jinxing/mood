@@ -6,7 +6,7 @@
   "scripts": {
     "start": "node -r ts-node/register src/main.ts",
     "start:watch": "nodemon",
-    "test": "mocha -r ts-node/register -r tsconfig-paths/register ./**/*.spec.ts"
+    "test": "cross-env NODE_ENV=test mocha -r ts-node/register -r tsconfig-paths/register ./**/*.spec.ts"
   },
   "dependencies": {
     "@nestjs/common": "^7.2.0",
@@ -30,6 +30,7 @@
     "@types/mongoose": "^5.7.31",
     "@types/supertest": "^2.0.10",
     "chai": "^4.2.0",
+    "cross-env": "^7.0.2",
     "mocha": "^8.0.1",
     "nodemon": "^2.0.4",
     "passport-jwt": "^4.0.0",
