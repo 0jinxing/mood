@@ -1,25 +1,27 @@
 import * as request from "supertest";
 import { INestApplication } from "@nestjs/common";
-import { createApp } from "../_common/create-app";
+import { createApp } from "../create-app";
+import { cleanUp } from "test/clean-up";
 
 describe("instance e2e", async () => {
   let app: INestApplication;
   let accessToken: string;
 
-  before(async () => {
+  beforeEach(async () => {
     app = await createApp();
 
     const data = { email: "test@domain.com", password: "password" };
 
     const res = await request(app.getHttpServer())
-      .post("/auth/login")
+      .post("/auth/register")
       .send(data);
 
     accessToken = res.body.accessToken;
   });
 
-  after(async () => {
-    app.close();
+  afterEach(async () => {
+    await app.close();
+    await cleanUp();
   });
 
   it("create instance", () => {

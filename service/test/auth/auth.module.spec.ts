@@ -1,6 +1,8 @@
 import * as request from "supertest";
 import { INestApplication } from "@nestjs/common";
-import { createApp } from "../_common/create-app";
+import { createApp } from "../create-app";
+import { cleanUp } from "test/clean-up";
+import { after } from "mocha";
 
 describe("auth e2e test", async () => {
   let app: INestApplication;
@@ -9,8 +11,9 @@ describe("auth e2e test", async () => {
     app = await createApp();
   });
 
-  after(() => {
-    app.close();
+  after(async () => {
+    await app.close();
+    await cleanUp();
   });
 
   it("unauthorized", () => {
