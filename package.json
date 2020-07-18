@@ -8,6 +8,7 @@
     "service",
     "client",
     "sdk",
+    "repl",
     "packages/*"
   ],
   "devDependencies": {
