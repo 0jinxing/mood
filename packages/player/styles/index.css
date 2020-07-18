@@ -6,11 +6,11 @@ body {
 .__wrapper {
   position: relative;
   height: 100%;
+}
 
-  iframe {
-    border: 0;
-    height: 100%;
-  }
+.__wrapper iframe {
+  border: 0;
+  height: 100%;
 }
 
 .__cursor {
@@ -35,7 +35,7 @@ body {
   transform: translate(-50%, -50%);
 }
 .__cursor.active::after {
-  animation: click .4s ease-in-out 1;
+  animation: click 0.4s ease-in-out 1;
 }
 
 @keyframes click {

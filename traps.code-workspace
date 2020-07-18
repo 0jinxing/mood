@@ -9,10 +9,6 @@
       "path": "packages"
     },
     {
-      "name": "repl",
-      "path": "repl"
-    },
-    {
       "name": "root",
       "path": "."
     }
