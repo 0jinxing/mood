@@ -51,7 +51,7 @@ export class AuthService {
       return null;
     }
 
-    const payload = { email: user.email, sub: user.id };
+    const payload = { email: user.email, sub: user._id };
 
     const accessToken = sign(payload, this.secret, { expiresIn: this.expires });
 
