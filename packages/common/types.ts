@@ -13,7 +13,6 @@ export enum NodeType {
 
 export type DocumentNode = {
   type: NodeType.DOCUMENT_NODE;
-  childNodes: SerializedNodeWithId[];
 };
 
 export type DocumentTypeNode = {
@@ -27,7 +26,6 @@ export type ElementNode = {
   type: NodeType.ELEMENT_NODE;
   tagName: string;
   attributes: Attributes;
-  childNodes: SerializedNodeWithId[];
   isSVG?: boolean;
 };
 
@@ -66,14 +64,6 @@ export type IdNodeMap = { [key: number]: TNode };
 export type AttrCursor = {
   $el: Node;
   attributes: Attributes;
-};
-
-export type Mirror = {
-  idNodeMap: IdNodeMap;
-  getId: (n: Node | TNode) => number;
-  getNode: <T extends Node = Node>(id: number) => (T & TNode) | undefined;
-  removeNodeFromMap: (n: TNode) => void;
-  has: (id: number) => boolean;
 };
 
 export type TextMutation = {

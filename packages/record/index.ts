@@ -1,5 +1,4 @@
 import { snapshot } from "@traps/snapshot";
-import { mirror } from "@traps/common";
 import {
   TEvent,
   TEventWithTime,
@@ -8,8 +7,8 @@ import {
   EventType,
   IncrementalSource,
 } from "@traps/common";
-import initObservers from "./observer";
 
+import initObservers from "./observer";
 import { on, queryWindowHeight, queryWindowWidth } from "./utils";
 
 function wrappedEvent(e: TEvent): TEventWithTime {
@@ -59,12 +58,11 @@ function record(options: RecordOptions<TEvent>): ListenerHandler {
       },
       isCheckout
     );
-    const [node, idNodeMap] = snapshot(document);
+    const node = snapshot(document);
     if (!node) {
       console.warn("Failed to snapshot the document");
       throw new Error("Failed to snapshot the document");
     }
-    mirror.idNodeMap = idNodeMap;
 
     wrappedEmitWithTime({
       type: EventType.FULL_SNAPSHOT,

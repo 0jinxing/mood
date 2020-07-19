@@ -3,7 +3,7 @@ import {
   SerializedNodeWithId,
   NodeType,
   TNode,
-  IdNodeMap,
+  mirror,
 } from "@traps/common";
 
 function getTagName(node: ElementNode) {
@@ -37,7 +37,7 @@ export function buildNode(
     const $el = isSVG
       ? $doc.createElementNS("http://www.w3.org/2000/svg", tagName)
       : $doc.createElement(tagName);
-      
+
     for (let [key, attrValue] of Object.entries(attributes)) {
       if (typeof attrValue === "boolean" && !attrValue) continue;
       let value = attrValue === true ? "" : attrValue;
@@ -117,9 +117,7 @@ export function buildNode(
 
 export function buildNodeWithSN(
   node: SerializedNodeWithId,
-  $doc: HTMLDocument,
-  sNodeMap: IdNodeMap,
-  skipChild = false
+  $doc: HTMLDocument
 ): TNode | null {
   let $el = buildNode(node, $doc);
 
@@ -133,30 +131,13 @@ export function buildNodeWithSN(
     $doc.open();
   }
   ($el as TNode).__sn = node;
-  sNodeMap[node.id] = $el as TNode;
-  if (
-    (node.type === NodeType.DOCUMENT_NODE ||
-      node.type === NodeType.ELEMENT_NODE) &&
-    !skipChild
-  ) {
-    for (const child of node.childNodes) {
-      const $child = buildNodeWithSN(child, $doc, sNodeMap);
-      if ($child) {
-        $el.appendChild($child);
-      } else {
-        console.warn("Failed to rebuild", $child);
-      }
-    }
-  }
+  mirror.idNodeMap[node.id] = $el as TNode;
+
   return $el as TNode;
 }
 
-function rebuild(
-  node: SerializedNodeWithId,
-  $doc: HTMLDocument
-): [TNode | null, IdNodeMap] {
-  const sNodeMap: IdNodeMap = {};
-  return [buildNodeWithSN(node, $doc, sNodeMap), sNodeMap];
+function rebuild(node: SerializedNodeWithId, $doc: HTMLDocument): TNode | null {
+  return buildNodeWithSN(node, $doc);
 }
 
 export default rebuild;

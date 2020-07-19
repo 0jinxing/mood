@@ -1,30 +1,36 @@
-import type { Mirror, TNode, ThrottleOptions } from "./types";
+import type { TNode, ThrottleOptions, IdNodeMap } from "./types";
 
-export const mirror: Mirror = {
-  idNodeMap: {},
-  getId($node) {
+export class Mirror {
+  readonly idNodeMap: IdNodeMap = {};
+
+  getId($node: Node | TNode) {
     if ("__sn" in $node) {
       return $node.__sn.id;
     }
     return 0;
-  },
+  }
+
   getNode<T extends Node = Node>(id: number) {
-    return (mirror.idNodeMap[id] as unknown) as (T & TNode) | undefined;
-  },
-  removeNodeFromMap($node) {
-    const id = mirror.getId($node);
-    delete mirror.idNodeMap[id];
+    return (this.idNodeMap[id] as unknown) as (T & TNode) | undefined;
+  }
+
+  remove($node: TNode) {
+    const id = this.getId($node);
+    delete this.idNodeMap[id];
 
     if ($node.childNodes) {
       $node.childNodes.forEach(($childNode) =>
-        mirror.removeNodeFromMap(($childNode as Node) as TNode)
+        this.remove(($childNode as Node) as TNode)
       );
     }
-  },
-  has(id) {
-    return mirror.idNodeMap.hasOwnProperty(id);
-  },
-};
+  }
+
+  has(id: number) {
+    return this.idNodeMap.hasOwnProperty(id);
+  }
+}
+
+export const mirror = new Mirror();
 
 export function throttle<T>(
   func: (arg: T) => void,
@@ -53,6 +59,16 @@ export function throttle<T>(
       }, remaining);
     }
   };
+}
+
+let baseUrl = "";
+export function getBaseUrl() {
+  if (!baseUrl) {
+    const $anchor = document.createElement("a");
+    $anchor.href = "/";
+    baseUrl = $anchor.href;
+  }
+  return baseUrl;
 }
 
 export * from "./types";

@@ -186,7 +186,7 @@ export default class Player {
           if (!$el) {
             return;
           }
-          mirror.removeNodeFromMap($el);
+          mirror.remove($el);
           if ($parent) {
             $parent.removeChild($el);
           }
@@ -214,9 +214,7 @@ export default class Player {
 
           const $target = buildNodeWithSN(
             mutation.node,
-            this.$iframe.contentDocument!,
-            mirror.idNodeMap,
-            true
+            this.$iframe.contentDocument!
           );
 
           if ($next && $next.parentElement) {
@@ -533,7 +531,8 @@ export default class Player {
 
   private rebuildFullSnapshot(event: TEventWithTime & FullSnapshotEvent) {
     const contentDocument = this.$iframe.contentDocument!;
-    mirror.idNodeMap = rebuild(event.data.node, contentDocument)[1];
+    
+    rebuild(event.data.node, contentDocument);
 
     const $style = document.createElement("style");
     const { documentElement, head } = contentDocument;
