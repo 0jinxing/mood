@@ -7,6 +7,7 @@ import {
   Attributes,
   getBaseUrl,
   mirror,
+  AddedNodeMutation,
 } from "@traps/common";
 
 let id = 0;
@@ -208,8 +209,39 @@ export function serializeWithId(
   return serializedNode;
 }
 
-export function snapshot(doc: Document): ReturnType<typeof serializeWithId> {
-  return serializeWithId(doc, doc);
+export function snapshot($doc: HTMLDocument): AddedNodeMutation[] {
+  const adds: AddedNodeMutation[] = [];
+  const queue: Node[] = [$doc];
+
+  const genAdds = ($node: Node | TNode) => {
+    const parentId = $node.parentElement
+      ? mirror.getId($node.parentElement)
+      : undefined;
+
+    const nextId = $node.nextSibling
+      ? mirror.getId($node.nextSibling)
+      : undefined;
+
+    if (nextId === 0 || parentId === 0) {
+      queue.unshift($node);
+    } else {
+      adds.push({
+        parentId: parentId,
+        nextId: nextId,
+        node: serializeWithId($node, $doc)!,
+      });
+
+      $node.childNodes.forEach(genAdds);
+    }
+  };
+
+  while (queue.length) {
+    genAdds(queue.pop()!);
+  }
+
+  serializeWithId($doc, $doc);
+
+  return adds;
 }
 
 export default snapshot;

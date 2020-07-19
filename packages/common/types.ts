@@ -82,7 +82,7 @@ export type RemovedNodeMutation = {
 };
 
 export type AddedNodeMutation = {
-  parentId: number;
+  parentId?: number;
   nextId?: number;
   node: SerializedNodeWithId;
 };
@@ -248,7 +248,7 @@ export type LoadedEvent = {
 export type FullSnapshotEvent = {
   type: EventType.FULL_SNAPSHOT;
   data: {
-    node: SerializedNodeWithId;
+    adds: AddedNodeMutation[];
     initialOffset: { top: number; left: number };
   };
 };

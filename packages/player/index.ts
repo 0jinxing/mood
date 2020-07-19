@@ -195,7 +195,10 @@ export default class Player {
         const queue: AddedNodeMutation[] = [];
 
         const appendNode = (mutation: AddedNodeMutation) => {
-          const $parent = mirror.getNode(mutation.parentId);
+          const $parent = mutation.parentId
+            ? mirror.getNode(mutation.parentId)
+            : undefined;
+
           if (!$parent) {
             queue.push(mutation);
             return;
@@ -232,7 +235,7 @@ export default class Player {
           appendNode(mutation);
         });
         while (queue.length) {
-          if (queue.every((m) => !mirror.getNode(m.parentId))) {
+          if (queue.every((m) => !m.parentId || !mirror.getNode(m.parentId))) {
             return;
           }
 
@@ -531,8 +534,8 @@ export default class Player {
 
   private rebuildFullSnapshot(event: TEventWithTime & FullSnapshotEvent) {
     const contentDocument = this.$iframe.contentDocument!;
-    
-    rebuild(event.data.node, contentDocument);
+
+    rebuild(event.data.adds, contentDocument);
 
     const $style = document.createElement("style");
     const { documentElement, head } = contentDocument;

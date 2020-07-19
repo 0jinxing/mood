@@ -4,7 +4,9 @@ import {
   NodeType,
   TNode,
   mirror,
+  AddedNodeMutation,
 } from "@traps/common";
+import { serializeWithId } from ".";
 
 function getTagName(node: ElementNode) {
   let tagName = node.tagName;
@@ -127,8 +129,8 @@ export function buildNodeWithSN(
   if (node.type === NodeType.DOCUMENT_NODE) {
     $el = $doc;
     // close before open to make sure document was closed
-    $doc.close();
-    $doc.open();
+    // $doc.close();
+    // $doc.open();
   }
   ($el as TNode).__sn = node;
   mirror.idNodeMap[node.id] = $el as TNode;
@@ -136,8 +138,31 @@ export function buildNodeWithSN(
   return $el as TNode;
 }
 
-function rebuild(node: SerializedNodeWithId, $doc: HTMLDocument): TNode | null {
-  return buildNodeWithSN(node, $doc);
+function rebuild(adds: AddedNodeMutation[], $doc: HTMLDocument) {
+  adds.forEach(({ node, parentId, nextId }) => {
+    const $el = buildNodeWithSN(node, $doc)!;
+
+    const $parent = parentId ? mirror.getNode(parentId) : undefined;
+    const $next = nextId ? mirror.getNode(nextId) : undefined;
+
+    if (
+      node.type === NodeType.DOCUMENT_NODE ||
+      node.type === NodeType.DOCUMENT_TYPE_NODE
+    ) {
+      /**
+       * ignore
+       */
+    } else if (!$parent) {
+      $doc.body.appendChild($el);
+    } else if ($parent && $next) {
+      $parent.insertBefore($el, $next);
+    } else {
+      $parent.appendChild($el);
+    }
+  });
+
+  // throw "TODO";
+  // return buildNodeWithSN(node, $doc);
 }
 
 export default rebuild;

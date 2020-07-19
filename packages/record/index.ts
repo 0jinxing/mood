@@ -58,8 +58,9 @@ function record(options: RecordOptions<TEvent>): ListenerHandler {
       },
       isCheckout
     );
-    const node = snapshot(document);
-    if (!node) {
+    const adds = snapshot(document);
+
+    if (!adds) {
       console.warn("Failed to snapshot the document");
       throw new Error("Failed to snapshot the document");
     }
@@ -67,7 +68,7 @@ function record(options: RecordOptions<TEvent>): ListenerHandler {
     wrappedEmitWithTime({
       type: EventType.FULL_SNAPSHOT,
       data: {
-        node,
+        adds,
         initialOffset: {
           left:
             window.pageXOffset !== undefined
