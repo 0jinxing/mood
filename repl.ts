@@ -7,7 +7,7 @@ import * as puppeteer from "puppeteer";
 const emitter = new EventEmitter();
 
 function getCode(): string {
-  const bundlePath = path.resolve("dist", "record.js");
+  const bundlePath = path.resolve("dist", "record.bundle.js");
   return fs.readFileSync(bundlePath, "utf8");
 }
 
@@ -31,16 +31,6 @@ function getCode(): string {
     console.log(`Going to open ${url}...`);
     await record(url);
     console.log("Ready to record. You can do any interaction on the page.");
-
-    const { shouldReplay } = await inquirer.prompt<{ shouldReplay: boolean }>([
-      {
-        type: "confirm",
-        name: "shouldReplay",
-        message: `Once you want to finish the recording, enter 'y' to start replay: `,
-      },
-    ]);
-
-    emitter.emit("done", shouldReplay);
 
     const { shouldStore } = await inquirer.prompt<{ shouldStore: boolean }>([
       {
@@ -88,7 +78,7 @@ function getCode(): string {
 
     await page.evaluate(`;${code}
       window.__IS_RECORDING__ = true
-      $$record({
+      $$record.default({
         emit: event => window._replLog(event)
       });
     `);
@@ -98,38 +88,12 @@ function getCode(): string {
       if (!isRecording) {
         await page.evaluate(`;${code}
           window.__IS_RECORDING__ = true
-          $$record({
+          $$record.default({
             emit: event => window._replLog(event)
           });
         `);
       }
     });
-
-    emitter.once("done", async (shouldReplay) => {
-      console.log(`Recorded ${events.length} events`);
-      await browser.close();
-      if (shouldReplay) {
-        await replay();
-      }
-    });
-  }
-
-  async function replay() {
-    const browser = await puppeteer.launch({
-      headless: false,
-      defaultViewport: null,
-      args: ["--start-maximized"],
-    });
-    const page = await browser.newPage();
-    await page.goto("about:blank");
-    // await page.addStyleTag({
-    //   path: path.resolve("dist", "bundle.css"),
-    // });
-    await page.evaluate(`${code}
-      const events = ${JSON.stringify(events)};
-      const replayer = new $$player(events);
-      replayer.play();
-    `);
   }
 
   function saveEvents() {
@@ -150,10 +114,9 @@ function getCode(): string {
           <meta name="viewport" content="width=device-width, initial-scale=1.0" />
           <meta http-equiv="X-UA-Compatible" content="ie=edge" />
           <title>Record @${time}</title>
-          <link rel="stylesheet" href="../dist/player/index.css" />
         </head>
         <body>
-          <script src="../dist/player/index.js"></script>
+          <script src="../dist/player.bundle.js"></script>
           <script>
             /*<!--*/
             const events = ${JSON.stringify(events).replace(
@@ -161,7 +124,7 @@ function getCode(): string {
               "<\\/script>"
             )};
             /*-->*/
-            const replayer = new $$player(events);
+            const replayer = new $$player.default(events);
             replayer.play();
           </script>
         </body>
