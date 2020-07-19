@@ -114,7 +114,7 @@ function initMutationObserver(cb: MutationCallBack) {
         : undefined;
 
       if (!parentId || nextId === 0) {
-        addQueue.unshift($node);
+        addQueue.push($node);
         return;
       }
 
