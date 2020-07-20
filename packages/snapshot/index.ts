@@ -32,27 +32,18 @@ export function getCSSRuleText(rule: CSSRule): string {
     : rule.cssText;
 }
 
-const URL_IN_CSS_REF = /url\(["']?(.*?)["']?\)/;
-const RELATIVE_PATH = /^(?!www\.|(?:http|ftp)s?:\/\/|[A-Za-z]:\\|\/\/).*/;
-const DATA_URI = /^(data:)([\w\/\+\-]+);(charset=[\w-]+|base64).*,(.*)/i;
+const URL_MATCH = /url\(["']?(.*?)["']?\)/;
 
 const baseUrl = getBaseUrl();
 
 export function absoluteToDoc(attrValue: string): string {
-  if (RELATIVE_PATH.test(attrValue) || DATA_URI.test(attrValue)) {
-    return attrValue;
-  } else {
-    const { href } = new URL(attrValue, baseUrl);
-    return href;
-  }
+  const { href } = new URL(attrValue, baseUrl);
+  return href;
 }
 
 export function absoluteToStylesheet(cssText: string) {
-  return cssText.replace(URL_IN_CSS_REF, (origin: string, filePath: string) => {
+  return cssText.replace(URL_MATCH, (origin: string, filePath: string) => {
     if (!filePath) return origin;
-    if (RELATIVE_PATH.test(filePath) || DATA_URI.test(filePath))
-      return `url(${filePath})`;
-
     return `url(${absoluteToDoc(filePath)})`;
   });
 }
