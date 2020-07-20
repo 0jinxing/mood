@@ -3,7 +3,6 @@ import {
   SerializedNodeWithId,
   TNode,
   NodeType,
-  IdNodeMap,
   Attributes,
   getBaseUrl,
   mirror,
@@ -159,7 +158,7 @@ export function serialize(
     }
     return {
       type: NodeType.ELEMENT_NODE,
-      tagName: $node.tagName,
+      tagName: /script/i.test($node.tagName) ? "NOSCRIPT" : $node.tagName,
       attributes,
       isSVG: isSVGElement($node),
     };

@@ -159,9 +159,6 @@ function rebuild(adds: AddedNodeMutation[], $doc: HTMLDocument) {
       $parent.appendChild($el);
     }
   });
-
-  // throw "TODO";
-  // return buildNodeWithSN(node, $doc);
 }
 
 export default rebuild;
