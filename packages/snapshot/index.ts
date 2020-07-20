@@ -213,7 +213,7 @@ export function snapshot($doc: HTMLDocument): AddedNodeMutation[] {
   const adds: AddedNodeMutation[] = [];
   const queue: Node[] = [$doc];
 
-  const genAdds = ($node: Node | TNode) => {
+  const serializeAdds = ($node: Node | TNode) => {
     const parentId = $node.parentElement
       ? mirror.getId($node.parentElement)
       : undefined;
@@ -224,22 +224,20 @@ export function snapshot($doc: HTMLDocument): AddedNodeMutation[] {
 
     if (nextId === 0 || parentId === 0) {
       queue.unshift($node);
-    } else {
-      adds.push({
-        parentId: parentId,
-        nextId: nextId,
-        node: serializeWithId($node, $doc)!,
-      });
-
-      $node.childNodes.forEach(genAdds);
+      return;
     }
+
+    adds.push({
+      parentId: parentId,
+      nextId: nextId,
+      node: serializeWithId($node, $doc)!,
+    });
+    $node.childNodes.forEach(serializeAdds);
   };
 
   while (queue.length) {
-    genAdds(queue.pop()!);
+    serializeAdds(queue.pop()!);
   }
-
-  serializeWithId($doc, $doc);
 
   return adds;
 }

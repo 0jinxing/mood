@@ -125,12 +125,11 @@ export function buildNodeWithSN(
 
   if (!$el) return null;
 
-  // use target document as root document
   if (node.type === NodeType.DOCUMENT_NODE) {
     $el = $doc;
-    // close before open to make sure document was closed
-    // $doc.close();
-    // $doc.open();
+    // Close before open to make sure document was closed
+    $doc.close();
+    $doc.open();
   }
   ($el as TNode).__sn = node;
   mirror.idNodeMap[node.id] = $el as TNode;
@@ -153,7 +152,7 @@ function rebuild(adds: AddedNodeMutation[], $doc: HTMLDocument) {
        * ignore
        */
     } else if (!$parent) {
-      $doc.body.appendChild($el);
+      $doc.appendChild($el);
     } else if ($parent && $next) {
       $parent.insertBefore($el, $next);
     } else {
