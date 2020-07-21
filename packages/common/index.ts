@@ -61,14 +61,4 @@ export function throttle<T>(
   };
 }
 
-let baseUrl = "";
-export function getBaseUrl() {
-  if (!baseUrl) {
-    const $anchor = document.createElement("a");
-    $anchor.href = "/";
-    baseUrl = $anchor.href;
-  }
-  return baseUrl;
-}
-
 export * from "./types";

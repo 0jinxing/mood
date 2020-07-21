@@ -4,7 +4,6 @@ import {
   TNode,
   NodeType,
   Attributes,
-  getBaseUrl,
   mirror,
   AddedNodeMutation,
 } from "@traps/common";
@@ -34,7 +33,9 @@ export function getCSSRuleText(rule: CSSRule): string {
 
 const URL_MATCH = /url\(["']?(.*?)["']?\)/;
 
-const baseUrl = getBaseUrl();
+const $anchor = document.createElement("a");
+$anchor.href = "/";
+const baseUrl = $anchor.href;
 
 export function absoluteToDoc(attrValue: string): string {
   const { href } = new URL(attrValue, baseUrl);

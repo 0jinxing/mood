@@ -8,7 +8,8 @@ import {
 } from "@traps/common";
 
 function getTagName(node: ElementNode) {
-  let tagName = node.tagName;
+  let tagName = node.tagName.toUpperCase();
+
   if (/LINK/i.test(tagName) && node.attributes.hasOwnProperty("_cssText")) {
     tagName = "STYLE";
   } else if (/SCRIPT/i.test(tagName)) {
@@ -44,8 +45,8 @@ export function buildNode(
       let value = attrValue === true ? "" : attrValue;
 
       if (!key.startsWith("__")) {
-        const isTextarea = tagName === "textarea" && key === "value";
-        const isRemoteOrDynamicCss = tagName === "style" && key === "_cssText";
+        const isTextarea = tagName === "TEXTAREA" && key === "value";
+        const isRemoteOrDynamicCss = tagName === "STYLE" && key === "_cssText";
 
         if (isRemoteOrDynamicCss) {
           value = addHoverClass(value);
