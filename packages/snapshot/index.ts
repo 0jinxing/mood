@@ -74,7 +74,7 @@ export function transformAttr(attrName: string, attrValue: string) {
 }
 
 export function isSVGElement($el: Element): boolean {
-  return $el.tagName === "svg" || $el instanceof SVGElement;
+  return /SVG/i.test($el.tagName) || $el instanceof SVGElement;
 }
 
 export function serialize(
@@ -149,7 +149,7 @@ export function serialize(
     }
     return {
       type: NodeType.ELEMENT_NODE,
-      tagName: /script/i.test($node.tagName) ? "NOSCRIPT" : $node.tagName,
+      tagName: $node.tagName.toUpperCase(),
       attributes,
       isSVG: isSVGElement($node),
     };

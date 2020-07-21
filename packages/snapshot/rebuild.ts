@@ -6,14 +6,13 @@ import {
   mirror,
   AddedNodeMutation,
 } from "@traps/common";
-import { serializeWithId } from ".";
 
 function getTagName(node: ElementNode) {
   let tagName = node.tagName;
-  if (tagName === "link" && node.attributes.hasOwnProperty("_cssText")) {
-    tagName = "style";
-  } else if (tagName === "script") {
-    tagName = "noscript";
+  if (/LINK/i.test(tagName) && node.attributes.hasOwnProperty("_cssText")) {
+    tagName = "STYLE";
+  } else if (/SCRIPT/i.test(tagName)) {
+    tagName = "NOSCRIPT";
   }
   return tagName;
 }
@@ -68,12 +67,7 @@ export function buildNode(
         try {
           if (isSVG && key === "xlink:href") {
             $el.setAttributeNS("http://www.w3.org/1999/xlink", key, value);
-          } else if (/^on[a-z]+/.test(key)) {
-            // Rename some of the more common atttributes from https://www.w3schools.com/tags/ref_eventattributes.asp
-            // as setting them triggers a console.error (which shows up despite the try/catch)
-            // Assumption: these attributes are not used to css
-            $el.setAttribute("_" + key, value);
-          } else {
+          } else if (!/^on[a-z]+/.test(key)) {
             $el.setAttribute(key, value);
           }
         } catch {
