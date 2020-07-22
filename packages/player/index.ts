@@ -459,7 +459,7 @@ export default class Player {
       case EventType.FULL_SNAPSHOT: {
         castFn = () => {
           this.rebuildFullSnapshot(event);
-          this.$iframe.contentWindow!.scrollTo(event.data.initialOffset);
+          this.$iframe.contentWindow!.scrollTo(event.data.offset);
         };
         break;
       }

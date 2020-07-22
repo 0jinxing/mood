@@ -69,7 +69,7 @@ function record(options: RecordOptions<TEvent>): ListenerHandler {
       type: EventType.FULL_SNAPSHOT,
       data: {
         adds,
-        initialOffset: {
+        offset: {
           left:
             window.pageXOffset !== undefined
               ? window.pageXOffset

@@ -81,11 +81,11 @@ export type RemovedNodeMutation = {
   parentId: number;
 };
 
-export type AddedNodeMutation = {
+export class AddedNodeMutation {
   parentId?: number;
   nextId?: number;
   node: SerializedNodeWithId;
-};
+}
 
 type MutationCallbackParam = {
   texts: TextMutation[];
@@ -249,7 +249,7 @@ export type FullSnapshotEvent = {
   type: EventType.FULL_SNAPSHOT;
   data: {
     adds: AddedNodeMutation[];
-    initialOffset: { top: number; left: number };
+    offset: { top: number; left: number };
   };
 };
 
