@@ -1,13 +1,12 @@
+import { mirror } from "@traps/snapshot";
+import { on, throttle } from "../utils";
+
 import {
   MousemoveCallBack,
   ListenerHandler,
   MousePosition,
   IncrementalSource,
-  throttle,
-  TNode,
-  mirror,
-} from "@traps/common";
-import { on } from "../utils";
+} from "../types";
 
 function initMouseMoveObserver(cb: MousemoveCallBack): ListenerHandler {
   let positions: MousePosition[] = [];
@@ -34,7 +33,7 @@ function initMouseMoveObserver(cb: MousemoveCallBack): ListenerHandler {
       positions.push({
         x: clientX,
         y: clientY,
-        id: mirror.getId(target as TNode),
+        id: mirror.getId(target as Node),
         timeOffset: Date.now() - timeBaseline,
       });
       throttleCb(event instanceof TouchEvent);

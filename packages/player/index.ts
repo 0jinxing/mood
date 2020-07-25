@@ -1,19 +1,20 @@
-import rebuild, { buildNodeWithSN } from "@traps/snapshot/rebuild";
 import * as mittProxy from "mitt";
-import Timer from "./timer";
-import { createPlayerService } from "./machine";
-import { mirror } from "@traps/common";
+
+import rebuild, { buildNodeWithSN } from "@traps/snapshot/rebuild";
+import { mirror, AddedNodeMutation } from "@traps/snapshot";
 import {
   TEventWithTime,
-  ViewportResizeDimention,
   EventType,
-  FullSnapshotEvent,
   IncrementalSource,
   IncrementalSnapshotEvent,
-  IncrementalData,
-  AddedNodeMutation,
   MouseInteractions,
-} from "@traps/common";
+  FullSnapshotEvent,
+  ViewportResizeDimention,
+  IncrementalData,
+} from "@traps/record";
+
+import Timer from "./timer";
+import { createPlayerService } from "./machine";
 import getInjectStyle from "./styles/inject-style";
 
 import {

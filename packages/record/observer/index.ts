@@ -1,5 +1,3 @@
-import { ObserverParam, HooksParam, ListenerHandler } from "@traps/common";
-
 import initInputObserver from "./input";
 import initScrollObserver from "./scroll";
 import initViewportResizeObserver from "./viewport-resize";
@@ -8,6 +6,8 @@ import initMouseMoveObserver from "./mouse-move";
 import initMediaInteractionObserver from "./media-interaction";
 import initStyleSheetObserver from "./style-sheet";
 import initMutationObserver from "./mutation";
+
+import { ObserverParam, HooksParam, ListenerHandler } from "../types";
 
 export function mergeHooks(observer: ObserverParam, hooks: HooksParam) {
   Object.keys(hooks).forEach((key: keyof HooksParam) => {

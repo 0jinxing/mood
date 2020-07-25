@@ -1,11 +1,11 @@
+import { on } from "../utils";
+import { mirror } from "@traps/snapshot";
+
 import {
   MouseInteractionCallBack,
   ListenerHandler,
   MouseInteractions,
-  mirror,
-  TNode,
-} from "@traps/common";
-import { on } from "../utils";
+} from "../types";
 
 export function initMouseInteractionObserver(
   cb: MouseInteractionCallBack
@@ -13,7 +13,7 @@ export function initMouseInteractionObserver(
   const handlers: ListenerHandler[] = [];
   const getHandler = (eventKey: keyof typeof MouseInteractions) => {
     return (event: MouseEvent | TouchEvent) => {
-      const id = mirror.getId(event.target as TNode);
+      const id = mirror.getId(event.target as Node);
       const { clientX, clientY } =
         event instanceof TouchEvent ? event.changedTouches[0] : event;
       cb({ type: MouseInteractions[eventKey], id, x: clientX, y: clientY });

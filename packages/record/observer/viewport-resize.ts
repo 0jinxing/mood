@@ -1,9 +1,6 @@
-import {
-  ListenerHandler,
-  ViewportResizeCallback,
-  throttle,
-} from "@traps/common";
-import { queryWindowHeight, queryWindowWidth, on } from "../utils";
+import { queryWindowHeight, queryWindowWidth, on, throttle } from "../utils";
+
+import { ViewportResizeCallback, ListenerHandler } from "../types";
 
 function initViewportResizeObserver(cb: ViewportResizeCallback): ListenerHandler {
   const updateDimension = throttle(() => {

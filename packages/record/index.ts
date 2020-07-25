@@ -1,15 +1,16 @@
 import { snapshot } from "@traps/snapshot";
-import {
-  TEvent,
-  TEventWithTime,
-  ListenerHandler,
-  RecordOptions,
-  EventType,
-  IncrementalSource,
-} from "@traps/common";
 
 import initObservers from "./observer";
 import { on, queryWindowHeight, queryWindowWidth } from "./utils";
+
+import {
+  TEvent,
+  TEventWithTime,
+  RecordOptions,
+  ListenerHandler,
+  EventType,
+  IncrementalSource,
+} from "./types";
 
 function wrappedEvent(e: TEvent): TEventWithTime {
   return { ...e, timestamp: Date.now() };
@@ -19,13 +20,14 @@ let wrappedEmit!: (e: TEventWithTime, isCheckout?: true) => void;
 let wrappedEmitWithTime!: (e: TEvent, isCheckout?: true) => void;
 
 function record(options: RecordOptions<TEvent>): ListenerHandler {
-  const { emit, hooks, pack, checkoutEveryNms, checkoutEveryNth } = options;
+  const { emit, hooks, checkoutEveryNms, checkoutEveryNth } = options;
 
   let lastFullSnapshotEvent: TEventWithTime;
   let incrementalSnapshotCount = 0;
 
   wrappedEmit = (event: TEventWithTime, isCheckout?: true) => {
-    emit(pack ? pack(event) : event, isCheckout);
+    emit(event, isCheckout);
+    
     if (event.type === EventType.FULL_SNAPSHOT) {
       lastFullSnapshotEvent = event;
       incrementalSnapshotCount = 0;
@@ -189,5 +191,7 @@ export function addCustomEvent<T>(tag: string, payload: T) {
   }
   wrappedEmitWithTime({ type: EventType.CUSTOM, data: { tag, payload } });
 }
+
+export * from "./types";
 
 export default record;

@@ -1,14 +1,7 @@
-import {
-  MutationCallBack,
-  AttrCursor,
-  RemovedNodeMutation,
-  AddedNodeMutation,
-  TNode,
-  mirror,
-} from "@traps/common";
-import { deepDelete, isParentRemoved, isAncestorInSet } from "../collection";
-import { isAncestorRemoved } from "../utils";
-import { serializeWithId, transformAttr } from "@traps/snapshot";
+import { serializeWithId, transformAttr, AddedNodeMutation, TNode, mirror } from "@traps/snapshot";
+import { isAncestorRemoved, deepDelete, isAncestorInSet, isParentRemoved } from "../utils";
+
+import { MutationCallBack, AttrCursor, RemovedNodeMutation } from "../types";
 
 const genKey = (id: number, parentId: number) => `${id}@${parentId}`;
 

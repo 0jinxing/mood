@@ -1,14 +1,10 @@
-import {
-  StyleSheetRuleCallback,
-  ListenerHandler,
-  TNode,
-  mirror,
-} from "@traps/common";
+import { StyleSheetRuleCallback, ListenerHandler } from "../types";
+import { mirror, TNode } from "@traps/snapshot";
 
 function initStyleSheetObserver(cb: StyleSheetRuleCallback): ListenerHandler {
   const insertRule = CSSStyleSheet.prototype.insertRule;
   CSSStyleSheet.prototype.insertRule = function (rule: string, index?: number) {
-    const id = mirror.getId(this.ownerNode as TNode);
+    const id = mirror.getId(this.ownerNode as Node | TNode);
     id && cb({ id, adds: [{ rule, index }] });
     return insertRule.apply(this, [rule, index]);
   };

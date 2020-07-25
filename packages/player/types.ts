@@ -1,4 +1,4 @@
-import type { TEventWithTime } from "@traps/common";
+import type { TEventWithTime } from "packages/record";
 
 export type PlayerConfig = {
   speed: number;

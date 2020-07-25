@@ -9,8 +9,5 @@
   },
   "keywords": [],
   "author": "",
-  "license": "MIT",
-  "dependencies": {
-    "@traps/common": "0.0.1"
-  }
+  "license": "MIT"
 }

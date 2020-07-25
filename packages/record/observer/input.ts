@@ -1,12 +1,12 @@
+import { on } from "../utils";
+import { mirror } from "@traps/snapshot";
+
 import {
+  HookResetter,
   InputValue,
   InputCallback,
   ListenerHandler,
-  TNode,
-  mirror,
-  HookResetter,
-} from "@traps/common";
-import { on } from "../utils";
+} from "../types";
 
 function hookSetter<T>(
   target: T,
@@ -43,7 +43,7 @@ function initInputObserver(cb: InputCallback): ListenerHandler {
     const lastInputValue = lastInputValueMap.get($target);
     if (!lastInputValue || lastInputValue !== value) {
       lastInputValueMap.set($target, value);
-      const id = mirror.getId(($target as Node) as TNode);
+      const id = mirror.getId($target);
       cb({ value, id });
     }
   };

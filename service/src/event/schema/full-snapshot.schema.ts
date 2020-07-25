@@ -1,6 +1,7 @@
 import { Prop, Schema, SchemaFactory, raw } from "@nestjs/mongoose";
 import { Document } from "mongoose";
-import { EventType, AddedNodeMutation } from "@traps/common/types";
+import { AddedNodeMutation } from "@traps/snapshot";
+import { EventType } from "@traps/record";
 
 @Schema({})
 export class FullSnapshot extends Document {
@@ -20,6 +21,4 @@ export class FullSnapshot extends Document {
   };
 }
 
-export const FullSnapshotSchema = SchemaFactory.createForClass(
-  FullSnapshot
-);
+export const FullSnapshotSchema = SchemaFactory.createForClass(FullSnapshot);

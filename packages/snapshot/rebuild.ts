@@ -3,9 +3,9 @@ import {
   SerializedNodeWithId,
   NodeType,
   TNode,
-  mirror,
   AddedNodeMutation,
-} from "@traps/common";
+} from "./types";
+import { mirror } from "./utils";
 
 function getTagName(node: ElementNode) {
   let tagName = node.tagName.toUpperCase();
@@ -18,10 +18,10 @@ function getTagName(node: ElementNode) {
   return tagName;
 }
 
-const HOVER_SELECTOR = /([^\s\\,.{};][^\\,{};]?):hover/gi;
+const HOVER_MATCH = /([^\s\\,.{};][^\\,{};]?):hover/gi;
 
 export function addHoverClass(cssText: string): string {
-  return cssText.replace(HOVER_SELECTOR, "$1:hover,$1.\\:hover");
+  return cssText.replace(HOVER_MATCH, "$1:hover,$1.\\:hover");
 }
 
 export function buildNode(
@@ -30,17 +30,21 @@ export function buildNode(
 ): Node | null {
   if (node.type === NodeType.DOCUMENT_NODE) {
     return $doc.implementation.createDocument(null, "", null);
-  } else if (node.type === NodeType.DOCUMENT_TYPE_NODE) {
+  }
+
+  if (node.type === NodeType.DOCUMENT_TYPE_NODE) {
     const { name, publicId, systemId } = node;
     return $doc.implementation.createDocumentType(name, publicId, systemId);
-  } else if (node.type === NodeType.ELEMENT_NODE) {
+  }
+
+  if (node.type === NodeType.ELEMENT_NODE) {
     const tagName = getTagName(node);
     const { attributes, isSVG } = node;
     const $el = isSVG
       ? $doc.createElementNS("http://www.w3.org/2000/svg", tagName)
       : $doc.createElement(tagName);
 
-    for (let [key, attrValue] of Object.entries(attributes)) {
+    for (const [key, attrValue] of Object.entries(attributes)) {
       if (typeof attrValue === "boolean" && !attrValue) continue;
       let value = attrValue === true ? "" : attrValue;
 
@@ -54,11 +58,6 @@ export function buildNode(
 
         if (isTextarea || isRemoteOrDynamicCss) {
           const $child = $doc.createTextNode(value);
-          for (const $childNode of Array.from($el.childNodes)) {
-            if ($childNode.nodeType === $el.TEXT_NODE) {
-              $el.removeChild($childNode);
-            }
-          }
           $el.appendChild($child);
           continue;
         }
