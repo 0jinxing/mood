@@ -2,5 +2,11 @@
   "name": "client",
   "version": "1.0.0",
   "main": "index.js",
-  "license": "MIT"
+  "license": "MIT",
+  "devDependencies": {
+    "webpack": "^4.44.0"
+  },
+  "dependencies": {
+    "@traps/player": "0.0.1"
+  }
 }

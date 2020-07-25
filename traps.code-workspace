@@ -1,8 +1,16 @@
 {
   "folders": [
     {
+      "name": "client",
+      "path": "client"
+    },
+    {
       "name": "service",
       "path": "service"
+    },
+    {
+      "name": "sdk",
+      "path": "sdk"
     },
     {
       "name": "packages",
