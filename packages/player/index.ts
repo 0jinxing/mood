@@ -448,7 +448,7 @@ export default class Player {
     let castFn: Function;
     switch (event.type) {
       case EventType.DOM_CONTENT_LOADED:
-      case EventType.LOAD: {
+      case EventType.LOADED: {
         break;
       }
       case EventType.META: {

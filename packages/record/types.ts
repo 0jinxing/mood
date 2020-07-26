@@ -2,7 +2,7 @@ import { Attributes, AddedNode } from "@traps/snapshot";
 
 export enum EventType {
   DOM_CONTENT_LOADED,
-  LOAD,
+  LOADED,
   FULL_SNAPSHOT,
   INCREMENTAL_SNAPSHOT,
   META,
@@ -35,12 +35,10 @@ export enum IncrementalSource {
 
 export type DomContentLoadedEvent = {
   type: EventType.DOM_CONTENT_LOADED;
-  data: {};
 };
 
 export type LoadedEvent = {
-  type: EventType.LOAD;
-  data: {};
+  type: EventType.LOADED;
 };
 
 export type FullSnapshotEvent = {

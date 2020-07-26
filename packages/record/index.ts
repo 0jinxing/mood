@@ -40,7 +40,7 @@ function record(options: RecordOptions<TEvent>): ListenerHandler {
       const exceedTime =
         checkoutEveryNms &&
         event.timestamp - lastFullSnapshotEvent.timestamp > checkoutEveryNms;
-        
+
       if (exceedCount || exceedTime) {
         takeFullSnapshot(true);
       }
@@ -97,7 +97,7 @@ function record(options: RecordOptions<TEvent>): ListenerHandler {
   const handlers: ListenerHandler[] = [];
   handlers.push(
     on("DOMContentLoaded", () => {
-      wrappedEmitWithTime({ type: EventType.DOM_CONTENT_LOADED, data: {} });
+      wrappedEmitWithTime({ type: EventType.DOM_CONTENT_LOADED });
     })
   );
 
@@ -175,7 +175,7 @@ function record(options: RecordOptions<TEvent>): ListenerHandler {
       on(
         "load",
         () => {
-          wrappedEmitWithTime({ type: EventType.LOAD, data: {} });
+          wrappedEmitWithTime({ type: EventType.LOADED });
           initial();
         },
         window
