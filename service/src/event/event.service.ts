@@ -1,10 +1,10 @@
 import { Injectable } from "@nestjs/common";
 import { Model, Connection } from "mongoose";
 import { InjectModel, InjectConnection } from "@nestjs/mongoose";
+import { EventType } from "@traps/record";
 
 import { FullSnapshot } from "./schema/full-snapshot.schema";
 import { IEvent } from "./schema/event";
-import { EventType } from "@traps/common/types";
 
 @Injectable()
 export class EventService {

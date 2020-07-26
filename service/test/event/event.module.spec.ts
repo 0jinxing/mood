@@ -2,9 +2,10 @@ import * as request from "supertest";
 import { INestApplication } from "@nestjs/common";
 import { createApp } from "test/create-app";
 import { cleanUp } from "test/clean-up";
-import { EventType, FullSnapshotEvent, NodeType } from "@traps/common/types";
-import { async } from "rxjs";
 import { expect } from "chai";
+
+import { FullSnapshotEvent, EventType } from "@traps/record";
+import { NodeType } from "@traps/snapshot";
 
 describe("event module e2e", async () => {
   let app: INestApplication;

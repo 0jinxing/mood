@@ -34,11 +34,13 @@ export const mirror = new Mirror();
 
 const URL_MATCH = /url\(["']?(.*?)["']?\)/;
 
-const $anchor = document.createElement("a");
-$anchor.href = "/";
-const baseUrl = $anchor.href;
-
+let baseUrl = "";
 export function absoluteToDoc(attrValue: string): string {
+  if (!baseUrl) {
+    const $anchor = document.createElement("a");
+    $anchor.href = "/";
+    baseUrl = $anchor.href;
+  }
   const { href } = new URL(attrValue, baseUrl);
   return href;
 }
