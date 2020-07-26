@@ -1,4 +1,4 @@
-import type { Attributes, AddedNodeMutation } from "@traps/snapshot";
+import { Attributes, AddedNode } from "@traps/snapshot";
 
 export enum EventType {
   DOM_CONTENT_LOADED,
@@ -46,7 +46,7 @@ export type LoadedEvent = {
 export type FullSnapshotEvent = {
   type: EventType.FULL_SNAPSHOT;
   data: {
-    adds: AddedNodeMutation[];
+    adds: AddedNode[];
     offset: { top: number; left: number };
   };
 };
@@ -146,6 +146,10 @@ export type InputValue = string | boolean;
 export type HookResetter = () => void;
 
 export type MediaInteractions = "play" | "pause";
+
+export class AddedNodeMutation extends AddedNode {
+  parentId: number;
+}
 
 export type MutationCallbackParam = {
   texts: TextMutation[];

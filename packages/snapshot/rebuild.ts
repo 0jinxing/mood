@@ -3,12 +3,12 @@ import {
   SerializedNodeWithId,
   NodeType,
   TNode,
-  AddedNodeMutation,
+  AddedNode,
 } from "./types";
 import { mirror } from "./utils";
 
 function getTagName(node: ElementNode) {
-  let tagName = node.tagName.toUpperCase();
+  let tagName = node.tagName;
 
   if (/LINK/i.test(tagName) && node.attributes.hasOwnProperty("_cssText")) {
     tagName = "STYLE";
@@ -18,10 +18,10 @@ function getTagName(node: ElementNode) {
   return tagName;
 }
 
-const HOVER_MATCH = /([^\s\\,.{};][^\\,{};]?):hover/gi;
+const HOVER_MATCH = /([^{}]+):hover([^{}]*{[^{}]+})/gi;
 
 export function addHoverClass(cssText: string): string {
-  return cssText.replace(HOVER_MATCH, "$1:hover,$1.\\:hover");
+  return cssText.replace(HOVER_MATCH, "$1:hover$2 $1.\\:hover$2");
 }
 
 export function buildNode(
@@ -131,7 +131,7 @@ export function buildNodeWithSN(
   return $el as TNode;
 }
 
-function rebuild(adds: AddedNodeMutation[], $doc: HTMLDocument) {
+function rebuild(adds: AddedNode[], $doc: HTMLDocument) {
   adds.forEach(({ node, parentId, nextId }) => {
     const $el = buildNodeWithSN(node, $doc)!;
 

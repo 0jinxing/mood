@@ -1,7 +1,7 @@
 import * as mittProxy from "mitt";
 
 import rebuild, { buildNodeWithSN } from "@traps/snapshot/rebuild";
-import { mirror, AddedNodeMutation } from "@traps/snapshot";
+import { mirror } from "@traps/snapshot";
 import {
   TEventWithTime,
   EventType,
@@ -11,6 +11,7 @@ import {
   FullSnapshotEvent,
   ViewportResizeDimention,
   IncrementalData,
+  AddedNodeMutation,
 } from "@traps/record";
 
 import Timer from "./timer";

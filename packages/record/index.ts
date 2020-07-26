@@ -12,7 +12,7 @@ import {
   IncrementalSource,
 } from "./types";
 
-function wrappedEvent(e: TEvent): TEventWithTime {
+function withTimestamp(e: TEvent): TEventWithTime {
   return { ...e, timestamp: Date.now() };
 }
 
@@ -27,17 +27,20 @@ function record(options: RecordOptions<TEvent>): ListenerHandler {
 
   wrappedEmit = (event: TEventWithTime, isCheckout?: true) => {
     emit(event, isCheckout);
-    
+
     if (event.type === EventType.FULL_SNAPSHOT) {
       lastFullSnapshotEvent = event;
       incrementalSnapshotCount = 0;
-    } else if (event.type === EventType.INCREMENTAL_SNAPSHOT) {
+    }
+
+    if (event.type === EventType.INCREMENTAL_SNAPSHOT) {
       incrementalSnapshotCount += 1;
       const exceedCount =
         checkoutEveryNth && incrementalSnapshotCount >= checkoutEveryNth;
       const exceedTime =
         checkoutEveryNms &&
         event.timestamp - lastFullSnapshotEvent.timestamp > checkoutEveryNms;
+        
       if (exceedCount || exceedTime) {
         takeFullSnapshot(true);
       }
@@ -45,7 +48,7 @@ function record(options: RecordOptions<TEvent>): ListenerHandler {
   };
 
   wrappedEmitWithTime = (event: TEvent, isCheckout?: true) => {
-    wrappedEmit(wrappedEvent(event), isCheckout);
+    wrappedEmit(withTimestamp(event), isCheckout);
   };
 
   const takeFullSnapshot = (isCheckout?: true) => {

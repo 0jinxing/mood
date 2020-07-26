@@ -12,8 +12,9 @@ import { ObserverParam, HooksParam, ListenerHandler } from "../types";
 export function mergeHooks(observer: ObserverParam, hooks: HooksParam) {
   Object.keys(hooks).forEach((key: keyof HooksParam) => {
     observer[key] = (...args: any[]) => {
-      hooks[key]?.apply(null, args);
       observer[key].apply(null, args);
+      // apply hook fn
+      hooks[key]?.apply(null, args);
     };
   });
 }
@@ -22,7 +23,9 @@ export default function initObservers(
   observer: ObserverParam,
   hooks: HooksParam = {}
 ): ListenerHandler {
+  // apply hooks
   mergeHooks(observer, hooks);
+
   const {
     mutation,
     mousemove,
@@ -35,16 +38,23 @@ export default function initObservers(
   } = observer;
 
   const mutationObserver = initMutationObserver(mutation);
+
   const mousemoveHandler = initMouseMoveObserver(mousemove);
+
   const mouseInteractionHandler = initMouseInteractionObserver(
     mouseInteraction
   );
+
   const scrollHandler = initScrollObserver(scroll);
+
   const viewportResizeHandler = initViewportResizeObserver(viewportResize);
+
   const inputHandler = initInputObserver(input);
+
   const mediaInteractionHandler = initMediaInteractionObserver(
     mediaInteraction
   );
+
   const styleSheetObserver = initStyleSheetObserver(styleSheetRule);
 
   return () => {

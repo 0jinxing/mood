@@ -55,7 +55,7 @@ export type SerializedNode =
 
 export type SerializedNodeWithId = SerializedNode & { id: number };
 
-export class AddedNodeMutation {
+export class AddedNode {
   parentId?: number;
   nextId?: number;
   node: SerializedNodeWithId;

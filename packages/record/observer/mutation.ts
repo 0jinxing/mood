@@ -1,7 +1,7 @@
-import { serializeWithId, transformAttr, AddedNodeMutation, TNode, mirror } from "@traps/snapshot";
+import { serializeWithId, transformAttr, TNode, mirror } from "@traps/snapshot";
 import { isAncestorRemoved, deepDelete, isAncestorInSet, isParentRemoved } from "../utils";
 
-import { MutationCallBack, AttrCursor, RemovedNodeMutation } from "../types";
+import { MutationCallBack, AttrCursor, RemovedNodeMutation, AddedNodeMutation } from "../types";
 
 const genKey = (id: number, parentId: number) => `${id}@${parentId}`;
 

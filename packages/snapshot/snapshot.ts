@@ -5,7 +5,7 @@ import {
   Attributes,
   TNode,
   SerializedNodeWithId,
-  AddedNodeMutation,
+  AddedNode,
 } from "./types";
 
 let id = 0;
@@ -168,8 +168,8 @@ export function serializeWithId(
   return serializedNode;
 }
 
-export function snapshot($doc: HTMLDocument): AddedNodeMutation[] {
-  const adds: AddedNodeMutation[] = [];
+export function snapshot($doc: HTMLDocument): AddedNode[] {
+  const adds: AddedNode[] = [];
   const queue: Node[] = [$doc];
 
   const serializeAdds = ($node: Node | TNode) => {
