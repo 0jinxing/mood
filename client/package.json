@@ -11,6 +11,7 @@
     "@babel/core": "^7.10.5",
     "@babel/preset-env": "^7.10.4",
     "@babel/preset-react": "^7.10.4",
+    "@types/classnames": "^2.2.10",
     "@types/react": "^16.9.43",
     "@types/react-dom": "^16.9.8",
     "@types/react-redux": "^7.1.9",
@@ -29,8 +30,10 @@
     "webpack-dev-server": "^3.11.0"
   },
   "dependencies": {
+    "@ant-design/icons": "^4.2.1",
     "@traps/player": "0.0.1",
     "antd": "^4.4.3",
+    "classnames": "^2.2.6",
     "dayjs": "^1.8.30",
     "react": "^16.13.1",
     "react-dom": "^16.13.1",

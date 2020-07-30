@@ -22,7 +22,7 @@ module.exports = {
         use: ["style-loader", "css-loader", "sass-loader"],
       },
       {
-        test: /\.(png|jpg|gif)$/i,
+        test: /\.(png|jpg|gif|svg)$/i,
         use: [{ loader: "url-loader", options: { limit: 8192 } }],
       },
     ],
@@ -30,6 +30,9 @@ module.exports = {
 
   resolve: {
     extensions: [".ts", ".tsx", ".js"],
+    alias: {
+      "@": path.resolve("src"),
+    },
   },
 
   plugins: [

@@ -1,0 +1,21 @@
+@import "../styles/partial/mixins.scss";
+
+@include b("user-layout") {
+  height: 100%;
+  background-image: url(../assets/day50-pirahna.svg);
+  background-repeat: no-repeat;
+  background-size: 80%;
+  background-position: right 420px;
+  @include e("content") {
+    max-width: 360px;
+    margin: 0 auto;
+    padding-top: 128px;
+  }
+}
+
+@include res("sm") {
+  @include b("user-layout") {
+    background-size: 40%;
+    background-position: right bottom;
+  }
+}

@@ -1,8 +1,27 @@
 import React from "react";
-import { Button } from "antd";
+import { BrowserRouter as Router, Route, Switch } from "react-router-dom";
+
+import Home from "./routes/Home";
+import Login from "./routes/Login";
 
 const App = () => {
-  return <Button>App</Button>;
+  return (
+    <Router>
+      <Switch>
+        <Route path="/login">
+          <Login />
+        </Route>
+
+        <Route path="/register">
+          <Home />
+        </Route>
+
+        <Route path="/">
+          <Home />
+        </Route>
+      </Switch>
+    </Router>
+  );
 };
 
 export default App;
