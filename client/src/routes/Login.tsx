@@ -12,20 +12,20 @@ const Login: FC = () => {
       <h1 className={"traps_login-title"}>
         <a href="/">
           <img src={favicon} className={"traps_login-title__icon"} />
-          <span className={"traps_login-title__text"}>前端异常监控系统</span>
+          <span className={"traps_login-title__text"}>FE Monitoring</span>
         </a>
       </h1>
-      <Form className={"traps_login-form"}>
-        <Form.Item>
+      <Form className={"traps_login-form"} layout="vertical">
+        <Form.Item label="Username or email address">
           <Input
             prefix={<MailOutlined className={"traps_login-form__icon"} />}
-            placeholder="Email"
+            placeholder="username or email"
           />
         </Form.Item>
-        <Form.Item>
+        <Form.Item label="Password">
           <Input
             prefix={<LockOutlined className={"traps_login-form__icon"} />}
-            placeholder="Password"
+            placeholder="password"
           />
         </Form.Item>
         <Form.Item>
@@ -42,7 +42,7 @@ const Login: FC = () => {
           >
             Submit
           </Button>
-          Or <a>register now!</a>
+          Or <a>register now</a>
         </Form.Item>
       </Form>
     </UserLayout>

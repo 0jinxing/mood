@@ -5,9 +5,9 @@
   background-image: url(../assets/day50-pirahna.svg);
   background-repeat: no-repeat;
   background-size: 80%;
-  background-position: right 420px;
+  background-position: right 480px;
   @include e("content") {
-    max-width: 360px;
+    max-width: 320px;
     margin: 0 auto;
     padding-top: 128px;
   }
