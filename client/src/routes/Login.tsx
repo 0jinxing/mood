@@ -3,42 +3,41 @@ import { Form, Button, Checkbox, Input } from "antd";
 import { MailOutlined, LockOutlined } from "@ant-design/icons";
 import UserLayout from "@/layouts/UserLayout";
 import favicon from "../assets/favicon.svg";
+import { b, e } from "@/utils/bem";
 
 import "./Login.scss";
 
 const Login: FC = () => {
   return (
     <UserLayout>
-      <h1 className={"traps_login-title"}>
+      <h1 className={b("login-title")}>
         <a href="/">
-          <img src={favicon} className={"traps_login-title__icon"} />
-          <span className={"traps_login-title__text"}>FE Monitoring</span>
+          <img src={favicon} className={e("icon")} />
+          <span className={e("text")}>MOOD</span>
         </a>
       </h1>
-      <Form className={"traps_login-form"} layout="vertical">
+      <Form className={b("login-form")} layout="vertical">
         <Form.Item label="Username or email address">
           <Input
-            prefix={<MailOutlined className={"traps_login-form__icon"} />}
+            prefix={<MailOutlined className={e("icon")} />}
             placeholder="username or email"
           />
         </Form.Item>
         <Form.Item label="Password">
           <Input
-            prefix={<LockOutlined className={"traps_login-form__icon"} />}
+            prefix={<LockOutlined className={e("icon")} />}
             placeholder="password"
           />
         </Form.Item>
         <Form.Item>
-          <Checkbox className={"traps_login-form__remember"}>
-            Remember me
-          </Checkbox>
-          <a className={"traps_login-form__forgot"}>Forgot password</a>
+          <Checkbox className={e("remember")}>Remember me</Checkbox>
+          <a className={e("forgot")}>Forgot password</a>
         </Form.Item>
         <Form.Item>
           <Button
             type="primary"
             htmlType="button"
-            className={"traps_login-form__submit"}
+            className={e("submit")}
           >
             Submit
           </Button>

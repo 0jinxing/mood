@@ -1,6 +1,4 @@
-@import "function";
 @import "var";
-
 
 @mixin res($key, $map: $--breakpoints) {
   @if map-has-key($map, $key) {
@@ -12,17 +10,17 @@
   }
 }
 
-/* BEM
- -------------------------- */
 @mixin b($block) {
-  $B: $namespace + "_" + $block !global;
+  $B: $namespace + $block-separator + $block !global;
 
-  .#{$B} {
-    @content;
+  @at-root {
+    #{$root} .#{$B} {
+      @content;
+    }
   }
 }
 
-@mixin e($element, $flat: false) {
+@mixin e($element) {
   $E: $element !global;
   $selector: &;
   $currentSelector: "";
@@ -35,30 +33,12 @@
       ",";
   }
 
-  @if $flat {
-    @if hitAllSpecialNestRule($selector) {
-      @at-root {
-        #{$selector} {
-          #{$currentSelector} {
-            @content;
-          }
-        }
-      }
-    } @else {
-      @at-root {
-        #{$currentSelector} {
-          @content;
-        }
-      }
-    }
-  } @else {
-    #{$currentSelector} {
-      @content;
-    }
+  #{$currentSelector} {
+    @content;
   }
 }
 
-@mixin m($modifier, $flat: false) {
+@mixin m($modifier) {
   $selector: &;
   $currentSelector: "";
   @each $unit in $modifier {
@@ -69,33 +49,8 @@
       ","};
   }
 
-  @if $flat {
-    @at-root {
-      #{$currentSelector} {
-        @content;
-      }
-    }
-  } @else {
-    #{$currentSelector} {
-      @content;
-    }
-  }
-}
-
-@mixin meb($modifier: false, $element: $E, $block: $B) {
-  $selector: &;
-  $modifierCombo: "";
-
-  @if $modifier {
-    $modifierCombo: $modifier-separator + $modifier;
-  }
-
-  @at-root {
-    #{$selector} {
-      .#{$block + $element-separator + $element + $modifierCombo} {
-        @content;
-      }
-    }
+  #{$currentSelector} {
+    @content;
   }
 }
 
@@ -107,20 +62,16 @@
   }
 }
 
-@mixin extend-rule($name) {
-  @extend #{"%shared-" + $name};
-}
-
-@mixin share-rule($name) {
-  $rule-name: "%shared-" + $name;
-
-  @at-root #{$rule-name} {
+@mixin placeholder {
+  &::-webkit-input-placeholder {
     @content;
   }
-}
 
-@mixin pseudo($pseudo) {
-  @at-root #{&}#{":#{$pseudo}"} {
+  &::-moz-placeholder {
+    @content;
+  }
+
+  &:-ms-input-placeholder {
     @content;
   }
 }

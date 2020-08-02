@@ -7,6 +7,7 @@ module.exports = {
   entry: path.resolve("src", "index.ts"),
 
   output: {
+    publicPath: '/',
     path: path.resolve("dist"),
     filename: "[name].[hash:8].js",
   },

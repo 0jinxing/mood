@@ -1,0 +1,18 @@
+@import "../styles/partial/mixins.scss";
+
+@include b("page-header") {
+  padding-left: 24px;
+  @include e("logo") {
+    img {
+      height: 32px;
+      vertical-align: top;
+      margin-right: 8px;
+    }
+    line-height: 32px;
+    margin: 16px 28px 16px 0;
+    float: left;
+    color: #fff;
+    font-weight: lighter;
+    font-size: 18px;
+  }
+}
