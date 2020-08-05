@@ -1,26 +1,21 @@
 import React, { FC } from "react";
+import { Link } from "react-router-dom";
 import { Form, Button, Checkbox, Input } from "antd";
 import { MailOutlined, LockOutlined } from "@ant-design/icons";
-import UserLayout from "@/layouts/UserLayout";
-import favicon from "../assets/favicon.svg";
+import AuthLayout from "@/layouts/AuthLayout";
 import { b, e } from "@/utils/bem";
+import LINK from "@/constant/link";
 
 import "./Login.scss";
 
 const Login: FC = () => {
   return (
-    <UserLayout>
-      <h1 className={b("login-title")}>
-        <a href="/">
-          <img src={favicon} className={e("icon")} />
-          <span className={e("text")}>MOOD</span>
-        </a>
-      </h1>
+    <AuthLayout>
       <Form className={b("login-form")} layout="vertical">
-        <Form.Item label="Username or email address">
+        <Form.Item label="Email address">
           <Input
             prefix={<MailOutlined className={e("icon")} />}
-            placeholder="username or email"
+            placeholder="email"
           />
         </Form.Item>
         <Form.Item label="Password">
@@ -31,20 +26,18 @@ const Login: FC = () => {
         </Form.Item>
         <Form.Item>
           <Checkbox className={e("remember")}>Remember me</Checkbox>
-          <a className={e("forgot")}>Forgot password</a>
+          <Link to={LINK.PASSWORD_RESET} className={e("forgot")}>
+            Forgot password
+          </Link>
         </Form.Item>
         <Form.Item>
-          <Button
-            type="primary"
-            htmlType="button"
-            className={e("submit")}
-          >
-            Submit
+          <Button type="primary" htmlType="button" className={e("submit")}>
+            LOGIN
           </Button>
-          Or <a>register now</a>
+          Or <Link to={LINK.REGISTER}>register now</Link>
         </Form.Item>
       </Form>
-    </UserLayout>
+    </AuthLayout>
   );
 };
 export default Login;

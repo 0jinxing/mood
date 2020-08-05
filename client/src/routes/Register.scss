@@ -1,0 +1,25 @@
+@import "~@/styles/partial/mixins.scss";
+
+@include b("register-form") {
+  @include e("submit") {
+    width: 100%;
+    margin-bottom: 8px;
+  }
+
+  @include e("icon") {
+    color: rgba(0, 0, 0, 0.25);
+  }
+
+  @include e("captcha-wrapper") {
+    display: flex;
+
+    input {
+      float: 1;
+    }
+
+    button {
+      padding-right: 0;
+      border: 0;
+    }
+  }
+}

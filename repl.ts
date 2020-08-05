@@ -24,8 +24,8 @@ function getCode(): string {
         type: "input",
         name: "url",
         message:
-          "Enter the url you want to record, e.g https://react-redux.realworld.io: ",
-      },
+          "Enter the url you want to record, e.g https://react-redux.realworld.io: "
+      }
     ]);
 
     console.log(`Going to open ${url}...`);
@@ -36,8 +36,8 @@ function getCode(): string {
       {
         type: "confirm",
         name: "shouldStore",
-        message: `Persistently store these recorded events?`,
-      },
+        message: `Persistently store these recorded events?`
+      }
     ]);
 
     if (shouldStore) {
@@ -50,8 +50,8 @@ function getCode(): string {
       {
         type: "confirm",
         name: "shouldRecordAnother",
-        message: "Record another one?",
-      },
+        message: "Record another one?"
+      }
     ]);
 
     if (shouldRecordAnother) {
@@ -65,11 +65,11 @@ function getCode(): string {
     const browser = await puppeteer.launch({
       headless: false,
       defaultViewport: null,
-      args: ["--start-maximized"],
+      args: ["--start-maximized"]
     });
     const page = await browser.newPage();
     await page.goto(url, {
-      waitUntil: "domcontentloaded",
+      waitUntil: "domcontentloaded"
     });
 
     await page.exposeFunction("_replLog", (event) => {

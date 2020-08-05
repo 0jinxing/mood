@@ -1,8 +1,7 @@
-@import "../styles/partial/mixins.scss";
-
-@include b("page-container") {
+.pageContainer {
   position: relative;
-  @include e("wrapper") {
+
+  .wrapper {
     position: absolute;
     top: 0;
     bottom: 0;

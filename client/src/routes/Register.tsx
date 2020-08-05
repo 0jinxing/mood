@@ -1,22 +1,49 @@
 import React from "react";
-import { Form } from "antd";
+import { Form, Input, Button } from "antd";
 
-import UserLayout from "@/layouts/UserLayout";
+import AuthLayout from "@/layouts/AuthLayout";
 import { b, e } from "@/utils/bem";
-
-import favicon from "../assets/favicon.svg";
+import { MailOutlined, LockOutlined, MessageOutlined } from "@ant-design/icons";
+import "./Register.scss";
+import { Link } from "react-router-dom";
+import LINK from "@/constant/link";
 
 const Register = () => {
   return (
-    <UserLayout>
-      <h1 className={b("register-title")}>
-        <a href="/">
-          <img src={favicon} className={e("icon")} />
-          <span className={e("text")}>MOOD</span>
-        </a>
-      </h1>
-      <Form className={b("register-form")}></Form>
-    </UserLayout>
+    <AuthLayout>
+      <Form className={b("register-form")} layout="vertical">
+        <Form.Item label="Email address">
+          <Input
+            prefix={<MailOutlined className={e("icon")} />}
+            placeholder="email"
+          />
+        </Form.Item>
+
+        <Form.Item label="Password">
+          <Input
+            prefix={<LockOutlined className={e("icon")} />}
+            placeholder="password"
+          />
+        </Form.Item>
+        <Form.Item label="Captcha">
+          <div className={e("captcha-wrapper")}>
+            <Input
+              placeholder="captcha"
+              prefix={<MessageOutlined className={e("icon")} />}
+            />
+            <Button type="link" htmlType="button">
+              Get captcha
+            </Button>
+          </div>
+        </Form.Item>
+        <Form.Item>
+          <Button type="primary" htmlType="submit" className={e("submit")}>
+            REGISTER
+          </Button>
+          Or <Link to={LINK.LOGIN}>login now</Link>
+        </Form.Item>
+      </Form>
+    </AuthLayout>
   );
 };
 

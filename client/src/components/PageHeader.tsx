@@ -1,7 +1,7 @@
 import React, { FC } from "react";
 import { Layout } from "antd";
 import { b, e } from "@/utils/bem";
-import logo from "@/assets/favicon.svg";
+import logo from "@/assets/logo.svg";
 
 import "./PageHeader.scss";
 

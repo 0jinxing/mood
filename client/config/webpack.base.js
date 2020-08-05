@@ -1,55 +1,55 @@
-const path = require("path");
-const HtmlPlugin = require("html-webpack-plugin");
+const path = require('path')
+const HtmlPlugin = require('html-webpack-plugin')
 
 module.exports = {
-  mode: "development",
+  mode: 'development',
 
-  entry: path.resolve("src", "index.ts"),
+  entry: path.resolve('src', 'index.ts'),
 
   output: {
     publicPath: '/',
-    path: path.resolve("dist"),
-    filename: "[name].[hash:8].js",
+    path: path.resolve('dist'),
+    filename: '[name].[hash:8].js'
   },
 
   module: {
     rules: [
       {
         test: /.tsx?$/i,
-        use: ["babel-loader", "ts-loader"],
+        use: ['babel-loader', 'ts-loader']
       },
       {
         test: /.s?css?$/i,
-        use: ["style-loader", "css-loader", "sass-loader"],
+        use: ['style-loader', 'css-loader', 'sass-loader']
       },
       {
         test: /\.(png|jpg|gif|svg)$/i,
-        use: [{ loader: "url-loader", options: { limit: 8192 } }],
-      },
-    ],
+        use: [{ loader: 'url-loader', options: { limit: 8192 } }]
+      }
+    ]
   },
 
   resolve: {
-    extensions: [".ts", ".tsx", ".js"],
+    extensions: ['.ts', '.tsx', '.js'],
     alias: {
-      "@": path.resolve("src"),
-    },
+      '@': path.resolve('src')
+    }
   },
 
   plugins: [
     new HtmlPlugin({
-      template: path.resolve("public/index.html"),
-      filename: "index.html",
-      hash: true,
-    }),
+      template: path.resolve('public/index.html'),
+      filename: 'index.html',
+      hash: true
+    })
   ],
 
   devServer: {
-    contentBase: path.resolve("dist"),
+    contentBase: path.resolve('dist'),
     compress: true,
     hot: true,
     historyApiFallback: true,
     port: 8080,
-    open: true,
-  },
-};
+    open: true
+  }
+}

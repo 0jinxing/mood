@@ -3,6 +3,7 @@ import { BrowserRouter as Router, Route, Switch } from "react-router-dom";
 
 import Home from "./routes/Home";
 import Login from "./routes/Login";
+import Register from "./routes/Register";
 import Instance from "./routes/instance";
 
 const App = () => {
@@ -11,10 +12,10 @@ const App = () => {
       <Switch>
         <Route path="/login">
           <Login />
-        </Route>
+      </Route>
 
         <Route path="/register">
-          <Home />
+          <Register />
         </Route>
 
         <Route path="/instance">
