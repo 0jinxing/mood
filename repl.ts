@@ -1,14 +1,14 @@
-import * as fs from "fs";
-import * as path from "path";
-import { EventEmitter } from "events";
-import * as inquirer from "inquirer";
-import * as puppeteer from "puppeteer";
+import * as fs from 'fs';
+import * as path from 'path';
+import { EventEmitter } from 'events';
+import * as inquirer from 'inquirer';
+import * as puppeteer from 'puppeteer';
 
 const emitter = new EventEmitter();
 
 function getCode(): string {
-  const bundlePath = path.resolve("dist", "record.bundle.js");
-  return fs.readFileSync(bundlePath, "utf8");
+  const bundlePath = path.resolve('dist', 'record.bundle.js');
+  return fs.readFileSync(bundlePath, 'utf8');
 }
 
 (async () => {
@@ -21,21 +21,21 @@ function getCode(): string {
     events = [];
     const { url } = await inquirer.prompt<{ url: string }>([
       {
-        type: "input",
-        name: "url",
+        type: 'input',
+        name: 'url',
         message:
-          "Enter the url you want to record, e.g https://react-redux.realworld.io: "
+          'Enter the url you want to record, e.g https://react-redux.realworld.io: '
       }
     ]);
 
     console.log(`Going to open ${url}...`);
     await record(url);
-    console.log("Ready to record. You can do any interaction on the page.");
+    console.log('Ready to record. You can do any interaction on the page.');
 
     const { shouldStore } = await inquirer.prompt<{ shouldStore: boolean }>([
       {
-        type: "confirm",
-        name: "shouldStore",
+        type: 'confirm',
+        name: 'shouldStore',
         message: `Persistently store these recorded events?`
       }
     ]);
@@ -48,9 +48,9 @@ function getCode(): string {
       shouldRecordAnother: boolean;
     }>([
       {
-        type: "confirm",
-        name: "shouldRecordAnother",
-        message: "Record another one?"
+        type: 'confirm',
+        name: 'shouldRecordAnother',
+        message: 'Record another one?'
       }
     ]);
 
@@ -65,14 +65,14 @@ function getCode(): string {
     const browser = await puppeteer.launch({
       headless: false,
       defaultViewport: null,
-      args: ["--start-maximized"]
+      args: ['--start-maximized']
     });
     const page = await browser.newPage();
     await page.goto(url, {
-      waitUntil: "domcontentloaded"
+      waitUntil: 'domcontentloaded'
     });
 
-    await page.exposeFunction("_replLog", (event) => {
+    await page.exposeFunction('_replLog', event => {
       events.push(event);
     });
 
@@ -83,8 +83,8 @@ function getCode(): string {
       });
     `);
 
-    page.on("framenavigated", async () => {
-      const isRecording = await page.evaluate("window.__IS_RECORDING__");
+    page.on('framenavigated', async () => {
+      const isRecording = await page.evaluate('window.__IS_RECORDING__');
       if (!isRecording) {
         await page.evaluate(`;${code}
           window.__IS_RECORDING__ = true
@@ -97,14 +97,14 @@ function getCode(): string {
   }
 
   function saveEvents() {
-    const tempFolder = path.resolve("temp");
+    const tempFolder = path.resolve('temp');
     if (!fs.existsSync(tempFolder)) {
       fs.mkdirSync(tempFolder);
     }
     const time = new Date()
       .toISOString()
-      .replace(/[-|:]/g, "_")
-      .replace(/\..+/, "");
+      .replace(/[-|:]/g, '_')
+      .replace(/\..+/, '');
     const fileName = `replay_${time}.html`;
     const content = `
       <!DOCTYPE html>
@@ -121,7 +121,7 @@ function getCode(): string {
             /*<!--*/
             const events = ${JSON.stringify(events).replace(
               /<\/script>/g,
-              "<\\/script>"
+              '<\\/script>'
             )};
             /*-->*/
             const replayer = new $$player.default(events);
@@ -136,10 +136,10 @@ function getCode(): string {
   }
 
   process
-    .on("uncaughtException", (error) => {
+    .on('uncaughtException', error => {
       console.error(error);
     })
-    .on("unhandledRejection", (error) => {
+    .on('unhandledRejection', error => {
       console.error(error);
     });
 })();

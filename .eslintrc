@@ -4,7 +4,13 @@
     "es2020": true,
     "node": true
   },
-  "extends": ["plugin:react/recommended", "standard", "prettier"],
+  "extends": [
+    "plugin:react/recommended",
+    "standard",
+    "prettier",
+    "prettier/react"
+  ],
+
   "parser": "@typescript-eslint/parser",
   "parserOptions": {
     "ecmaFeatures": {
@@ -14,8 +20,11 @@
   },
   "plugins": ["react", "@typescript-eslint"],
   "rules": {
+    "react/prop-types": 0,
+    "@typescript-eslint/no-unused-vars": [2, { "args": "none" }],
+
     "semi": ["error", "always"],
     "comma-dangle": ["error", "never"],
-    "quotes": ["error", "double"]
+    "quotes": ["error", "single"]
   }
 }

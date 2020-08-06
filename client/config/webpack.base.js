@@ -1,5 +1,5 @@
-const path = require('path')
-const HtmlPlugin = require('html-webpack-plugin')
+const path = require('path');
+const HtmlPlugin = require('html-webpack-plugin');
 
 module.exports = {
   mode: 'development',
@@ -52,4 +52,4 @@ module.exports = {
     port: 8080,
     open: true
   }
-}
+};
