@@ -1,10 +1,7 @@
 import * as fs from 'fs';
 import * as path from 'path';
-import { EventEmitter } from 'events';
 import * as inquirer from 'inquirer';
 import * as puppeteer from 'puppeteer';
-
-const emitter = new EventEmitter();
 
 function getCode(): string {
   const bundlePath = path.resolve('dist', 'record.bundle.js');
@@ -36,7 +33,7 @@ function getCode(): string {
       {
         type: 'confirm',
         name: 'shouldStore',
-        message: `Persistently store these recorded events?`
+        message: 'Persistently store these recorded events?'
       }
     ]);
 

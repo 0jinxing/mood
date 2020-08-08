@@ -1,9 +1,9 @@
-import { Injectable, ForbiddenException } from "@nestjs/common";
-import { InjectModel, InjectConnection } from "@nestjs/mongoose";
-import { Instance } from "./instance.schema";
-import { Model, Connection } from "mongoose";
-import { genUID } from "@/_common/uid";
-import { AuthService } from "@/auth/auth.service";
+import { Injectable, ForbiddenException } from '@nestjs/common';
+import { InjectModel, InjectConnection } from '@nestjs/mongoose';
+import { Instance } from './instance.schema';
+import { Model, Connection } from 'mongoose';
+import { genUID } from '@/_common/uid';
+import { AuthService } from '@/auth/auth.service';
 
 @Injectable()
 export class InstanceService {
@@ -66,7 +66,7 @@ export class InstanceService {
         await current.updateOne({ $pullAll: { instances: ids } });
 
         const { deletedCount } = await this.instanceModel.deleteMany({
-          _id: { $in: ids },
+          _id: { $in: ids }
         });
 
         return { deletedCount };

@@ -4,15 +4,15 @@ import {
   Body,
   UseGuards,
   Get,
-  Delete,
-} from "@nestjs/common";
-import { InstanceService } from "./instance.service";
-import { CreateDTO } from "./dto/create.dto";
-import { AuthGuard } from "@/auth/auth.guard";
-import { QueryDTO } from "./dto/query.dto";
-import { DeleteDTO } from "./dto/delete.dto";
+  Delete
+} from '@nestjs/common';
+import { InstanceService } from './instance.service';
+import { CreateDTO } from './dto/create.dto';
+import { AuthGuard } from '@/auth/auth.guard';
+import { QueryDTO } from './dto/query.dto';
+import { DeleteDTO } from './dto/delete.dto';
 
-@Controller("instance")
+@Controller('instance')
 export class InstanceController {
   constructor(private instanceService: InstanceService) {}
 

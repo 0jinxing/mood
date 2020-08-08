@@ -1,6 +1,6 @@
-import { on, throttle } from "../utils";
-import { ListenerHandler, ScrollCallback } from "../types";
-import { mirror, TNode } from "@traps/snapshot";
+import { on, throttle } from '../utils';
+import { ListenerHandler, ScrollCallback } from '../types';
+import { mirror, TNode } from '@traps/snapshot';
 
 function initScrollObserver(cb: ScrollCallback): ListenerHandler {
   const updatePosition = throttle<UIEvent>((event) => {
@@ -10,7 +10,7 @@ function initScrollObserver(cb: ScrollCallback): ListenerHandler {
     if (target === document) $scroll = document.scrollingElement as HTMLElement;
     cb({ id, x: $scroll.scrollLeft, y: $scroll.scrollTop });
   }, 100);
-  return on("scroll", updatePosition);
+  return on('scroll', updatePosition);
 }
 
 export default initScrollObserver;

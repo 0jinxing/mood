@@ -1,13 +1,13 @@
-import React, { FC } from "react";
-import { Layout } from "antd";
+import React, { FC } from 'react';
+import { Layout } from 'antd';
 
-import PageSider from "@/components/PageSider";
-import PageHeader from "@/components/PageHeader";
-import PageContainer from "@/components/PageContainer";
+import PageSider from '@/components/PageSider';
+import PageHeader from '@/components/PageHeader';
+import PageContainer from '@/components/PageContainer';
 
 const BasicLayout: FC = ({ children }) => {
   return (
-    <Layout style={{ minHeight: "100%" }}>
+    <Layout style={{ minHeight: '100%' }}>
       <PageHeader />
       <Layout>
         <PageSider />

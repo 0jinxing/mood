@@ -1,8 +1,8 @@
-import * as request from "supertest";
-import { INestApplication } from "@nestjs/common";
-import { createApp } from "../create-app";
-import { cleanUp } from "test/clean-up";
-import { expect } from "chai";
+import * as request from 'supertest';
+import { INestApplication } from '@nestjs/common';
+import { createApp } from '../create-app';
+import { cleanUp } from 'test/clean-up';
+import { expect } from 'chai';
 
 function queryInstance(
   app: INestApplication,
@@ -11,8 +11,8 @@ function queryInstance(
   limit?: number
 ) {
   return request(app.getHttpServer())
-    .get("/instance")
-    .set("Authorization", `bearer ${accessToken}`)
+    .get('/instance')
+    .set('Authorization', `bearer ${accessToken}`)
     .send({ skip, limit })
     .expect(200);
 }
@@ -23,23 +23,23 @@ function createInstance(
   domain: string
 ) {
   return request(app.getHttpServer())
-    .post("/instance")
-    .set("Authorization", `bearer ${accessToken}`)
+    .post('/instance')
+    .set('Authorization', `bearer ${accessToken}`)
     .send({ domain })
     .expect(201);
 }
 
-describe("instance e2e", async () => {
+describe('instance e2e', async () => {
   let app: INestApplication;
   let accessToken: string;
 
   before(async () => {
     app = await createApp();
 
-    const data = { email: "test@domain.com", password: "password" };
+    const data = { email: 'test@domain.com', password: 'password' };
 
     const res = await request(app.getHttpServer())
-      .post("/auth/register")
+      .post('/auth/register')
       .send(data);
 
     accessToken = res.body.accessToken;
@@ -50,10 +50,10 @@ describe("instance e2e", async () => {
     await cleanUp();
   });
 
-  it("create instance", async () => {
-    await createInstance(app, accessToken, "baidu.com");
-    await createInstance(app, accessToken, "bing.com");
-    await createInstance(app, accessToken, "google.com");
+  it('create instance', async () => {
+    await createInstance(app, accessToken, 'baidu.com');
+    await createInstance(app, accessToken, 'bing.com');
+    await createInstance(app, accessToken, 'google.com');
 
     const { body } = await queryInstance(app, accessToken);
 
@@ -61,7 +61,7 @@ describe("instance e2e", async () => {
   });
 
   let instances: string[];
-  it("query instance", async () => {
+  it('query instance', async () => {
     const { body } = await queryInstance(app, accessToken);
     instances = body.map(({ _id }) => _id);
     expect(instances.length).eq(3);
@@ -73,18 +73,18 @@ describe("instance e2e", async () => {
     expect(skip.map(({ _id }) => _id)).deep.eq(instances.slice(1, 3));
   });
 
-  it("delete instance", async () => {
+  it('delete instance', async () => {
     const { body } = await request(app.getHttpServer())
-      .delete("/instance")
-      .set("Authorization", `bearer ${accessToken}`)
+      .delete('/instance')
+      .set('Authorization', `bearer ${accessToken}`)
       .send(instances.slice(0, 1))
       .expect(200);
 
     expect(body.deletedCount).eq(1);
 
     const { body: list }: { body: any[] } = await request(app.getHttpServer())
-      .get("/instance")
-      .set("Authorization", `bearer ${accessToken}`)
+      .get('/instance')
+      .set('Authorization', `bearer ${accessToken}`)
       .send()
       .expect(200);
 
@@ -93,12 +93,12 @@ describe("instance e2e", async () => {
     instances = list.map((i) => i._id);
   });
 
-  it("batch delete instance", async () => {
+  it('batch delete instance', async () => {
     const {
-      body: { deletedCount },
+      body: { deletedCount }
     } = await request(app.getHttpServer())
-      .delete("/instance")
-      .set("Authorization", `bearer ${accessToken}`)
+      .delete('/instance')
+      .set('Authorization', `bearer ${accessToken}`)
       .send(instances)
       .expect(200);
 

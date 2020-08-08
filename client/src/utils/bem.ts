@@ -1,10 +1,10 @@
-import classnames from "classnames";
+import classnames from 'classnames';
 
-const namespace = "mood";
-const blockSeparator = "_";
-const elementSeparator = "__";
-const modifierSeparator = "--";
-const statePrefix = "is-";
+const namespace = 'mood';
+const blockSeparator = '_';
+const elementSeparator = '__';
+const modifierSeparator = '--';
+const statePrefix = 'is-';
 
 let block: string;
 export const b = (b: string) => {
@@ -29,7 +29,7 @@ export const m = (m: string) => {
 };
 
 export const when = (state: string | string[]) => {
-  const stateList = typeof state === "string" ? [state] : state;
+  const stateList = typeof state === 'string' ? [state] : state;
   stateList.map((s) => statePrefix + s);
   return classnames(stateList);
 };

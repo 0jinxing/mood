@@ -1,7 +1,7 @@
-import * as mittProxy from "mitt";
+import * as mittProxy from 'mitt';
 
-import rebuild, { buildNodeWithSN } from "@traps/snapshot/rebuild";
-import { mirror } from "@traps/snapshot";
+import rebuild, { buildNodeWithSN } from '@traps/snapshot/rebuild';
+import { mirror } from '@traps/snapshot';
 import {
   TEventWithTime,
   EventType,
@@ -11,29 +11,29 @@ import {
   FullSnapshotEvent,
   ViewportResizeDimention,
   IncrementalData,
-  AddedNodeMutation,
-} from "@traps/record";
+  AddedNodeMutation
+} from '@traps/record';
 
-import Timer from "./timer";
-import { createPlayerService } from "./machine";
-import getInjectStyle from "./styles/inject-style";
+import Timer from './timer';
+import { createPlayerService } from './machine';
+import getInjectStyle from './styles/inject-style';
 
 import {
   PlayerConfig,
   PlayerEmitterEvent,
   PlayerMetaData,
   ActionWithDelay,
-  PlayerEventType,
-} from "./types";
+  PlayerEventType
+} from './types';
 
-import "./styles/index.css";
+import './styles/index.css';
 
 const mitt = (mittProxy as any).default || mittProxy;
 
 const SKIP_TIME_THRESHOLD = 10 * 1000;
 const SKIP_TIME_INTERVAL = 5 * 1000;
 
-const REPLAY_CONSOLE_PREFIX = "[TRAPS WARN]";
+const REPLAY_CONSOLE_PREFIX = '[TRAPS WARN]';
 
 const defaultConfig: PlayerConfig = {
   speed: 1,
@@ -43,7 +43,7 @@ const defaultConfig: PlayerConfig = {
   showDebug: false,
   liveMode: false,
   insertStyleRules: [],
-  triggerFocus: true,
+  triggerFocus: true
 };
 
 export default class Player {
@@ -65,12 +65,12 @@ export default class Player {
     events: Array<TEventWithTime>,
     config: Partial<PlayerConfig> = defaultConfig
   ) {
-    if (events.length < 2) throw new Error("Replayer need at least 2 events.");
+    if (events.length < 2) throw new Error('Replayer need at least 2 events.');
     this.config = Object.assign({}, defaultConfig, config);
     this.service = createPlayerService({
       events,
       timeOffset: 0,
-      speed: config.speed!,
+      speed: config.speed!
     });
     this.service.start();
     this.events = events;
@@ -119,7 +119,7 @@ export default class Player {
             castFn();
             this.emitter.emit(PlayerEmitterEvent.EVENT_CAST, event);
           },
-          delay: this.getDelay(event),
+          delay: this.getDelay(event)
         });
       }
     }
@@ -138,7 +138,8 @@ export default class Player {
   public resume(timeOffset = 0) {
     this.timer.clear();
     this.baselineTime = this.events[0].timestamp + timeOffset;
-    const actions = new Array<ActionWithDelay>();
+    const actions: ActionWithDelay[] = [];
+    
     for (const event of this.events) {
       if (
         event.timestamp <= this.lastPlayedEvent.timestamp ||
@@ -149,7 +150,7 @@ export default class Player {
       const castFn = this.getCastFn(event);
       actions.push({
         doAction: castFn,
-        delay: this.getDelay(event),
+        delay: this.getDelay(event)
       });
     }
     this.timer.addActions(actions);
@@ -182,7 +183,7 @@ export default class Player {
     const { data, timestamp } = event;
     switch (data.source) {
       case IncrementalSource.MUTATION: {
-        data.removes.forEach((mutation) => {
+        data.removes.forEach(mutation => {
           const $el = mirror.getNode(mutation.id);
           const $parent = mirror.getNode(mutation.parentId);
           if (!$el) {
@@ -206,7 +207,7 @@ export default class Player {
             return;
           }
 
-          let $next: Node | undefined = undefined;
+          let $next: Node | undefined;
 
           if (mutation.nextId) {
             $next = mirror.getNode(mutation.nextId);
@@ -233,11 +234,11 @@ export default class Player {
           }
         };
 
-        data.adds.forEach((mutation) => {
+        data.adds.forEach(mutation => {
           appendNode(mutation);
         });
         while (queue.length) {
-          if (queue.every((m) => !m.parentId || !mirror.getNode(m.parentId))) {
+          if (queue.every(m => !m.parentId || !mirror.getNode(m.parentId))) {
             return;
           }
 
@@ -245,7 +246,7 @@ export default class Player {
           appendNode(mutation);
         }
 
-        data.texts.forEach((mutation) => {
+        data.texts.forEach(mutation => {
           const $target = mirror.getNode(mutation.id);
           if (!$target) {
             return;
@@ -253,7 +254,7 @@ export default class Player {
           $target.textContent = mutation.value;
         });
 
-        data.attributes.forEach((mutation) => {
+        data.attributes.forEach(mutation => {
           const $target = mirror.getNode<Element>(mutation.id);
           if (!$target) {
             return;
@@ -261,7 +262,7 @@ export default class Player {
           for (const attributeName in mutation.attributes) {
             const value = mutation.attributes[attributeName];
             if (value) {
-              $target.setAttribute(attributeName, value + "");
+              $target.setAttribute(attributeName, value + '');
             } else {
               $target.removeAttribute(attributeName);
             }
@@ -275,12 +276,12 @@ export default class Player {
           const lastPosition = data.positions[data.positions.length - 1];
           this.moveAndHover(lastPosition.x, lastPosition.y, lastPosition.id);
         } else {
-          data.positions.forEach((mutation) => {
+          data.positions.forEach(mutation => {
             const action = {
               doAction: () => {
                 this.moveAndHover(mutation.x, mutation.y, mutation.id);
               },
-              delay: mutation.timeOffset + timestamp - this.baselineTime,
+              delay: mutation.timeOffset + timestamp - this.baselineTime
             };
             this.timer.addAction(action);
           });
@@ -295,7 +296,7 @@ export default class Player {
         const event = new Event(MouseInteractions[data.type].toLowerCase());
         this.emitter.emit(PlayerEmitterEvent.MOUSE_INTERACTION, {
           type: data.type,
-          $target,
+          $target
         });
         const { triggerFocus } = this.config;
         switch (data.type) {
@@ -314,9 +315,9 @@ export default class Player {
           case MouseInteractions.TOUCHSTART: {
             if (!isSync) {
               this.moveAndHover(data.x, data.y, data.id);
-              this.$cursor.classList.remove("active");
+              this.$cursor.classList.remove('active');
               setTimeout(() => {
-                this.$cursor.classList.add("active");
+                this.$cursor.classList.add('active');
               });
             }
             break;
@@ -336,7 +337,7 @@ export default class Player {
           this.$iframe.contentWindow!.scrollTo({
             top: data.y,
             left: data.x,
-            behavior: isSync ? "auto" : "smooth",
+            behavior: isSync ? 'auto' : 'smooth'
           });
         } else {
           try {
@@ -355,7 +356,7 @@ export default class Player {
       case IncrementalSource.VIEWPORT_RESIZE: {
         this.emitter.emit(PlayerEmitterEvent.RESIZE, {
           width: data.width,
-          height: data.height,
+          height: data.height
         });
         break;
       }
@@ -364,13 +365,13 @@ export default class Player {
         const $target = mirror.getNode<HTMLMediaElement>(data.id);
         if (!$target) break;
 
-        if (data.type === "play") {
+        if (data.type === 'play') {
           if ($target.readyState >= HTMLMediaElement.HAVE_CURRENT_DATA) {
             $target.play();
           } else {
-            $target.addEventListener("canplay", () => $target.play());
+            $target.addEventListener('canplay', () => $target.play());
           }
-        } else if (data.type === "pause") {
+        } else if (data.type === 'pause') {
           $target.pause();
         }
         break;
@@ -381,7 +382,7 @@ export default class Player {
 
         if (!$target) break;
 
-        if (typeof data.value === "boolean") {
+        if (typeof data.value === 'boolean') {
           $target.checked = data.value;
         } else {
           $target.value = data.value;
@@ -431,14 +432,14 @@ export default class Player {
 
   private hoverElement($el: Element) {
     this.$iframe
-      .contentDocument!.querySelectorAll(".\\:hover")
-      .forEach(($hovered) => {
-        $hovered.classList.remove(":hover");
+      .contentDocument!.querySelectorAll('.\\:hover')
+      .forEach($hovered => {
+        $hovered.classList.remove(':hover');
       });
     let $current: Element | null = $el;
     while ($current) {
       if ($current.classList) {
-        $current.classList.add(":hover");
+        $current.classList.add(':hover');
       }
       $current = $current.parentElement;
     }
@@ -490,7 +491,7 @@ export default class Player {
               const skipTime =
                 this.nextUserInteractionEvent.delay! - event.delay!;
               const payload = {
-                speed: Math.min(Math.round(skipTime / SKIP_TIME_INTERVAL), 360),
+                speed: Math.min(Math.round(skipTime / SKIP_TIME_INTERVAL), 360)
               };
               this.setConfig(payload);
               this.emitter.emit(PlayerEmitterEvent.SKIP_START, payload);
@@ -539,7 +540,7 @@ export default class Player {
 
     rebuild(event.data.adds, contentDocument);
 
-    const $style = document.createElement("style");
+    const $style = document.createElement('style');
     const { documentElement, head } = contentDocument;
     documentElement.insertBefore($style, head);
     const injectStylesRules = getInjectStyle().concat(
@@ -567,17 +568,17 @@ export default class Player {
           this.timer.clear();
           this.emitter.emit(PlayerEmitterEvent.LOAD_STYLESHEET_END);
           timer = window.setTimeout(() => {
-            if (this.service.state.matches("playing")) {
+            if (this.service.state.matches('playing')) {
               this.resume(this.getCurrentTime());
             }
             timer = -1;
           }, this.config.loadTimeout);
         }
         unloadSheets.add($link);
-        $link.addEventListener("load", () => {
+        $link.addEventListener('load', () => {
           unloadSheets.delete($link);
           if (unloadSheets.size === 0 && timer !== -1) {
-            if (this.service.state.matches("playing")) {
+            if (this.service.state.matches('playing')) {
               this.resume(this.getCurrentTime());
             }
             this.emitter.emit(PlayerEmitterEvent.LOAD_STYLESHEET_END);
@@ -590,18 +591,18 @@ export default class Player {
   }
 
   private setupDOM() {
-    this.$wrapper = document.createElement("div");
-    this.$wrapper.classList.add("__wrapper");
+    this.$wrapper = document.createElement('div');
+    this.$wrapper.classList.add('__wrapper');
     this.config.root.appendChild(this.$wrapper);
 
-    this.$cursor = document.createElement("div");
-    this.$cursor.classList.add("__cursor");
+    this.$cursor = document.createElement('div');
+    this.$cursor.classList.add('__cursor');
     this.$wrapper.appendChild(this.$cursor);
 
-    this.$iframe = document.createElement("iframe");
-    this.$iframe.setAttribute("sandbox", "allow-same-origin");
-    this.$iframe.setAttribute("scrolling", "no");
-    this.$iframe.setAttribute("style", "pointer-events: none");
+    this.$iframe = document.createElement('iframe');
+    this.$iframe.setAttribute('sandbox', 'allow-same-origin');
+    this.$iframe.setAttribute('scrolling', 'no');
+    this.$iframe.setAttribute('style', 'pointer-events: none');
     this.$wrapper.appendChild(this.$iframe);
   }
 

@@ -1,7 +1,7 @@
-import { serializeWithId, transformAttr, TNode, mirror } from "@traps/snapshot";
-import { isAncestorRemoved, deepDelete, isAncestorInSet, isParentRemoved } from "../utils";
+import { serializeWithId, transformAttr, TNode, mirror } from '@traps/snapshot';
+import { isAncestorRemoved, deepDelete, isAncestorInSet, isParentRemoved } from '../utils';
 
-import { MutationCallBack, AttrCursor, RemovedNodeMutation, AddedNodeMutation } from "../types";
+import { MutationCallBack, AttrCursor, RemovedNodeMutation, AddedNodeMutation } from '../types';
 
 const genKey = (id: number, parentId: number) => `${id}@${parentId}`;
 
@@ -18,7 +18,7 @@ function initMutationObserver(cb: MutationCallBack) {
     const movedMap = new Map<string, true>();
 
     const genAdds = ($node: Node | TNode, $parent?: Node | TNode) => {
-      if ("__sn" in $node) {
+      if ('__sn' in $node) {
         movedSet.add($node);
         const parentId = $parent ? mirror.getId($parent) : undefined;
         if (parentId) {
@@ -34,7 +34,7 @@ function initMutationObserver(cb: MutationCallBack) {
     mutations.forEach(
       ({ type, target, oldValue, addedNodes, removedNodes, attributeName }) => {
         // characterData
-        if (type === "characterData") {
+        if (type === 'characterData') {
           const value = target.textContent;
 
           if (value === oldValue) return;
@@ -42,7 +42,7 @@ function initMutationObserver(cb: MutationCallBack) {
           texts.push({ value: value!, $el: target });
         }
         // attributes
-        else if (type === "attributes") {
+        else if (type === 'attributes') {
           const value = (target as HTMLElement).getAttribute(attributeName!);
 
           if (oldValue === value) return;
@@ -58,7 +58,7 @@ function initMutationObserver(cb: MutationCallBack) {
           );
         }
         // childList
-        else if (type === "childList") {
+        else if (type === 'childList') {
           addedNodes.forEach(($node) => genAdds($node, target));
           removedNodes.forEach(($node) => {
             const id = mirror.getId($node);
@@ -114,7 +114,7 @@ function initMutationObserver(cb: MutationCallBack) {
       adds.push({
         parentId,
         nextId,
-        node: serializeWithId($node, document)!,
+        node: serializeWithId($node, document)!
       });
     };
 
@@ -153,15 +153,15 @@ function initMutationObserver(cb: MutationCallBack) {
       texts: texts
         .map((text) => ({
           id: mirror.getId(text.$el as TNode),
-          value: text.value,
+          value: text.value
         }))
         .filter((text) => mirror.has(text.id)),
       attributes: attrs.map((attr) => ({
         id: mirror.getId(attr.$el as TNode),
-        attributes: attr.attributes,
+        attributes: attr.attributes
       })),
       removes,
-      adds,
+      adds
     };
 
     if (
@@ -180,7 +180,7 @@ function initMutationObserver(cb: MutationCallBack) {
     characterData: true,
     characterDataOldValue: true,
     childList: true,
-    subtree: true,
+    subtree: true
   });
   return observer;
 }

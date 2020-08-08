@@ -1,5 +1,5 @@
-import { TNode, mirror } from "@traps/snapshot";
-import { ListenerHandler } from "./types";
+import { TNode, mirror } from '@traps/snapshot';
+import { ListenerHandler } from './types';
 
 export function on(
   type: string,
@@ -16,13 +16,13 @@ export function throttle<T>(
   wait: number,
   options?: { leading?: boolean; trailing?: boolean }
 ) {
-  let timeout: ReturnType<typeof setTimeout> | undefined = undefined;
+  let timeout: ReturnType<typeof setTimeout> | undefined;
   let previous = 0;
   return (...args: any[]) => {
     const now = Date.now();
     const { leading, trailing } = options || {};
     !previous && leading === false && (previous = now);
-    let remaining = wait - (now - previous);
+    const remaining = wait - (now - previous);
     if (remaining <= 0 || remaining > wait) {
       if (timeout) {
         clearTimeout(timeout);

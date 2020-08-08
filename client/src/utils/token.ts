@@ -1,15 +1,15 @@
 class Token {
-  private value: string = "";
+  private value: string = '';
   private timestamp: number = 0;
   private expires: number = 0;
 
   constructor(private key: string) {
-    this.value = localStorage.getItem(`${key}`) ?? "";
+    this.value = localStorage.getItem(`${key}`) ?? '';
 
-    const timestamp = +(localStorage.getItem(`${key}_timestamp`) ?? "");
+    const timestamp = +(localStorage.getItem(`${key}_timestamp`) ?? '');
     this.timestamp = isNaN(timestamp) ? 0 : timestamp;
 
-    const expires = +(localStorage.getItem(`${key}_expires`) ?? "");
+    const expires = +(localStorage.getItem(`${key}_expires`) ?? '');
     this.expires = isNaN(expires) ? 0 : expires;
   }
 

@@ -1,10 +1,10 @@
-import * as request from "supertest";
-import { INestApplication } from "@nestjs/common";
-import { createApp } from "../create-app";
-import { cleanUp } from "test/clean-up";
-import { after } from "mocha";
+import * as request from 'supertest';
+import { INestApplication } from '@nestjs/common';
+import { createApp } from '../create-app';
+import { cleanUp } from 'test/clean-up';
+import { after } from 'mocha';
 
-describe("auth e2e test", async () => {
+describe('auth e2e test', async () => {
   let app: INestApplication;
 
   before(async () => {
@@ -16,42 +16,42 @@ describe("auth e2e test", async () => {
     await cleanUp();
   });
 
-  it("unauthorized", () => {
-    return request(app.getHttpServer()).post("/auth/logout").expect(401);
+  it('unauthorized', () => {
+    return request(app.getHttpServer()).post('/auth/logout').expect(401);
   });
 
   let accessToken: string;
 
-  it("register", async () => {
-    const data = { email: "test@domain.com", password: "password" };
+  it('register', async () => {
+    const data = { email: 'test@domain.com', password: 'password' };
     const res = await request(app.getHttpServer())
-      .post("/auth/register")
+      .post('/auth/register')
       .send(data)
       .expect(200);
 
     accessToken = res.body.accessToken;
   });
 
-  it("re-register", () => {
-    const data = { email: "test@domain.com", password: "password" };
-    request(app.getHttpServer()).post("/auth/register").send(data).expect(403);
+  it('re-register', () => {
+    const data = { email: 'test@domain.com', password: 'password' };
+    request(app.getHttpServer()).post('/auth/register').send(data).expect(403);
   });
 
-  it("login", async () => {
-    const data = { email: "test@domain.com", password: "password" };
+  it('login', async () => {
+    const data = { email: 'test@domain.com', password: 'password' };
 
     const res = await request(app.getHttpServer())
-      .post("/auth/login")
+      .post('/auth/login')
       .send(data)
       .expect(200);
 
     accessToken = res.body.accessToken;
   });
 
-  it("authorized", () => {
+  it('authorized', () => {
     return request(app.getHttpServer())
-      .get("/user")
-      .set("Authorization", `bearer ${accessToken}`)
+      .get('/user')
+      .set('Authorization', `bearer ${accessToken}`)
       .expect(200);
   });
 });

@@ -1,1 +1,1 @@
-export default () => ["noscript { display: none !important; }"];
+export default () => ['noscript { display: none !important; }'];

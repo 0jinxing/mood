@@ -1,4 +1,4 @@
-import { Attributes, AddedNode } from "@traps/snapshot";
+import { Attributes, AddedNode } from '@traps/snapshot';
 
 export enum EventType {
   DOM_CONTENT_LOADED,
@@ -10,15 +10,15 @@ export enum EventType {
 }
 
 export enum MouseInteractions {
-  MOUSEUP = "MOUSEUP",
-  MOUSEDOWN = "MOUSEDOWN",
-  CLICK = "CLICK",
-  CONTEXTMENU = "CONTEXTMENU",
-  DBLCLICK = "DBLCLICK",
-  FOCUS = "FOCUS",
-  BLUR = "BLUR",
-  TOUCHSTART = "TOUCHSTART",
-  TOUCHEND = "TOUCHEND",
+  MOUSEUP = 'MOUSEUP',
+  MOUSEDOWN = 'MOUSEDOWN',
+  CLICK = 'CLICK',
+  CONTEXTMENU = 'CONTEXTMENU',
+  DBLCLICK = 'DBLCLICK',
+  FOCUS = 'FOCUS',
+  BLUR = 'BLUR',
+  TOUCHSTART = 'TOUCHSTART',
+  TOUCHEND = 'TOUCHEND',
 }
 
 export enum IncrementalSource {
@@ -143,7 +143,7 @@ export type InputValue = string | boolean;
 
 export type HookResetter = () => void;
 
-export type MediaInteractions = "play" | "pause";
+export type MediaInteractions = 'play' | 'pause';
 
 export class AddedNodeMutation extends AddedNode {
   parentId: number;

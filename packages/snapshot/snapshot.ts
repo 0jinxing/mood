@@ -1,12 +1,12 @@
-import { mirror, transformAttr, absoluteToStylesheet } from "./utils";
+import { mirror, transformAttr, absoluteToStylesheet } from './utils';
 import {
   SerializedNode,
   NodeType,
   Attributes,
   TNode,
   SerializedNodeWithId,
-  AddedNode,
-} from "./types";
+  AddedNode
+} from './types';
 
 let id = 0;
 function genId(): number {
@@ -18,10 +18,10 @@ function getCSSText(styleSheet: CSSStyleSheet): string {
     const rules = styleSheet.cssRules;
     return Array.from(rules).reduce(
       (prev, cur) => prev + getCSSRuleText(cur),
-      ""
+      ''
     );
   } catch {
-    return "";
+    return '';
   }
 }
 
@@ -45,7 +45,7 @@ function serialize($node: Node, $doc: HTMLDocument): SerializedNode | null {
       type: NodeType.DOCUMENT_TYPE_NODE,
       name: $node.name,
       publicId: $node.publicId,
-      systemId: $node.systemId,
+      systemId: $node.systemId
     };
   }
 
@@ -57,31 +57,31 @@ function serialize($node: Node, $doc: HTMLDocument): SerializedNode | null {
     // link \ style => inline style & absolute url
     if ($node instanceof HTMLLinkElement) {
       const styleSheet = Array.from($doc.styleSheets).find(
-        (sheet) => sheet.href === $node.href
+        sheet => sheet.href === $node.href
       ) as CSSStyleSheet;
-      const cssText = styleSheet ? getCSSText(styleSheet) : "";
+      const cssText = styleSheet ? getCSSText(styleSheet) : '';
       if (cssText) {
-        delete attributes["rel"];
-        delete attributes["href"];
-        attributes["_cssText"] = absoluteToStylesheet(cssText);
+        delete attributes.rel;
+        delete attributes.href;
+        attributes._cssText = absoluteToStylesheet(cssText);
       }
     }
 
     if ($node instanceof HTMLStyleElement) {
       const cssText = getCSSText($node.sheet as CSSStyleSheet);
       if (cssText) {
-        attributes["_cssText"] = absoluteToStylesheet(cssText);
+        attributes._cssText = absoluteToStylesheet(cssText);
       }
     }
 
     // handle form fields
     if ($node instanceof HTMLInputElement) {
-      const type = attributes["type"];
+      const type = attributes.type;
       const value = $node.value;
-      if (type !== "radio" && type !== "checkbox") {
-        attributes["value"] = value;
+      if (type !== 'radio' && type !== 'checkbox') {
+        attributes.value = value;
       } else {
-        attributes["checked"] = $node.checked;
+        attributes.checked = $node.checked;
       }
     }
 
@@ -90,20 +90,20 @@ function serialize($node: Node, $doc: HTMLDocument): SerializedNode | null {
       $node instanceof HTMLSelectElement
     ) {
       const value = $node.value;
-      attributes["value"] = value;
+      attributes.value = value;
     } else if ($node instanceof HTMLOptionElement) {
-      attributes["selected"] = $node.selected;
+      attributes.selected = $node.selected;
     }
 
     // handle canvas
     if ($node instanceof HTMLCanvasElement) {
-      let dataURL = "";
+      let dataURL = '';
       try {
         dataURL = $node.toDataURL();
       } catch {
         // @WARN cross
       }
-      attributes["__dataURL"] = dataURL;
+      attributes.__dataURL = dataURL;
     }
 
     // handle audio and video
@@ -111,13 +111,13 @@ function serialize($node: Node, $doc: HTMLDocument): SerializedNode | null {
       $node instanceof HTMLAudioElement ||
       $node instanceof HTMLVideoElement
     ) {
-      attributes["__mediaState"] = $node.paused;
+      attributes.__mediaState = $node.paused;
     }
     return {
       type: NodeType.ELEMENT_NODE,
       tagName: $node.tagName,
       attributes,
-      isSVG: isSVGElement($node),
+      isSVG: isSVGElement($node)
     };
   }
 
@@ -128,23 +128,24 @@ function serialize($node: Node, $doc: HTMLDocument): SerializedNode | null {
     if (isStyle && textContent) {
       textContent = absoluteToStylesheet(textContent);
     } else if ($parentNode instanceof HTMLScriptElement) {
-      textContent = "SCRIPT_PLACEHOLDER";
+      textContent = 'SCRIPT_PLACEHOLDER';
     }
     return {
       type: NodeType.TEXT_NODE,
-      textContent: textContent || "",
-      isStyle,
+      textContent: textContent || '',
+      isStyle
     };
   }
 
+  // eslint-disable-next-line no-undef
   if ($node instanceof CDATASection) {
-    return { type: NodeType.CDATA_SECTION_NODE, textContent: "" };
+    return { type: NodeType.CDATA_SECTION_NODE, textContent: '' };
   }
 
   if ($node instanceof Comment) {
     return {
       type: NodeType.COMMENT_NODE,
-      textContent: $node.textContent || "",
+      textContent: $node.textContent || ''
     };
   }
 
@@ -160,7 +161,7 @@ export function serializeWithId(
     // @WARN not serialized
     return null;
   }
-  const id = "__sn" in $node ? $node.__sn.id : genId();
+  const id = '__sn' in $node ? $node.__sn.id : genId();
   const serializedNode = Object.assign(_serializedNode, { id });
   ($node as TNode).__sn = serializedNode;
   mirror.idNodeMap[id] = $node as TNode;
@@ -189,7 +190,7 @@ export function snapshot($doc: HTMLDocument): AddedNode[] {
     adds.push({
       parentId: parentId,
       nextId: nextId,
-      node: serializeWithId($node, $doc)!,
+      node: serializeWithId($node, $doc)!
     });
     $node.childNodes.forEach(serializeAdds);
   };

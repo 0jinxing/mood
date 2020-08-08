@@ -1,9 +1,9 @@
-declare module "*.svg" {
+declare module '*.svg' {
   const value: any;
   export default value;
 }
 
-declare module "*.scss" {
+declare module '*.scss' {
   const value: Record<string, string>;
   export default value;
 }

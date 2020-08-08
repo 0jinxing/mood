@@ -1,10 +1,10 @@
-import React from "react";
-import { BrowserRouter as Router, Route, Switch } from "react-router-dom";
+import React from 'react';
+import { BrowserRouter as Router, Route, Switch } from 'react-router-dom';
 
-import Home from "./routes/Home";
-import Login from "./routes/Login";
-import Register from "./routes/Register";
-import Instance from "./routes/instance";
+import Home from './routes/Home';
+import Login from './routes/Login';
+import Register from './routes/Register';
+import Instance from './routes/instance';
 
 const App = () => {
   return (

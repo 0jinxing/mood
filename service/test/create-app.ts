@@ -1,9 +1,9 @@
-import { Test } from "@nestjs/testing";
-import { AppModule } from "@/app.module";
+import { Test } from '@nestjs/testing';
+import { AppModule } from '@/app.module';
 
 export async function createApp() {
   const moduleFixture = await Test.createTestingModule({
-    imports: [AppModule],
+    imports: [AppModule]
   }).compile();
 
   const app = moduleFixture.createNestApplication();

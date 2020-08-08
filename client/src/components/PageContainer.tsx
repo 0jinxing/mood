@@ -1,6 +1,6 @@
-import React, { FC } from "react";
-import { Layout } from "antd";
-import styles from "./PageContainer.scss";
+import React, { FC } from 'react';
+import { Layout } from 'antd';
+import styles from './PageContainer.scss';
 
 const PageContainer: FC = ({ children }) => {
   return (

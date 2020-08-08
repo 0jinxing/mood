@@ -1,8 +1,8 @@
 enum LINK {
-  HOME = "/",
-  LOGIN = "/login",
-  REGISTER = "/register",
-  PASSWORD_RESET = "/password_reset",
+  HOME = '/',
+  LOGIN = '/login',
+  REGISTER = '/register',
+  PASSWORD_RESET = '/password_reset',
 }
 
 export default LINK;

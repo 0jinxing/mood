@@ -1,7 +1,7 @@
-import { snapshot } from "@traps/snapshot";
+import { snapshot } from '@traps/snapshot';
 
-import initObservers from "./observer";
-import { on, queryWindowHeight, queryWindowWidth } from "./utils";
+import initObservers from './observer';
+import { on, queryWindowHeight, queryWindowWidth } from './utils';
 
 import {
   TEvent,
@@ -9,8 +9,8 @@ import {
   RecordOptions,
   ListenerHandler,
   EventType,
-  IncrementalSource,
-} from "./types";
+  IncrementalSource
+} from './types';
 
 function withTimestamp(e: TEvent): TEventWithTime {
   return { ...e, timestamp: Date.now() };
@@ -58,16 +58,16 @@ function record(options: RecordOptions<TEvent>): ListenerHandler {
         data: {
           href: window.location.href,
           width: queryWindowWidth(),
-          height: queryWindowHeight(),
-        },
+          height: queryWindowHeight()
+        }
       },
       isCheckout
     );
     const adds = snapshot(document);
 
     if (!adds) {
-      console.warn("Failed to snapshot the document");
-      throw new Error("Failed to snapshot the document");
+      console.warn('Failed to snapshot the document');
+      throw new Error('Failed to snapshot the document');
     }
 
     wrappedEmitWithTime({
@@ -88,15 +88,15 @@ function record(options: RecordOptions<TEvent>): ListenerHandler {
               : document?.documentElement.scrollTop ||
                 document?.body?.parentElement?.scrollTop ||
                 document?.body.scrollTop ||
-                0,
-        },
-      },
+                0
+        }
+      }
     });
   };
 
   const handlers: ListenerHandler[] = [];
   handlers.push(
-    on("DOMContentLoaded", () => {
+    on('DOMContentLoaded', () => {
       wrappedEmitWithTime({ type: EventType.DOM_CONTENT_LOADED });
     })
   );
@@ -109,56 +109,56 @@ function record(options: RecordOptions<TEvent>): ListenerHandler {
           mutation: (m) => {
             wrappedEmitWithTime({
               type: EventType.INCREMENTAL_SNAPSHOT,
-              data: { source: IncrementalSource.MUTATION, ...m },
+              data: { source: IncrementalSource.MUTATION, ...m }
             });
           },
           mousemove: (positions, source) => {
             wrappedEmitWithTime({
               type: EventType.INCREMENTAL_SNAPSHOT,
-              data: { source, positions },
+              data: { source, positions }
             });
           },
           mouseInteraction: (param) => {
             wrappedEmitWithTime({
               type: EventType.INCREMENTAL_SNAPSHOT,
-              data: { source: IncrementalSource.MOUSE_INTERACTION, ...param },
+              data: { source: IncrementalSource.MOUSE_INTERACTION, ...param }
             });
           },
 
           scroll: (position) => {
             wrappedEmitWithTime({
               type: EventType.INCREMENTAL_SNAPSHOT,
-              data: { source: IncrementalSource.SCROLL, ...position },
+              data: { source: IncrementalSource.SCROLL, ...position }
             });
           },
 
           viewportResize: (dimention) => {
             wrappedEmitWithTime({
               type: EventType.INCREMENTAL_SNAPSHOT,
-              data: { source: IncrementalSource.VIEWPORT_RESIZE, ...dimention },
+              data: { source: IncrementalSource.VIEWPORT_RESIZE, ...dimention }
             });
           },
 
           input: (param) => {
             wrappedEmitWithTime({
               type: EventType.INCREMENTAL_SNAPSHOT,
-              data: { source: IncrementalSource.INPUT, ...param },
+              data: { source: IncrementalSource.INPUT, ...param }
             });
           },
 
           mediaInteraction: (param) => {
             wrappedEmitWithTime({
               type: EventType.INCREMENTAL_SNAPSHOT,
-              data: { source: IncrementalSource.MEDIA_INTERACTION, ...param },
+              data: { source: IncrementalSource.MEDIA_INTERACTION, ...param }
             });
           },
 
           styleSheetRule: (param) => {
             wrappedEmitWithTime({
               type: EventType.INCREMENTAL_SNAPSHOT,
-              data: { source: IncrementalSource.STYLE_SHEETRULE, ...param },
+              data: { source: IncrementalSource.STYLE_SHEETRULE, ...param }
             });
-          },
+          }
         },
         hooks
       )
@@ -166,14 +166,14 @@ function record(options: RecordOptions<TEvent>): ListenerHandler {
   };
 
   if (
-    document.readyState === "interactive" ||
-    document.readyState === "complete"
+    document.readyState === 'interactive' ||
+    document.readyState === 'complete'
   ) {
     initial();
   } else {
     handlers.push(
       on(
-        "load",
+        'load',
         () => {
           wrappedEmitWithTime({ type: EventType.LOADED });
           initial();
@@ -190,11 +190,11 @@ function record(options: RecordOptions<TEvent>): ListenerHandler {
 
 export function addCustomEvent<T>(tag: string, payload: T) {
   if (!wrappedEmitWithTime) {
-    throw new Error("please add custom event after start recording");
+    throw new Error('please add custom event after start recording');
   }
   wrappedEmitWithTime({ type: EventType.CUSTOM, data: { tag, payload } });
 }
 
-export * from "./types";
+export * from './types';
 
 export default record;

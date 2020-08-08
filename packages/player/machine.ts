@@ -3,15 +3,15 @@ import {
   EventObject,
   Typestate,
   InterpreterStatus,
-  StateMachine,
-} from "@xstate/fsm";
-import type { PlayerContext, PlayerEvent, PlayerState } from "./types";
+  StateMachine
+} from '@xstate/fsm';
+import type { PlayerContext, PlayerEvent, PlayerState } from './types';
 
 export function toEventObject<E extends EventObject>(event: string | E): E {
-  return (typeof event === "string" ? { type: event } : event) as E;
+  return (typeof event === 'string' ? { type: event } : event) as E;
 }
 
-export const INIT_EVENT: EventObject = { type: "xstate.init" };
+export const INIT_EVENT: EventObject = { type: 'xstate.init' };
 
 export const executeStateActions = <
   C extends object,
@@ -48,7 +48,7 @@ export const interpret = <
       listenerSet.add(handler);
       handler(state);
       return {
-        unsubscribe: () => listenerSet.delete(handler),
+        unsubscribe: () => listenerSet.delete(handler)
       };
     },
     start: () => {
@@ -66,7 +66,7 @@ export const interpret = <
     },
     get status() {
       return status;
-    },
+    }
   };
 
   return service;
@@ -74,18 +74,18 @@ export const interpret = <
 
 export function createPlayerService(context: PlayerContext) {
   const playerMachine = createMachine<PlayerContext, PlayerEvent, PlayerState>({
-    id: "player",
+    id: 'player',
     context,
-    initial: "inited",
+    initial: 'inited',
     states: {
-      inited: { on: { PLAY: "playing" } },
+      inited: { on: { PLAY: 'playing' } },
       playing: {
-        on: { PAUSE: "paused", END: "ended", FAST_FORWARD: "skipping" },
+        on: { PAUSE: 'paused', END: 'ended', FAST_FORWARD: 'skipping' }
       },
-      paused: { on: { RESUME: "playing" } },
-      skipping: { on: { BACK_TO_NORMAL: "playing" } },
-      ended: { on: { REPLAY: "playing" } },
-    },
+      paused: { on: { RESUME: 'playing' } },
+      skipping: { on: { BACK_TO_NORMAL: 'playing' } },
+      ended: { on: { REPLAY: 'playing' } }
+    }
   });
 
   return interpret(playerMachine);

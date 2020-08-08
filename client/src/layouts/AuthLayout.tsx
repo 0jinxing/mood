@@ -1,9 +1,9 @@
-import React, { FC } from "react";
-import logo from "../assets/logo.svg";
-import { Link } from "react-router-dom";
-import LINK from "@/constant/link";
+import React, { FC } from 'react';
+import logo from '../assets/logo.svg';
+import { Link } from 'react-router-dom';
+import LINK from '@/constant/link';
 
-import styles from "./AuthLayout.scss";
+import styles from './AuthLayout.scss';
 
 const AuthLayout: FC = ({ children }) => {
   return (

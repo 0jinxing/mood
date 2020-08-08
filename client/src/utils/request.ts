@@ -1,7 +1,7 @@
-import Token from "./token";
+import Token from './token';
 
-const accessToken = new Token("access");
-const refreshToken = new Token("refresh");
+const accessToken = new Token('access');
+const refreshToken = new Token('refresh');
 
 const request: typeof fetch = async (...args) => {
   let [input, init] = args;
@@ -10,7 +10,7 @@ const request: typeof fetch = async (...args) => {
   if (token) {
     init = {
       ...init,
-      headers: { ...init?.headers, authorization: `bearer ${token}` },
+      headers: { ...init?.headers, authorization: `bearer ${token}` }
     };
   }
 
@@ -31,7 +31,7 @@ export const login = () => {};
 export const refresh = async () => {
   const token = refreshToken.get();
   if (token) {
-    fetch("");
+    fetch('');
   }
 };
 

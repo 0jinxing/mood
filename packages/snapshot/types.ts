@@ -37,7 +37,7 @@ export type TextNode = {
 
 export type CDataNode = {
   type: NodeType.CDATA_SECTION_NODE;
-  textContent: "";
+  textContent: '';
 };
 
 export type CommentNode = {

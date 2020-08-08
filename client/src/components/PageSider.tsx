@@ -1,16 +1,16 @@
-import React, { FC } from "react";
-import { Layout, Menu } from "antd";
+import React, { FC } from 'react';
+import { Layout, Menu } from 'antd';
 
 import {
   UserOutlined,
   VideoCameraOutlined,
-  UploadOutlined,
-} from "@ant-design/icons";
+  UploadOutlined
+} from '@ant-design/icons';
 
 const menu = [
-  { label: "nav 1", path: "1", icon: <UserOutlined /> },
-  { label: "nav 2", path: "2", icon: <UploadOutlined /> },
-  { label: "nav 3", path: "3", icon: <VideoCameraOutlined /> },
+  { label: 'nav 1', path: '1', icon: <UserOutlined /> },
+  { label: 'nav 2', path: '2', icon: <UploadOutlined /> },
+  { label: 'nav 3', path: '3', icon: <VideoCameraOutlined /> }
 ];
 
 const PageSider: FC = () => {

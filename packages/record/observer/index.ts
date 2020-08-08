@@ -1,13 +1,13 @@
-import initInputObserver from "./input";
-import initScrollObserver from "./scroll";
-import initViewportResizeObserver from "./viewport-resize";
-import initMouseInteractionObserver from "./mouse-interaction";
-import initMouseMoveObserver from "./mouse-move";
-import initMediaInteractionObserver from "./media-interaction";
-import initStyleSheetObserver from "./style-sheet";
-import initMutationObserver from "./mutation";
+import initInputObserver from './input';
+import initScrollObserver from './scroll';
+import initViewportResizeObserver from './viewport-resize';
+import initMouseInteractionObserver from './mouse-interaction';
+import initMouseMoveObserver from './mouse-move';
+import initMediaInteractionObserver from './media-interaction';
+import initStyleSheetObserver from './style-sheet';
+import initMutationObserver from './mutation';
 
-import { ObserverParam, HooksParam, ListenerHandler } from "../types";
+import { ObserverParam, HooksParam, ListenerHandler } from '../types';
 
 export function mergeHooks(observer: ObserverParam, hooks: HooksParam) {
   Object.keys(hooks).forEach((key: keyof HooksParam) => {
@@ -34,7 +34,7 @@ export default function initObservers(
     viewportResize,
     input,
     mediaInteraction,
-    styleSheetRule,
+    styleSheetRule
   } = observer;
 
   const mutationObserver = initMutationObserver(mutation);

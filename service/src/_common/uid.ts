@@ -1,7 +1,7 @@
-import { randomBytes } from "crypto";
+import { randomBytes } from 'crypto';
 
 const UIDCHARS =
-  "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+  'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
 
 export const genUID = (len: number = 8) =>
   new Promise<string>((resolve, reject) => {
@@ -22,6 +22,6 @@ export const genUID = (len: number = 8) =>
         }
         str.push(UIDCHARS[rand % UIDCHARS.length]);
       }
-      resolve(str.join(""));
+      resolve(str.join(''));
     });
   });

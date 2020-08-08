@@ -1,14 +1,14 @@
-import { Injectable, Inject, ForbiddenException } from "@nestjs/common";
-import { sign, verify } from "jsonwebtoken";
+import { Injectable, Inject, ForbiddenException } from '@nestjs/common';
+import { sign, verify } from 'jsonwebtoken';
 
-import { validatePassword, hashPassword } from "../_common/password";
-import { InjectModel } from "@nestjs/mongoose";
-import { User } from "@/user/user.schema";
-import { Model } from "mongoose";
-import { Request } from "express";
-import { REQUEST } from "@nestjs/core";
-import { ConfigService } from "@nestjs/config";
-import { genUID } from "@/_common/uid";
+import { validatePassword, hashPassword } from '../_common/password';
+import { InjectModel } from '@nestjs/mongoose';
+import { User } from '@/user/user.schema';
+import { Model } from 'mongoose';
+import { Request } from 'express';
+import { REQUEST } from '@nestjs/core';
+import { ConfigService } from '@nestjs/config';
+import { genUID } from '@/_common/uid';
 
 export type BearerPayload = {
   email: string;
@@ -28,11 +28,11 @@ export class AuthService {
     @InjectModel(User.name) private userModel: Model<User>,
     private configService: ConfigService
   ) {
-    this.refreshSecret = this.configService.get("JWT_REFRESH_SECRET");
-    this.secret = this.configService.get("JWT_SECRET");
+    this.refreshSecret = this.configService.get('JWT_REFRESH_SECRET');
+    this.secret = this.configService.get('JWT_SECRET');
 
-    this.expires = this.configService.get("JWT_EXPIRES");
-    this.refreshExpires = this.configService.get("JWT_REFRESH_EXPIRES");
+    this.expires = this.configService.get('JWT_EXPIRES');
+    this.refreshExpires = this.configService.get('JWT_REFRESH_EXPIRES');
   }
 
   verify(token: string, secret: string) {
@@ -56,13 +56,13 @@ export class AuthService {
     const accessToken = sign(payload, this.secret, { expiresIn: this.expires });
 
     const refreshToken = sign(payload, this.refreshSecret, {
-      expiresIn: this.refreshExpires,
+      expiresIn: this.refreshExpires
     });
 
     return {
       email: user.email,
       accessToken,
-      refreshToken,
+      refreshToken
     };
   }
 
@@ -72,7 +72,7 @@ export class AuthService {
     const accessToken = sign(payload, this.secret, { expiresIn: this.expires });
 
     const refreshToken = sign(payload, this.refreshSecret, {
-      expiresIn: this.refreshExpires,
+      expiresIn: this.refreshExpires
     });
 
     return { accessToken, refreshToken };
@@ -93,13 +93,13 @@ export class AuthService {
       passwordSalt,
       passwordHash,
       deleted: false,
-      instances: [],
+      instances: []
     });
     return this.sign(email, password);
   }
 
   getBearerToken() {
-    const authorization = this.request.headers.authorization ?? "";
+    const authorization = this.request.headers.authorization ?? '';
     const [, token] = authorization.match(/bearer\s+(\S+)/) ?? [];
 
     return token;
@@ -108,7 +108,7 @@ export class AuthService {
   getBearPayload() {
     const token = this.getBearerToken();
     if (token) {
-      return this.verify(token, this.configService.get("JWT_SECRET"));
+      return this.verify(token, this.configService.get('JWT_SECRET'));
     }
   }
 

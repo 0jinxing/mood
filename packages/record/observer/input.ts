@@ -1,12 +1,12 @@
-import { on } from "../utils";
-import { mirror } from "@traps/snapshot";
+import { on } from '../utils';
+import { mirror } from '@traps/snapshot';
 
 import {
   HookResetter,
   InputValue,
   InputCallback,
-  ListenerHandler,
-} from "../types";
+  ListenerHandler
+} from '../types';
 
 function hookSetter<T>(
   target: T,
@@ -27,7 +27,7 @@ function hookSetter<T>(
               descriptor.set!.call(this, value);
             }, 0);
             original && original.set && original.set.call(this, value);
-          },
+          }
         }
   );
   return () => hookSetter(target, key, original || {}, true);
@@ -35,7 +35,7 @@ function hookSetter<T>(
 
 const lastInputValueMap: WeakMap<EventTarget, InputValue> = new WeakMap();
 
-function initInputObserver(cb: InputCallback): ListenerHandler {
+function initInputObserver(callback: InputCallback): ListenerHandler {
   const cbWithDedup = (
     $target: HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement,
     value: InputValue
@@ -44,7 +44,7 @@ function initInputObserver(cb: InputCallback): ListenerHandler {
     if (!lastInputValue || lastInputValue !== value) {
       lastInputValueMap.set($target, value);
       const id = mirror.getId($target);
-      cb({ value, id });
+      callback({ value, id });
     }
   };
 
@@ -66,41 +66,41 @@ function initInputObserver(cb: InputCallback): ListenerHandler {
     cbWithDedup(target, value);
     const inputType = target.type;
     const name = target.name;
-    if (inputType === "radio" && name && value) {
+    if (inputType === 'radio' && name && value) {
       const $$radio = document.querySelectorAll(
         `input[type=radio][name=${name}]`
       );
-      $$radio.forEach(($el) => {
+      $$radio.forEach($el => {
         $el !== target && cbWithDedup($el as HTMLInputElement, !value);
       });
     }
   };
 
   const handlers: Array<ListenerHandler | HookResetter> = [
-    "input",
-    "change",
-  ].map((eventName) => {
+    'input',
+    'change'
+  ].map(eventName => {
     return on(eventName, eventHandler);
   });
 
   const hookProperties: Array<[HTMLElement, string]> = [
-    [HTMLInputElement.prototype, "value"],
-    [HTMLInputElement.prototype, "checked"],
-    [HTMLSelectElement.prototype, "value"],
-    [HTMLTextAreaElement.prototype, "value"],
+    [HTMLInputElement.prototype, 'value'],
+    [HTMLInputElement.prototype, 'checked'],
+    [HTMLSelectElement.prototype, 'value'],
+    [HTMLTextAreaElement.prototype, 'value']
   ];
 
   const hookHandlers = hookProperties.map(([$target, key]) =>
     hookSetter<HTMLElement>($target, key, {
       set() {
         eventHandler({ target: this } as Event);
-      },
+      }
     })
   );
   handlers.push(...hookHandlers);
 
   return () => {
-    handlers.forEach((h) => h());
+    handlers.forEach(h => h());
   };
 }
 

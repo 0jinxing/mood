@@ -1,9 +1,9 @@
-import { Test } from "@nestjs/testing";
-import { MongoModule } from "@/mongo/mongo.module";
-import { ConfModule } from "@/conf/conf.module";
-import { Injectable } from "@nestjs/common";
-import { InjectConnection } from "@nestjs/mongoose";
-import { Connection } from "mongoose";
+import { Test } from '@nestjs/testing';
+import { MongoModule } from '@/mongo/mongo.module';
+import { ConfModule } from '@/conf/conf.module';
+import { Injectable } from '@nestjs/common';
+import { InjectConnection } from '@nestjs/mongoose';
+import { Connection } from 'mongoose';
 
 @Injectable()
 class CleanUpService {
@@ -16,7 +16,7 @@ class CleanUpService {
 export async function cleanUp() {
   const moduleRef = await Test.createTestingModule({
     imports: [ConfModule, MongoModule],
-    providers: [CleanUpService],
+    providers: [CleanUpService]
   }).compile();
 
   const cleanUpService = await moduleRef.resolve(CleanUpService);
