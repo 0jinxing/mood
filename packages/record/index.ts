@@ -1,4 +1,4 @@
-import { snapshot } from '@traps/snapshot';
+import { snapshot } from '@mood/snapshot';
 
 import initObservers from './observer';
 import { on, queryWindowHeight, queryWindowWidth } from './utils';

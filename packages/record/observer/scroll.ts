@@ -1,6 +1,6 @@
 import { on, throttle } from '../utils';
 import { ListenerHandler, ScrollCallback } from '../types';
-import { mirror, TNode } from '@traps/snapshot';
+import { mirror, TNode } from '@mood/snapshot';
 
 function initScrollObserver(cb: ScrollCallback): ListenerHandler {
   const updatePosition = throttle<UIEvent>((event) => {

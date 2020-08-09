@@ -1,5 +1,5 @@
 import { StyleSheetRuleCallback, ListenerHandler } from '../types';
-import { mirror, TNode } from '@traps/snapshot';
+import { mirror, TNode } from '@mood/snapshot';
 
 function initStyleSheetObserver(cb: StyleSheetRuleCallback): ListenerHandler {
   const insertRule = CSSStyleSheet.prototype.insertRule;

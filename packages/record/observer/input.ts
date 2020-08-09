@@ -1,5 +1,5 @@
 import { on } from '../utils';
-import { mirror } from '@traps/snapshot';
+import { mirror } from '@mood/snapshot';
 
 import {
   HookResetter,

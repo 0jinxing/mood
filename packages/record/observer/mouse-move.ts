@@ -1,4 +1,4 @@
-import { mirror } from '@traps/snapshot';
+import { mirror } from '@mood/snapshot';
 import { on, throttle } from '../utils';
 
 import {

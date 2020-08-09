@@ -1,4 +1,4 @@
-import { Attributes, AddedNode } from '@traps/snapshot';
+import { Attributes, AddedNode } from '@mood/snapshot';
 
 export enum EventType {
   DOM_CONTENT_LOADED,

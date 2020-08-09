@@ -1,4 +1,4 @@
-import { serializeWithId, transformAttr, TNode, mirror } from '@traps/snapshot';
+import { serializeWithId, transformAttr, TNode, mirror } from '@mood/snapshot';
 import { isAncestorRemoved, deepDelete, isAncestorInSet, isParentRemoved } from '../utils';
 
 import { MutationCallBack, AttrCursor, RemovedNodeMutation, AddedNodeMutation } from '../types';

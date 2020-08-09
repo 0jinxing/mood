@@ -1,7 +1,7 @@
 import * as mittProxy from 'mitt';
 
-import rebuild, { buildNodeWithSN } from '@traps/snapshot/rebuild';
-import { mirror } from '@traps/snapshot';
+import rebuild, { buildNodeWithSN } from '@mood/snapshot/rebuild';
+import { mirror } from '@mood/snapshot';
 import {
   TEventWithTime,
   EventType,
@@ -12,7 +12,7 @@ import {
   ViewportResizeDimention,
   IncrementalData,
   AddedNodeMutation
-} from '@traps/record';
+} from '@mood/record';
 
 import Timer from './timer';
 import { createPlayerService } from './machine';
@@ -33,7 +33,7 @@ const mitt = (mittProxy as any).default || mittProxy;
 const SKIP_TIME_THRESHOLD = 10 * 1000;
 const SKIP_TIME_INTERVAL = 5 * 1000;
 
-const REPLAY_CONSOLE_PREFIX = '[TRAPS WARN]';
+const REPLAY_CONSOLE_PREFIX = '[WARN]';
 
 const defaultConfig: PlayerConfig = {
   speed: 1,

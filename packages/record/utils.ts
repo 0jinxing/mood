@@ -1,4 +1,4 @@
-import { TNode, mirror } from '@traps/snapshot';
+import { TNode, mirror } from '@mood/snapshot';
 import { ListenerHandler } from './types';
 
 export function on(

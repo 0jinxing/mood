@@ -1,6 +1,6 @@
 import { Schema, Prop, SchemaFactory } from '@nestjs/mongoose';
 import { Document } from 'mongoose';
-import { EventType } from '@traps/record';
+import { EventType } from '@mood/record';
 
 @Schema()
 export class DomContentLoadedEvent extends Document {

@@ -7,6 +7,6 @@ export default () => ({
   JWT_REFRESH_EXPIRES: '2d',
 
   MONGO_URI: isTest
-    ? 'mongodb://192.168.31.2/db_test_traps'
-    : 'mongodb://192.168.31.2/db_traps'
+    ? 'mongodb://192.168.31.2/db_test_mood'
+    : 'mongodb://192.168.31.2/db_mood'
 });

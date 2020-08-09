@@ -1,5 +1,5 @@
 import { on } from '../utils';
-import { TNode, mirror } from '@traps/snapshot';
+import { TNode, mirror } from '@mood/snapshot';
 
 import { MediaInteractionCallback, MediaInteractions } from '../types';
 

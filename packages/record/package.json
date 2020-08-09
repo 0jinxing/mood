@@ -1,5 +1,5 @@
 {
-  "name": "@traps/record",
+  "name": "@mood/record",
   "version": "0.0.1",
   "description": "",
   "main": "index.js",
@@ -11,6 +11,6 @@
   "author": "",
   "license": "MIT",
   "dependencies": {
-    "@traps/snapshot": "0.0.1"
+    "@mood/snapshot": "0.0.1"
   }
 }
