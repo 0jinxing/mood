@@ -12,7 +12,7 @@ const App = () => {
       <Switch>
         <Route path="/login">
           <Login />
-      </Route>
+        </Route>
 
         <Route path="/register">
           <Register />

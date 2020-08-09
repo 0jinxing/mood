@@ -1,14 +1,13 @@
 import React, { FC } from 'react';
 import { Layout } from 'antd';
-import { b, e } from '@/utils/bem';
 import logo from '@/assets/logo.svg';
 
-import './PageHeader.scss';
+import styles from './PageHeader.scss';
 
 const PageHeader: FC = () => {
   return (
-    <Layout.Header className={b('page-header')}>
-      <div className={e('logo')}>
+    <Layout.Header className={styles.pageHeader}>
+      <div className={styles.logo}>
         <img src={logo} />
         MOOD
       </div>

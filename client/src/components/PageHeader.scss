@@ -1,8 +1,6 @@
-@import "../styles/partial/mixins.scss";
-
-@include b("page-header") {
+.pageHeader {
   padding-left: 24px;
-  @include e("logo") {
+  .logo {
     img {
       height: 32px;
       vertical-align: top;

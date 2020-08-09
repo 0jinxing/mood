@@ -1,4 +1,4 @@
-@import "var";
+@import 'var';
 
 @mixin res($key, $map: $--breakpoints) {
   @if map-has-key($map, $key) {
@@ -7,50 +7,6 @@
     }
   } @else {
     @warn "Undefeined points: `#{$map}`";
-  }
-}
-
-@mixin b($block) {
-  $B: $namespace + $block-separator + $block !global;
-
-  @at-root {
-    #{$root} .#{$B} {
-      @content;
-    }
-  }
-}
-
-@mixin e($element) {
-  $E: $element !global;
-  $selector: &;
-  $currentSelector: "";
-  @each $unit in $element {
-    $currentSelector: $currentSelector +
-      "." +
-      $B +
-      $element-separator +
-      $unit +
-      ",";
-  }
-
-  #{$currentSelector} {
-    @content;
-  }
-}
-
-@mixin m($modifier) {
-  $selector: &;
-  $currentSelector: "";
-  @each $unit in $modifier {
-    $currentSelector: #{$currentSelector +
-      & +
-      $modifier-separator +
-      $unit +
-      ","};
-  }
-
-  #{$currentSelector} {
-    @content;
   }
 }
 
