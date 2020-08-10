@@ -53,7 +53,7 @@ export class AuthService {
 
     const payload = { email: user.email, sub: user._id };
 
-    const accessToken = sign(payload, this.secret, { expiresIn: this.expires });
+    const token = sign(payload, this.secret, { expiresIn: this.expires });
 
     const refreshToken = sign(payload, this.refreshSecret, {
       expiresIn: this.refreshExpires
@@ -61,21 +61,25 @@ export class AuthService {
 
     return {
       email: user.email,
-      accessToken,
-      refreshToken
+      token,
+      expires: this.expires,
+      refreshToken,
+      refreshExpires: this.refreshExpires
     };
   }
 
-  async refresh(token: string) {
-    const payload = verify(token, this.refreshSecret);
+  async refresh(refreshToken: string) {
+    const payload = verify(refreshToken, this.refreshSecret);
 
-    const accessToken = sign(payload, this.secret, { expiresIn: this.expires });
+    const { expires, secret, refreshExpires, refreshSecret } = this;
 
-    const refreshToken = sign(payload, this.refreshSecret, {
-      expiresIn: this.refreshExpires
-    });
-
-    return { accessToken, refreshToken };
+    return {
+      token: sign(payload, secret, { expiresIn: expires }),
+      refreshToken: sign(payload, refreshSecret, { expiresIn: refreshExpires }),
+      
+      expires,
+      refreshExpires
+    };
   }
 
   async register(email: string, password: string) {
