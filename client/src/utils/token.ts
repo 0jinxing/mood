@@ -14,20 +14,28 @@ class Token {
   }
 
   public get() {
-    if (this.timestamp + this.expires < Date.now()) {
+    if (this.expires === 0) {
       return this.value;
+    } else if (this.timestamp + this.expires < Date.now()) {
+      return '';
     }
     return this.value;
   }
 
-  public set(val: string, expires: number) {
-    localStorage.setItem(this.key, val);
-    localStorage.setItem(`${this.key}_timestamp`, Date.now().toString());
-    localStorage.setItem(`${this.key}_expires`, expires.toString());
+  public set(val: string, expires: number = 0) {
+    if (expires) {
+      localStorage.setItem(this.key, val);
+      localStorage.setItem(`${this.key}_timestamp`, Date.now().toString());
+      localStorage.setItem(`${this.key}_expires`, expires.toString());
+    } else {
+      localStorage.removeItem(this.key);
+      localStorage.removeItem(`${this.key}_timestamp`);
+      localStorage.removeItem(`${this.key}_expires`);
+    }
 
-    this.value = val;
     this.timestamp = Date.now();
     this.expires = expires;
+    this.value = val;
   }
 }
 
