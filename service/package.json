@@ -4,19 +4,19 @@
   "main": "index.js",
   "license": "MIT",
   "scripts": {
-    "start": "node -r ts-node/register src/main.ts",
+    "start": "node -r ts-node/register -r tsconfig-paths/register src/main.ts",
     "start:watch": "nodemon",
     "test": "cross-env NODE_ENV=test mocha -r ts-node/register -r tsconfig-paths/register ./**/*.spec.ts"
   },
   "dependencies": {
+    "@mood/record": "0.0.1",
+    "@mood/snapshot": "0.0.1",
     "@nestjs/common": "^7.2.0",
     "@nestjs/config": "^0.5.0",
     "@nestjs/core": "^7.2.0",
     "@nestjs/mongoose": "^7.0.1",
     "@nestjs/passport": "^7.1.0",
     "@nestjs/platform-express": "^7.2.0",
-    "@mood/record": "0.0.1",
-    "@mood/snapshot": "0.0.1",
     "jsonwebtoken": "^8.5.1",
     "mongoose": "^5.9.20",
     "passport": "^0.4.1",

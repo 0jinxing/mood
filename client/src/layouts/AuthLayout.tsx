@@ -1,7 +1,7 @@
 import React, { FC } from 'react';
 import logo from '../assets/logo.svg';
 import { Link } from 'react-router-dom';
-import LINK from '@/constant/link';
+import LINK from '@/constants/link';
 
 import styles from './AuthLayout.scss';
 

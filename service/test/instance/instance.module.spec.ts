@@ -6,32 +6,32 @@ import { expect } from 'chai';
 
 function queryInstance(
   app: INestApplication,
-  accessToken: string,
+  token: string,
   skip: number = 0,
   limit?: number
 ) {
   return request(app.getHttpServer())
     .get('/instance')
-    .set('Authorization', `bearer ${accessToken}`)
+    .set('Authorization', `bearer ${token}`)
     .send({ skip, limit })
     .expect(200);
 }
 
 function createInstance(
   app: INestApplication,
-  accessToken: string,
+  token: string,
   domain: string
 ) {
   return request(app.getHttpServer())
     .post('/instance')
-    .set('Authorization', `bearer ${accessToken}`)
+    .set('Authorization', `bearer ${token}`)
     .send({ domain })
     .expect(201);
 }
 
 describe('instance e2e', async () => {
   let app: INestApplication;
-  let accessToken: string;
+  let token: string;
 
   before(async () => {
     app = await createApp();
@@ -42,7 +42,7 @@ describe('instance e2e', async () => {
       .post('/auth/register')
       .send(data);
 
-    accessToken = res.body.accessToken;
+    token = res.body.token;
   });
 
   after(async () => {
@@ -51,32 +51,32 @@ describe('instance e2e', async () => {
   });
 
   it('create instance', async () => {
-    await createInstance(app, accessToken, 'baidu.com');
-    await createInstance(app, accessToken, 'bing.com');
-    await createInstance(app, accessToken, 'google.com');
+    await createInstance(app, token, 'baidu.com');
+    await createInstance(app, token, 'bing.com');
+    await createInstance(app, token, 'google.com');
 
-    const { body } = await queryInstance(app, accessToken);
+    const { body } = await queryInstance(app, token);
 
     expect(body.length).eq(3);
   });
 
   let instances: string[];
   it('query instance', async () => {
-    const { body } = await queryInstance(app, accessToken);
+    const { body } = await queryInstance(app, token);
     instances = body.map(({ _id }) => _id);
     expect(instances.length).eq(3);
 
-    const { body: limit } = await queryInstance(app, accessToken, 0, 2);
+    const { body: limit } = await queryInstance(app, token, 0, 2);
     expect(limit.map(({ _id }) => _id)).deep.eq(instances.slice(0, 2));
 
-    const { body: skip } = await queryInstance(app, accessToken, 1, 2);
+    const { body: skip } = await queryInstance(app, token, 1, 2);
     expect(skip.map(({ _id }) => _id)).deep.eq(instances.slice(1, 3));
   });
 
   it('delete instance', async () => {
     const { body } = await request(app.getHttpServer())
       .delete('/instance')
-      .set('Authorization', `bearer ${accessToken}`)
+      .set('Authorization', `bearer ${token}`)
       .send(instances.slice(0, 1))
       .expect(200);
 
@@ -84,7 +84,7 @@ describe('instance e2e', async () => {
 
     const { body: list }: { body: any[] } = await request(app.getHttpServer())
       .get('/instance')
-      .set('Authorization', `bearer ${accessToken}`)
+      .set('Authorization', `bearer ${token}`)
       .send()
       .expect(200);
 
@@ -98,7 +98,7 @@ describe('instance e2e', async () => {
       body: { deletedCount }
     } = await request(app.getHttpServer())
       .delete('/instance')
-      .set('Authorization', `bearer ${accessToken}`)
+      .set('Authorization', `bearer ${token}`)
       .send(instances)
       .expect(200);
 

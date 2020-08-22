@@ -1,9 +1,9 @@
 import ms from 'ms';
 import Token from './token';
-import API from '@/constant/api';
+import API from '@/constants/api';
 
-const accessToken = new Token('access');
-const refreshToken = new Token('refresh');
+let accessToken = new Token('access');
+let refreshToken = new Token('refresh');
 
 let rememberMe = false;
 
@@ -20,7 +20,7 @@ type AuthData = {
 const request: typeof fetch = async (...args) => {
   let [input, init] = args;
 
-  const token = accessToken.get();
+  let token = accessToken.get();
   if (token) {
     init = {
       ...init,
@@ -28,16 +28,28 @@ const request: typeof fetch = async (...args) => {
     };
   }
 
-  const resp = await fetch(input, init);
-  if (resp.ok) {
-    return resp;
+  let res = await fetch(input, init);
+  if (res.ok) {
+    return res;
   }
 
-  if (resp.status === 401) {
+  if (res.status === 401 && refreshToken.get()) {
     await refresh();
+  } else {
+    throw res;
   }
 
-  return resp;
+  token = accessToken.get();
+  init = {
+    ...init,
+    headers: { ...init?.headers, authorization: `bearer ${token}` }
+  };
+  res = await fetch(input, init);
+  if (res.ok) {
+    return res;
+  } else {
+    throw res;
+  }
 };
 
 export const login = async (
@@ -53,11 +65,44 @@ export const login = async (
     body: JSON.stringify({ email, password })
   });
 
+  if (!res.ok) throw res;
+
   const data: AuthData = await res.json();
 
   accessToken.set(data.token, rememberMe ? ms(data.expires) : 0);
 
   refreshToken.set(data.refreshToken, rememberMe ? ms(data.refreshExpires) : 0);
+};
+
+export const register = async (
+  email: string,
+  password: string,
+  remember: boolean
+) => {
+  rememberMe = remember;
+
+  const res = await fetch(API.REGISTER, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ email, password })
+  });
+
+  if (!res.ok) throw res;
+
+  const data: AuthData = await res.json();
+
+  accessToken.set(data.token, rememberMe ? ms(data.expires) : 0);
+
+  refreshToken.set(data.refreshToken, rememberMe ? ms(data.refreshExpires) : 0);
+};
+
+export const logout = async () => {
+  const res = await request(API.LOGOUT);
+
+  if (!res.ok) throw res;
+
+  accessToken = new Token('access');
+  refreshToken = new Token('refresh');
 };
 
 export const refresh = async () => {
@@ -70,6 +115,8 @@ export const refresh = async () => {
       body: JSON.stringify({ refreshToken: token })
     });
 
+    if (!res.ok) throw res;
+
     const data: AuthData = await res.json();
 
     accessToken.set(data.token, rememberMe ? ms(data.expires) : 0);
@@ -78,6 +125,8 @@ export const refresh = async () => {
       data.refreshToken,
       rememberMe ? ms(data.refreshExpires) : 0
     );
+  } else {
+    throw new Error('empty refresh token');
   }
 };
 

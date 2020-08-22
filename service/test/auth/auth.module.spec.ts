@@ -20,7 +20,7 @@ describe('auth e2e test', async () => {
     return request(app.getHttpServer()).post('/auth/logout').expect(401);
   });
 
-  let accessToken: string;
+  let token: string;
 
   it('register', async () => {
     const data = { email: 'test@domain.com', password: 'password' };
@@ -29,7 +29,7 @@ describe('auth e2e test', async () => {
       .send(data)
       .expect(200);
 
-    accessToken = res.body.accessToken;
+    token = res.body.token;
   });
 
   it('re-register', () => {
@@ -45,13 +45,13 @@ describe('auth e2e test', async () => {
       .send(data)
       .expect(200);
 
-    accessToken = res.body.accessToken;
+    token = res.body.token;
   });
 
   it('authorized', () => {
     return request(app.getHttpServer())
       .get('/user')
-      .set('Authorization', `bearer ${accessToken}`)
+      .set('Authorization', `bearer ${token}`)
       .expect(200);
   });
 });

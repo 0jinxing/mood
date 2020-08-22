@@ -60,7 +60,10 @@ module.exports = {
     hot: true,
     historyApiFallback: true,
     port: 8080,
-    open: true
+    open: true,
+    proxy: {
+      '/api': 'http://127.0.0.1:3000'
+    }
   },
 
   optimization: {

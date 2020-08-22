@@ -5,26 +5,17 @@ import Home from './routes/Home';
 import Login from './routes/Login';
 import Register from './routes/Register';
 import Instance from './routes/instance';
+import NotFound from './routes/404';
 
 const App = () => {
   return (
     <Router>
       <Switch>
-        <Route path="/login">
-          <Login />
-        </Route>
-
-        <Route path="/register">
-          <Register />
-        </Route>
-
-        <Route path="/instance">
-          <Instance />
-        </Route>
-
-        <Route exact path="/">
-          <Home />
-        </Route>
+        <Route component={Login} path="/login" />
+        <Route component={Register} path="/register" />
+        <Route component={Instance} path="/instance" />
+        <Route component={Home} exact path="/" />
+        <Route component={NotFound} />
       </Switch>
     </Router>
   );
