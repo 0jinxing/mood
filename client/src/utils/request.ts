@@ -2,8 +2,8 @@ import ms from 'ms';
 import Token from './token';
 import API from '@/constants/api';
 
-let accessToken = new Token('access');
-let refreshToken = new Token('refresh');
+const accessToken = new Token('access');
+const refreshToken = new Token('refresh');
 
 let rememberMe = false;
 
@@ -17,9 +17,10 @@ type AuthData = {
   refreshExpires: string;
 };
 
-const request: typeof fetch = async (...args) => {
-  let [input, init] = args;
-
+const request = async <T = Record<string, any>>(
+  input: RequestInfo,
+  init?: RequestInit | undefined
+) => {
   let token = accessToken.get();
   if (token) {
     init = {
@@ -30,7 +31,8 @@ const request: typeof fetch = async (...args) => {
 
   let res = await fetch(input, init);
   if (res.ok) {
-    return res;
+    const data: T = await res.json();
+    return data;
   }
 
   if (res.status === 401 && refreshToken.get()) {
@@ -46,7 +48,8 @@ const request: typeof fetch = async (...args) => {
   };
   res = await fetch(input, init);
   if (res.ok) {
-    return res;
+    const data: T = await res.json();
+    return data;
   } else {
     throw res;
   }
@@ -72,6 +75,8 @@ export const login = async (
   accessToken.set(data.token, rememberMe ? ms(data.expires) : 0);
 
   refreshToken.set(data.refreshToken, rememberMe ? ms(data.refreshExpires) : 0);
+
+  return data;
 };
 
 export const register = async (
@@ -94,15 +99,20 @@ export const register = async (
   accessToken.set(data.token, rememberMe ? ms(data.expires) : 0);
 
   refreshToken.set(data.refreshToken, rememberMe ? ms(data.refreshExpires) : 0);
+
+  return res;
 };
 
 export const logout = async () => {
   const res = await request(API.LOGOUT);
 
   if (!res.ok) throw res;
+  const data = await res.json();
 
-  accessToken = new Token('access');
-  refreshToken = new Token('refresh');
+  accessToken.clear();
+  refreshToken.clear();
+
+  return data;
 };
 
 export const refresh = async () => {
@@ -115,6 +125,13 @@ export const refresh = async () => {
       body: JSON.stringify({ refreshToken: token })
     });
 
+    if (res.status === 401) {
+      accessToken.clear();
+      refreshToken.clear();
+
+      throw res;
+    }
+
     if (!res.ok) throw res;
 
     const data: AuthData = await res.json();
@@ -125,6 +142,8 @@ export const refresh = async () => {
       data.refreshToken,
       rememberMe ? ms(data.refreshExpires) : 0
     );
+
+    return data;
   } else {
     throw new Error('empty refresh token');
   }

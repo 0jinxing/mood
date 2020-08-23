@@ -48,7 +48,7 @@ export class AuthService {
       !user ||
       !validatePassword(password, user.passwordHash, user.passwordSalt)
     ) {
-      return null;
+      throw new ForbiddenException();
     }
 
     const payload = { email: user.email, sub: user._id };

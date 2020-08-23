@@ -3,7 +3,7 @@ import { Link, useHistory, useParams } from 'react-router-dom';
 import { Form, Input, Button, Checkbox, message } from 'antd';
 import { MailOutlined, LockOutlined } from '@ant-design/icons';
 
-import AuthLayout from '@/layouts/AuthLayout';
+import SignInLayout from '@/layouts/SignInLayout';
 import LINK from '@/constants/link';
 import { register } from '@/utils/request';
 
@@ -34,7 +34,7 @@ const Register = () => {
   };
 
   return (
-    <AuthLayout>
+    <SignInLayout>
       <Form
         form={form}
         className={styles.registerForm}
@@ -72,7 +72,7 @@ const Register = () => {
           Or <Link to={LINK.LOGIN}>login now</Link>
         </Form.Item>
       </Form>
-    </AuthLayout>
+    </SignInLayout>
   );
 };
 

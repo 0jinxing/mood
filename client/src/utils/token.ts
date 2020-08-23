@@ -1,6 +1,6 @@
 class Token {
   private value: string = '';
-  private timestamp: number = 0;
+  private timestamp: number = Date.now();
   private expires: number = 0;
 
   constructor(private key: string) {
@@ -36,6 +36,16 @@ class Token {
     this.timestamp = Date.now();
     this.expires = expires;
     this.value = val;
+  }
+
+  public clear() {
+    localStorage.removeItem(this.key);
+    localStorage.removeItem(`${this.key}_timestamp`);
+    localStorage.removeItem(`${this.key}_expires`);
+
+    this.value = '';
+    this.timestamp = Date.now();
+    this.expires = 0;
   }
 }
 

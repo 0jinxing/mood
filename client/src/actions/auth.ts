@@ -1,7 +1,7 @@
 type SetCurrentUserActionPayload = {
   email: string;
 };
-type SetCurrentUserAction = {
+export type SetCurrentUserAction = {
   type: 'SET_CURRENT_USER';
   payload: SetCurrentUserActionPayload;
 };
@@ -14,7 +14,7 @@ export function setCurrentUser(
   };
 }
 
-type ClearCurrentUserAction = {
+export type ClearCurrentUserAction = {
   type: 'CLEAR_CURRENT_USER';
 };
 export function clearCurrentUser(): ClearCurrentUserAction {

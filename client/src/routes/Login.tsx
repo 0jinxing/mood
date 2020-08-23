@@ -1,12 +1,14 @@
-import React, { FC } from 'react';
+import React, { FC, useState } from 'react';
 import { Link, useParams, useHistory } from 'react-router-dom';
 import { Form, Button, Checkbox, Input } from 'antd';
 import { MailOutlined, LockOutlined } from '@ant-design/icons';
-import AuthLayout from '@/layouts/AuthLayout';
+import SignInLayout from '@/layouts/SignInLayout';
 import LINK from '@/constants/link';
 import { login } from '@/utils/request';
 
 import styles from './Login.scss';
+import { useDispatch } from 'react-redux';
+import { setCurrentUser } from '@/actions/auth';
 
 type FormValues = {
   email: string;
@@ -15,19 +17,26 @@ type FormValues = {
 };
 
 const Login: FC = () => {
+  const dispatch = useDispatch();
+
+  const [loading, setLoading] = useState(false);
   const history = useHistory();
   const { redirectUrl } = useParams<{ redirectUrl: string }>();
   const [form] = Form.useForm();
 
   const submit = async ({ email, password, remember }: FormValues) => {
     try {
-      await login(email, password, remember);
-      history.push(redirectUrl ?? '/');
-    } catch (err) {}
+      setLoading(true);
+      const data = await login(email, password, remember);
+      dispatch(setCurrentUser({ email: data.email }));
+      history.push(redirectUrl ?? LINK.INSTANCE);
+    } catch {
+      setLoading(false);
+    }
   };
 
   return (
-    <AuthLayout>
+    <SignInLayout>
       <Form
         className={styles.loginForm}
         layout="vertical"
@@ -69,13 +78,18 @@ const Login: FC = () => {
           </Link>
         </Form.Item>
         <Form.Item>
-          <Button type="primary" htmlType="submit" className={styles.submit}>
+          <Button
+            loading={loading}
+            type="primary"
+            htmlType="submit"
+            className={styles.submit}
+          >
             LOGIN
           </Button>
           Or <Link to={LINK.REGISTER}>register now</Link>
         </Form.Item>
       </Form>
-    </AuthLayout>
+    </SignInLayout>
   );
 };
 export default Login;

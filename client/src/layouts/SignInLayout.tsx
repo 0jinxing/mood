@@ -3,11 +3,11 @@ import logo from '../assets/logo.svg';
 import { Link } from 'react-router-dom';
 import LINK from '@/constants/link';
 
-import styles from './AuthLayout.scss';
+import styles from './SignInLayout.scss';
 
-const AuthLayout: FC = ({ children }) => {
+const SignInLayout: FC = ({ children }) => {
   return (
-    <div className={styles.authLayout}>
+    <div className={styles.signInLayout}>
       <main className={styles.container}>
         <div>
           <h1 className={styles.title}>
@@ -23,4 +23,4 @@ const AuthLayout: FC = ({ children }) => {
   );
 };
 
-export default AuthLayout;
+export default SignInLayout;
