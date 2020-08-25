@@ -1,4 +1,9 @@
-import { Injectable, Inject, ForbiddenException } from '@nestjs/common';
+import {
+  Injectable,
+  Inject,
+  ForbiddenException,
+  UnauthorizedException
+} from '@nestjs/common';
 import { sign, verify } from 'jsonwebtoken';
 
 import { validatePassword, hashPassword } from '../_common/password';
@@ -76,7 +81,7 @@ export class AuthService {
     return {
       token: sign(payload, secret, { expiresIn: expires }),
       refreshToken: sign(payload, refreshSecret, { expiresIn: refreshExpires }),
-      
+
       expires,
       refreshExpires
     };
@@ -105,8 +110,10 @@ export class AuthService {
   getBearerToken() {
     const authorization = this.request.headers.authorization ?? '';
     const [, token] = authorization.match(/bearer\s+(\S+)/) ?? [];
-
-    return token;
+    if (token) {
+      return token;
+    }
+    throw new UnauthorizedException();
   }
 
   getBearPayload() {

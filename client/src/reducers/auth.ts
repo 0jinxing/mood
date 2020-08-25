@@ -1,9 +1,9 @@
 import type {
-  ClearCurrentUserAction,
-  SetCurrentUserAction
+  ClearCurrentAction,
+  SetCurrentAction
 } from '@/actions/auth';
 
-export type AuthAction = ClearCurrentUserAction | SetCurrentUserAction;
+export type AuthAction = ClearCurrentAction | SetCurrentAction;
 
 export type AuthState = {
   email: string;
@@ -18,10 +18,10 @@ export default function authReducer(
   action: AuthAction
 ): AuthState {
   switch (action.type) {
-    case 'CLEAR_CURRENT_USER': {
+    case 'CLEAR_CURRENT': {
       return initialState;
     }
-    case 'SET_CURRENT_USER': {
+    case 'SET_CURRENT': {
       const email = action.payload.email;
       return { email };
     }

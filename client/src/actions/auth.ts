@@ -1,24 +1,24 @@
-type SetCurrentUserActionPayload = {
+type SetCurrentActionPayload = {
   email: string;
 };
-export type SetCurrentUserAction = {
-  type: 'SET_CURRENT_USER';
-  payload: SetCurrentUserActionPayload;
+export type SetCurrentAction = {
+  type: 'SET_CURRENT';
+  payload: SetCurrentActionPayload;
 };
-export function setCurrentUser(
-  payload: SetCurrentUserActionPayload
-): SetCurrentUserAction {
+export function setCurrent(
+  payload: SetCurrentActionPayload
+): SetCurrentAction {
   return {
-    type: 'SET_CURRENT_USER',
+    type: 'SET_CURRENT',
     payload
   };
 }
 
-export type ClearCurrentUserAction = {
-  type: 'CLEAR_CURRENT_USER';
+export type ClearCurrentAction = {
+  type: 'CLEAR_CURRENT';
 };
-export function clearCurrentUser(): ClearCurrentUserAction {
+export function clearCurrent(): ClearCurrentAction {
   return {
-    type: 'CLEAR_CURRENT_USER'
+    type: 'CLEAR_CURRENT'
   };
 }

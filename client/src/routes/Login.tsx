@@ -1,5 +1,5 @@
 import React, { FC, useState } from 'react';
-import { Link, useParams, useHistory } from 'react-router-dom';
+import { Link, useParams, useHistory, Redirect } from 'react-router-dom';
 import { Form, Button, Checkbox, Input } from 'antd';
 import { MailOutlined, LockOutlined } from '@ant-design/icons';
 import SignInLayout from '@/layouts/SignInLayout';
@@ -7,8 +7,9 @@ import LINK from '@/constants/link';
 import { login } from '@/utils/request';
 
 import styles from './Login.scss';
-import { useDispatch } from 'react-redux';
-import { setCurrentUser } from '@/actions/auth';
+import { useDispatch, useSelector } from 'react-redux';
+import { setCurrent } from '@/actions/auth';
+import { RootState } from '@/reducers';
 
 type FormValues = {
   email: string;
@@ -24,11 +25,16 @@ const Login: FC = () => {
   const { redirectUrl } = useParams<{ redirectUrl: string }>();
   const [form] = Form.useForm();
 
+  const authorization = useSelector((state: RootState) => !!state.auth.email);
+  if (authorization) {
+    return <Redirect to={redirectUrl||LINK.INSTANCE} />;
+  }
+
   const submit = async ({ email, password, remember }: FormValues) => {
     try {
       setLoading(true);
       const data = await login(email, password, remember);
-      dispatch(setCurrentUser({ email: data.email }));
+      dispatch(setCurrent({ email: data.email }));
       history.push(redirectUrl ?? LINK.INSTANCE);
     } catch {
       setLoading(false);
