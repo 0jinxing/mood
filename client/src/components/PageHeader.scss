@@ -13,4 +13,18 @@
     font-weight: lighter;
     font-size: 18px;
   }
+
+  .user {
+    float: right;
+    color: #fff;
+  }
+
+  .logout {
+    margin: 0 10px;
+    cursor: pointer;
+  }
+
+  .email {
+    font-style: italic;
+  }
 }

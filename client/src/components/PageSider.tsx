@@ -1,4 +1,4 @@
-import React, { FC } from 'react';
+import React, { FC, useState, useEffect } from 'react';
 import { Layout, Menu } from 'antd';
 
 import {
@@ -6,20 +6,30 @@ import {
   VideoCameraOutlined,
   UploadOutlined
 } from '@ant-design/icons';
+import { useHistory, Link } from 'react-router-dom';
 
 const menu = [
-  { label: 'nav 1', path: '1', icon: <UserOutlined /> },
-  { label: 'nav 2', path: '2', icon: <UploadOutlined /> },
-  { label: 'nav 3', path: '3', icon: <VideoCameraOutlined /> }
+  { label: 'Overview', path: '/overview', icon: <UserOutlined /> },
+  { label: 'Instance', path: '/instance/list', icon: <UploadOutlined /> },
+  { label: 'Event', path: '/event/list', icon: <VideoCameraOutlined /> }
 ];
 
 const PageSider: FC = () => {
+  const [selectedKeys, setSelectedKeys] = useState<string[]>([]);
+
+  const history = useHistory();
+  const { pathname } = history.location;
+
+  useEffect(() => {
+    setSelectedKeys([pathname]);
+  }, [pathname]);
+
   return (
     <Layout.Sider theme="light">
-      <Menu theme="light" mode="inline">
-        {menu.map((i) => (
+      <Menu theme="light" mode="inline" selectedKeys={selectedKeys}>
+        {menu.map(i => (
           <Menu.Item key={i.path} icon={i.icon}>
-            {i.label}
+            <Link to={i.path}>{i.label}</Link>
           </Menu.Item>
         ))}
       </Menu>

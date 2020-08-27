@@ -1,10 +1,12 @@
 type SetCurrentActionPayload = {
   email: string;
 };
+
 export type SetCurrentAction = {
   type: 'SET_CURRENT';
   payload: SetCurrentActionPayload;
 };
+
 export function setCurrent(
   payload: SetCurrentActionPayload
 ): SetCurrentAction {
