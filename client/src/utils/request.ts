@@ -1,6 +1,7 @@
 import ms from 'ms';
 import Token from './token';
 import API from '@/constants/api';
+import qs from 'qs';
 
 const accessToken = new Token('access');
 const refreshToken = new Token('refresh');
@@ -17,9 +18,13 @@ type AuthData = {
   refreshExpires: string;
 };
 
+interface ExtendsRequestInit extends Omit<RequestInit, 'body'> {
+  body?: object | BodyInit;
+}
+
 const request = async <T = Record<string, any>>(
   input: RequestInfo,
-  init?: RequestInit | undefined
+  init: ExtendsRequestInit = {}
 ) => {
   let token = accessToken.get();
   if (token) {
@@ -29,7 +34,31 @@ const request = async <T = Record<string, any>>(
     };
   }
 
-  let res = await fetch(input, init);
+  if (
+    (!init?.method || /get/i.test(init?.method)) &&
+    init?.body !== undefined
+  ) {
+    if (typeof input === 'string') {
+      const queryString =
+        typeof init.body === 'string' ? init.body : qs.stringify(init.body);
+
+      delete init.body;
+
+      input =
+        input.indexOf('?') >= 0
+          ? `${input}&${queryString}`
+          : `${input}?${queryString}`;
+    }
+    delete init.body;
+  } else if (init.body) {
+    const body =
+      typeof init?.body === 'object' ? JSON.stringify(init.body) : '';
+
+    init = { ...init, body };
+  }
+  
+  let res = await fetch(input, init as RequestInit);
+
   if (res.ok) {
     const data: T = await res.json();
     return data;
@@ -42,11 +71,12 @@ const request = async <T = Record<string, any>>(
   }
 
   token = accessToken.get();
+
   init = {
     ...init,
     headers: { ...init?.headers, authorization: `bearer ${token}` }
   };
-  res = await fetch(input, init);
+  res = await fetch(input, init as RequestInit);
   if (res.ok) {
     const data: T = await res.json();
     return data;

@@ -1,6 +1,6 @@
 import React, { FC, useState } from 'react';
 import { Link, useParams, useHistory, Redirect } from 'react-router-dom';
-import { Form, Button, Checkbox, Input } from 'antd';
+import { Form, Button, Checkbox, Input, message } from 'antd';
 import { MailOutlined, LockOutlined } from '@ant-design/icons';
 import SignInLayout from '@/layouts/SignInLayout';
 import LINK from '@/constants/link';
@@ -27,7 +27,7 @@ const Login: FC = () => {
 
   const authorization = useSelector((state: RootState) => !!state.auth.email);
   if (authorization) {
-    return <Redirect to={redirectUrl||LINK.INSTANCE} />;
+    return <Redirect to={redirectUrl || LINK.INSTANCE} />;
   }
 
   const submit = async ({ email, password, remember }: FormValues) => {
@@ -35,8 +35,13 @@ const Login: FC = () => {
       setLoading(true);
       const data = await login(email, password, remember);
       dispatch(setCurrent({ email: data.email }));
-      history.push(redirectUrl ?? LINK.INSTANCE);
-    } catch {
+      history.push(redirectUrl ?? LINK.INSTANCE_LIST);
+    } catch (e) {
+      if (e instanceof Response) {
+        if (e.status === 403) {
+          message.error('Invalid account or password');
+        }
+      }
       setLoading(false);
     }
   };

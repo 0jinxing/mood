@@ -23,12 +23,12 @@ const Register = () => {
   const submit = async ({ email, password, remember }: FormValues) => {
     try {
       await register(email, password, remember);
-      history.push(redirectUrl ?? '/');
+      history.push(redirectUrl ?? LINK.INSTANCE_LIST);
     } catch (err) {
       if (err instanceof Response) {
         message.error(err.statusText);
       } else {
-        message.error(err.message || '注册失败');
+        message.error(err.message || 'Register fail');
       }
     }
   };

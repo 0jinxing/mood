@@ -4,7 +4,9 @@ enum API {
   REGISTER = '/api/auth/register',
   REFRESH = '/api/auth/refresh',
 
-  QUERY_CURRENT = '/api/auth/current'
+  QUERY_CURRENT = '/api/auth/current',
+
+  INSTANCE = '/api/instance'
 }
 
 export default API;
