@@ -48,14 +48,16 @@ export class InstanceService {
       .limit(limit)
       .exec();
 
-    return instances;
+    const total = current.instances.length;
+
+    return { list: instances, total };
   }
 
   async delete(id: string | string[]) {
     const ids = Array.isArray(id) ? id : [id];
     const current = await this.authService.getCurrent();
 
-    const isOwner = ids.every((id) => {
+    const isOwner = ids.every(id => {
       return current.instances.includes(id);
     });
 
