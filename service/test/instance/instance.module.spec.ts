@@ -17,11 +17,7 @@ function queryInstance(
     .expect(200);
 }
 
-function createInstance(
-  app: INestApplication,
-  token: string,
-  domain: string
-) {
+function createInstance(app: INestApplication, token: string, domain: string) {
   return request(app.getHttpServer())
     .post('/instance')
     .set('Authorization', `bearer ${token}`)
@@ -55,22 +51,26 @@ describe('instance e2e', async () => {
     await createInstance(app, token, 'bing.com');
     await createInstance(app, token, 'google.com');
 
-    const { body } = await queryInstance(app, token);
-
-    expect(body.length).eq(3);
+    const res = await queryInstance(app, token);
+    const { list } = res.body;
+    expect(list.length).eq(3);
   });
 
   let instances: string[];
   it('query instance', async () => {
-    const { body } = await queryInstance(app, token);
-    instances = body.map(({ _id }) => _id);
+    const queryRes = await queryInstance(app, token);
+    const { list } = queryRes.body;
+    instances = list.map(({ _id }) => _id);
     expect(instances.length).eq(3);
 
-    const { body: limit } = await queryInstance(app, token, 0, 2);
-    expect(limit.map(({ _id }) => _id)).deep.eq(instances.slice(0, 2));
+    const limitRes = await queryInstance(app, token, 0, 2);
+    const { list: limitList } = limitRes.body;
 
-    const { body: skip } = await queryInstance(app, token, 1, 2);
-    expect(skip.map(({ _id }) => _id)).deep.eq(instances.slice(1, 3));
+    expect(limitList.map(({ _id }) => _id)).deep.eq(instances.slice(0, 2));
+
+    const skipRes = await queryInstance(app, token, 1, 2);
+    const { list: skipList } = skipRes.body;
+    expect(skipList.map(({ _id }) => _id)).deep.eq(instances.slice(1, 3));
   });
 
   it('delete instance', async () => {
@@ -82,15 +82,12 @@ describe('instance e2e', async () => {
 
     expect(body.deletedCount).eq(1);
 
-    const { body: list }: { body: any[] } = await request(app.getHttpServer())
-      .get('/instance')
-      .set('Authorization', `bearer ${token}`)
-      .send()
-      .expect(200);
+    const res = await queryInstance(app, token);
+    const { list } = res.body;
 
     expect(instances.length - list.length).eq(1);
 
-    instances = list.map((i) => i._id);
+    instances = list.map((i: { _id: string }) => i._id);
   });
 
   it('batch delete instance', async () => {
