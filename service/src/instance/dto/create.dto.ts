@@ -1,3 +1,3 @@
-export class CreateDTO {
+export class InstanceCreateDTO {
   domain: string;
 }

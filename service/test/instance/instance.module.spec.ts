@@ -1,6 +1,6 @@
 import * as request from 'supertest';
 import { INestApplication } from '@nestjs/common';
-import { createApp } from '../create-app';
+import { createApp } from 'test/create-app';
 import { cleanUp } from 'test/clean-up';
 import { expect } from 'chai';
 
@@ -30,6 +30,7 @@ describe('instance e2e', async () => {
   let token: string;
 
   before(async () => {
+    await cleanUp();
     app = await createApp();
 
     const data = { email: 'test@domain.com', password: 'password' };

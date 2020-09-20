@@ -4,6 +4,7 @@ import { Instance } from './instance.schema';
 import { Model, Connection } from 'mongoose';
 import { genUID } from '@/_common/uid';
 import { AuthService } from '@/auth/auth.service';
+import { genQueryConditions, QueryConditions } from '@/_common/conditions';
 
 @Injectable()
 export class InstanceService {
@@ -36,13 +37,14 @@ export class InstanceService {
     }
   }
 
-  async query(domain?: string, skip?: number, limit?: number) {
+  async query(conditions: QueryConditions<Instance>) {
     const current = await this.authService.getCurrent();
 
-    const conditions = domain ? { domain } : {};
+    const { skip, limit } = conditions;
+    const query = genQueryConditions(conditions, ['skip', 'limit']);
 
     const instances = await this.instanceModel
-      .find(conditions)
+      .find(query)
       .where({ _id: { $in: current.instances } })
       .skip(skip)
       .limit(limit)

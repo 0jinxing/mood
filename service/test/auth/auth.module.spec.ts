@@ -8,6 +8,7 @@ describe('auth e2e test', async () => {
   let app: INestApplication;
 
   before(async () => {
+    await cleanUp();
     app = await createApp();
   });
 

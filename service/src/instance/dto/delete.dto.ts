@@ -1,1 +1,1 @@
-export type DeleteDTO = string | string[];
+export type InstanceDeleteDTO = string | string[];
