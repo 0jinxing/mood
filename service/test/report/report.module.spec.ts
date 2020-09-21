@@ -1,9 +1,12 @@
 import { INestApplication } from '@nestjs/common';
+import { expect } from 'chai';
 import * as request from 'supertest';
 import { cleanUp } from 'test/clean-up';
 import { createApp } from 'test/create-app';
 
-describe('event e2e', async () => {
+const eventData = require('./event-data.json');
+
+describe('report e2e', async () => {
   let app: INestApplication;
   let token: string;
   before(async () => {
@@ -21,7 +24,6 @@ describe('event e2e', async () => {
 
   after(async () => {
     app.close();
-    await cleanUp();
   });
 
   let uid: string;
@@ -38,8 +40,16 @@ describe('event e2e', async () => {
     const reportRes = await request(app.getHttpServer())
       .post('/event')
       .set('Authorization', `bearer ${token}`)
-      .send({ uid, events: [] });
+      .send({ uid, events: eventData });
+    const { count } = reportRes.body;
+    expect(count).eq(eventData.length);
+  });
 
-    console.log(reportRes.body);
+  it('report query', async () => {
+    const queryRes = await request(app.getHttpServer())
+      .get('/event')
+      .set('Authorization', `bearer ${token}`)
+      .send({ uid });
+    console.log(queryRes.body);
   });
 });

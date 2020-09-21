@@ -44,7 +44,6 @@ describe('instance e2e', async () => {
 
   after(async () => {
     await app.close();
-    await cleanUp();
   });
 
   it('create instance', async () => {

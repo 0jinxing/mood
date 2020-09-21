@@ -14,7 +14,6 @@ describe('auth e2e test', async () => {
 
   after(async () => {
     await app.close();
-    await cleanUp();
   });
 
   it('unauthorized', () => {

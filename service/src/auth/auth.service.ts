@@ -101,7 +101,6 @@ export class AuthService {
       username: email,
       passwordSalt,
       passwordHash,
-      deleted: false,
       instances: []
     });
     return this.sign(email, password);

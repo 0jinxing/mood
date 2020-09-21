@@ -4,7 +4,7 @@ import { AuthModule } from './auth/auth.module';
 import { MongoModule } from './mongo/mongo.module';
 import { UserModule } from './user/user.module';
 import { InstanceModule } from './instance/instance.module';
-import { EventModule } from './event/event.module';
+import { ReportModule } from './report/report.module';
 
 @Module({
   imports: [
@@ -15,7 +15,7 @@ import { EventModule } from './event/event.module';
     // business module
     UserModule,
     InstanceModule,
-    EventModule
+    ReportModule
   ]
 })
 export class AppModule {}
