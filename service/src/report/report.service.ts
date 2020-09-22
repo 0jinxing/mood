@@ -1,5 +1,5 @@
 import { ForbiddenException, Injectable } from '@nestjs/common';
-import { isValidObjectId, Model } from 'mongoose';
+import { Model, Promise } from 'mongoose';
 import { InjectModel } from '@nestjs/mongoose';
 import { TEvent, EventType } from '@mood/record';
 import { Report } from './report.schema';
@@ -33,23 +33,29 @@ export class ReportService {
     instance?: string,
     uid?: string,
     type?: EventType,
-    skip?: number,
-    limit?: number
+    skip: number = 0,
+    limit: number = Infinity
   ) {
     const current = await this.authService.getCurrent();
 
     const conditions = genQueryConditions({ domain, instance, uid });
 
-    console.log(current.instances.map(i => typeof i));
-    const events1 = await this.eventModel
+    const query = this.eventModel
       .aggregate()
       .match({
         ['instance' as keyof Report]: {
           $in: current.instances
-        }
+        },
+        ...conditions
       })
       .unwind('events' as keyof Report)
-      .exec();
+      .project({ data: '$events' });
+
+    const [total, list] = await Promise.all([
+      query.group({ _id: null, total: { $sum: 1 } }).exec(),
+      query.skip(skip).limit(limit).exec()
+    ]);
+    return { total, list };
 
     // const events = await this.eventModel
     //   .find(conditions)
@@ -64,7 +70,5 @@ export class ReportService {
     //   .skip(skip)
     //   .limit(limit)
     //   .exec();
-
-    return { list: events1 };
   }
 }

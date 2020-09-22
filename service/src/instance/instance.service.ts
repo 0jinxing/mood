@@ -1,7 +1,7 @@
 import { Injectable, ForbiddenException } from '@nestjs/common';
 import { InjectModel, InjectConnection } from '@nestjs/mongoose';
 import { Instance } from './instance.schema';
-import { Model, Connection } from 'mongoose';
+import { Model, Connection, Types } from 'mongoose';
 import { genUID } from '@/_common/uid';
 import { AuthService } from '@/auth/auth.service';
 import { genQueryConditions, QueryConditions } from '@/_common/conditions';
@@ -55,7 +55,7 @@ export class InstanceService {
     return { list: instances, total };
   }
 
-  async delete(id: string | string[]) {
+  async delete(id: Types.ObjectId | Types.ObjectId[]) {
     const ids = Array.isArray(id) ? id : [id];
     const current = await this.authService.getCurrent();
 

@@ -50,6 +50,6 @@ describe('report e2e', async () => {
       .get('/event')
       .set('Authorization', `bearer ${token}`)
       .send({ uid });
-    console.log(queryRes.body);
+    console.log(JSON.stringify(queryRes.body));
   });
 });
