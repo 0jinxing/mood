@@ -17,6 +17,6 @@ export class ReportController {
   @Post()
   async report(@Body() { uid, events }: ReportEventDTO) {
     const res = await this.reportService.report(uid, events);
-    return { _id: res._id, count: res.events.length };
+    return { count: res.length };
   }
 }

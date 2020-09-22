@@ -10,7 +10,7 @@ import { InstanceService } from '@/instance/instance.service';
 @Injectable()
 export class ReportService {
   constructor(
-    @InjectModel(Report.name) private eventModel: Model<Report>,
+    @InjectModel(Report.name) private reportModel: Model<Report>,
     private authService: AuthService,
     private instanceService: InstanceService
   ) {}
@@ -23,7 +23,8 @@ export class ReportService {
     } = await this.instanceService.query({ uid });
 
     if (current.instances.includes(instance)) {
-      return this.eventModel.create({ instance, uid, events });
+      const reports = events.map(e => ({ instance, uid, data: e }));
+      return this.reportModel.insertMany(reports);
     }
     throw new ForbiddenException();
   }
@@ -34,41 +35,32 @@ export class ReportService {
     uid?: string,
     type?: EventType,
     skip: number = 0,
-    limit: number = Infinity
+    limit: number = Number.MAX_SAFE_INTEGER
   ) {
     const current = await this.authService.getCurrent();
 
-    const conditions = genQueryConditions({ domain, instance, uid });
+    const conditions = genQueryConditions({
+      domain,
+      instance,
+      uid,
+      'data.type': type
+    });
 
-    const query = this.eventModel
-      .aggregate()
-      .match({
-        ['instance' as keyof Report]: {
-          $in: current.instances
-        },
+    const total = await this.reportModel
+      .find({
+        instance: { $in: current.instances },
         ...conditions
       })
-      .unwind('events' as keyof Report)
-      .project({ data: '$events' });
+      .countDocuments();
 
-    const [total, list] = await Promise.all([
-      query.group({ _id: null, total: { $sum: 1 } }).exec(),
-      query.skip(skip).limit(limit).exec()
-    ]);
+    const list = await this.reportModel
+      .find({
+        instance: { $in: current.instances },
+        ...conditions
+      })
+      .skip(skip)
+      .limit(limit);
+
     return { total, list };
-
-    // const events = await this.eventModel
-    //   .find(conditions)
-    //   .where('instance' as keyof Report)
-    //   .in(current.instances)
-    //   .where('events' as keyof Report)
-    //   .elemMatch(elem => {
-    //     if (type) {
-    //       elem.where('type' as keyof TEvent).equals(type);
-    //     }
-    //   })
-    //   .skip(skip)
-    //   .limit(limit)
-    //   .exec();
   }
 }
