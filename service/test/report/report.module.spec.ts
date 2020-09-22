@@ -1,3 +1,4 @@
+import { TEvent } from '@mood/record';
 import { INestApplication } from '@nestjs/common';
 import { expect } from 'chai';
 import * as request from 'supertest';
@@ -50,6 +51,21 @@ describe('report e2e', async () => {
       .get('/event')
       .set('Authorization', `bearer ${token}`)
       .send({ uid });
-    console.log(JSON.stringify(queryRes.body));
+
+    const { total, list } = queryRes.body;
+
+    expect(total).eq(eventData.length).eq(list.length);
+  });
+
+  it('report filter query', async () => {
+    const filterRes = await request(app.getHttpServer())
+      .get('/event')
+      .set('Authorization', `bearer ${token}`)
+      .send({ uid, type: 2 });
+
+    const { total, list } = filterRes.body;
+    expect(total)
+      .eq(list.length)
+      .eq(eventData.filter((d: TEvent) => d.type === 2).length);
   });
 });
