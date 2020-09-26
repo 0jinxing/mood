@@ -1,0 +1,30 @@
+.pageHeader {
+  padding-left: 24px;
+  .logo {
+    img {
+      height: 32px;
+      vertical-align: top;
+      margin-right: 8px;
+    }
+    line-height: 32px;
+    margin: 16px 28px 16px 0;
+    float: left;
+    color: #fff;
+    font-weight: lighter;
+    font-size: 18px;
+  }
+
+  .user {
+    float: right;
+    color: #fff;
+  }
+
+  .logout {
+    margin: 0 10px;
+    cursor: pointer;
+  }
+
+  .email {
+    font-style: italic;
+  }
+}

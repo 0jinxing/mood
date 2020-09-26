@@ -1,0 +1,19 @@
+{
+  "name": "@mood/record",
+  "version": "0.0.1",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "publish": "npm publish --access public"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "@mood/snapshot": "0.0.1"
+  },
+  "devDependencies": {
+    "ts-loader": "^8.0.4"
+  }
+}
