@@ -2,8 +2,5 @@
   "name": "sdk",
   "version": "1.0.0",
   "main": "index.js",
-  "license": "MIT",
-  "devDependencies": {
-    "ts-loader": "^8.0.4"
-  }
+  "license": "MIT"
 }

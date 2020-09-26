@@ -15,8 +15,5 @@
     "@mood/snapshot": "0.0.1",
     "@xstate/fsm": "^1.4.0",
     "mitt": "^1.2.0"
-  },
-  "devDependencies": {
-    "ts-loader": "^8.0.4"
   }
 }

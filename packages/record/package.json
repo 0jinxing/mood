@@ -12,8 +12,5 @@
   "license": "MIT",
   "dependencies": {
     "@mood/snapshot": "0.0.1"
-  },
-  "devDependencies": {
-    "ts-loader": "^8.0.4"
   }
 }

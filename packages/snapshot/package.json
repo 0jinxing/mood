@@ -9,8 +9,5 @@
   },
   "keywords": [],
   "author": "",
-  "license": "MIT",
-  "devDependencies": {
-    "ts-loader": "^8.0.4"
-  }
+  "license": "MIT"
 }
