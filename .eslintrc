@@ -21,7 +21,7 @@
   "parser": "@typescript-eslint/parser",
   "plugins": ["react", "@typescript-eslint"],
   "rules": {
-    "no-undef": "off",
+    "no-undef": "error",
     "standard/no-callback-literal": "off",
     "no-useless-constructor": "off",
 
