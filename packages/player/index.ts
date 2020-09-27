@@ -54,7 +54,7 @@ export default class Player {
   private $cursor: HTMLElement;
   private events: TEventWithTime[];
   private config: PlayerConfig;
-  private emitter: mitt.Emitter = mitt();
+  private emitter: typeof mitt.Emitter = mitt();
   private baselineTime: number = 0;
   private lastPlayedEvent: TEventWithTime;
   private nextUserInteractionEvent: TEventWithTime | null;
@@ -80,7 +80,7 @@ export default class Player {
     this.emitter.on(PlayerEmitterEvent.RESIZE, this.handleResize);
   }
 
-  public on(type: string, handler: mitt.Handler) {
+  public on(type: string, handler: typeof mitt.Handler) {
     this.emitter.on(type, handler);
   }
 
@@ -139,7 +139,7 @@ export default class Player {
     this.timer.clear();
     this.baselineTime = this.events[0].timestamp + timeOffset;
     const actions: ActionWithDelay[] = [];
-    
+
     for (const event of this.events) {
       if (
         event.timestamp <= this.lastPlayedEvent.timestamp ||
