@@ -4,7 +4,7 @@
     "module": "commonjs",
     "rootDir": ".",
     "target": "ES5",
-    "lib": ["ES2017", "DOM"],
+    "lib": ["es2018", "dom"],
     "noImplicitAny": true,
     "strictNullChecks": true,
     "downlevelIteration": true,
