@@ -5,6 +5,7 @@ import { MongoModule } from './mongo/mongo.module';
 import { UserModule } from './user/user.module';
 import { InstanceModule } from './instance/instance.module';
 import { ReportModule } from './report/report.module';
+import { LoggerModule } from './logger/logger.module';
 
 @Module({
   imports: [
@@ -12,6 +13,8 @@ import { ReportModule } from './report/report.module';
     ConfModule,
     MongoModule,
     AuthModule,
+    LoggerModule,
+
     // business module
     UserModule,
     InstanceModule,

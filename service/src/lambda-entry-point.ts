@@ -5,16 +5,22 @@ import { Context } from 'aws-lambda';
 import * as serverlessExpress from 'aws-serverless-express';
 import * as express from 'express';
 import { ExpressAdapter } from '@nestjs/platform-express';
+import { LoggerService } from './logger/logger.service';
 
 let lambdaProxy: Server;
 
 async function bootstrap() {
   const expressServer = express();
+
+  const logger = new LoggerService();
   const nestApp = await NestFactory.create(
     AppModule,
-    new ExpressAdapter(expressServer)
+    new ExpressAdapter(expressServer),
+    { logger }
   );
+
   nestApp.setGlobalPrefix('api');
+
   await nestApp.init();
 
   return serverlessExpress.createServer(expressServer);

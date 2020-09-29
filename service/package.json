@@ -22,7 +22,8 @@
     "mongoose": "^5.9.20",
     "passport": "^0.4.1",
     "reflect-metadata": "^0.1.13",
-    "rxjs": "^6.5.5"
+    "rxjs": "^6.5.5",
+    "winston": "^3.3.3"
   },
   "devDependencies": {
     "@nestjs/testing": "^7.3.1",
