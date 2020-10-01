@@ -21,6 +21,7 @@ async function bootstrap() {
 
   nestApp.setGlobalPrefix('api');
 
+  nestApp.enableCors({ origin: /ghoo.cc$/ });
   await nestApp.init();
 
   return serverlessExpress.createServer(expressServer);
