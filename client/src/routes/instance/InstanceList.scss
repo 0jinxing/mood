@@ -1,0 +1,20 @@
+.toolbar {
+  display: flex;
+  .createBtn {
+    margin-left: auto;
+  }
+
+  .search {
+    max-width: 200px;
+  }
+}
+
+.action {
+  margin: 0 8px;
+  &:last-child {
+    margin-right: 0;
+  }
+  &:first-child {
+    margin-left: 0;
+  }
+}
