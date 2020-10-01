@@ -1,5 +1,7 @@
 const path = require('path');
+const webpack = require('webpack');
 const HtmlPlugin = require('html-webpack-plugin');
+const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 
 module.exports = {
   mode: 'development',
@@ -20,13 +22,13 @@ module.exports = {
       },
       {
         test: /.css$/i,
-        use: ['style-loader', 'css-loader'],
+        use: [MiniCssExtractPlugin.loader, 'css-loader'],
         include: [/node_modules/, /global\.s?css/]
       },
       {
         test: /.s?css$/i,
         use: [
-          'style-loader',
+          MiniCssExtractPlugin.loader,
           { loader: 'css-loader', options: { modules: true } },
           'sass-loader'
         ],
@@ -47,6 +49,12 @@ module.exports = {
   },
 
   plugins: [
+    new webpack.EnvironmentPlugin(['URL_PREFIX']),
+
+    new MiniCssExtractPlugin({
+      filename: '[name].[hash:8].css'
+    }),
+
     new HtmlPlugin({
       template: path.resolve('public/index.html'),
       filename: 'index.html',
@@ -63,13 +71,6 @@ module.exports = {
     open: true,
     proxy: {
       '/api': 'http://127.0.0.1:3000'
-      // '/api': {
-      //   host: 'rqrn2gefbh.execute-api.ap-southeast-1.amazonaws.com',
-      //   target: 'https://rqrn2gefbh.execute-api.ap-southeast-1.amazonaws.com',
-      //   secure: false,
-      //   changeOrigin: true,
-      //   pathRewrite: { '^/api': '/Prod/api' }
-      // }
     }
   },
 
@@ -80,19 +81,23 @@ module.exports = {
         common: {
           test: module => [/react/, /redux/].some(r => r.test(module.context)),
           name: 'common',
+          priority: 1000
+        },
+        rc: {
+          test: module => /rc-[a-z-]+/.test(module.context),
+          name: 'rc',
           priority: 100
         },
         antd: {
-          test: module => /antd/.test(module.context),
+          test: module =>
+            /antd/.test(module.context) || /@ant-design/.test(module.context),
           name: 'antd',
           priority: 10
         },
-
         vendor: {
           test: /node_modules/,
           name: 'vendor',
-          minChunks: 2,
-          priority: 0
+          priority: 1
         }
       }
     }

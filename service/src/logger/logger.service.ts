@@ -2,13 +2,13 @@ import { Injectable, Scope, Logger } from '@nestjs/common';
 import * as winston from 'winston';
 
 let format = winston.format.combine(
-  winston.format.colorize(),
+  winston.format.uncolorize(),
   winston.format.simple()
 );
 
-if (process.env.NODE_ENV === 'production') {
+if (process.env.NODE_ENV === 'development') {
   format = winston.format.combine(
-    winston.format.uncolorize(),
+    winston.format.colorize(),
     winston.format.simple()
   );
 }
