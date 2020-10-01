@@ -4,7 +4,7 @@
   "main": "index.js",
   "license": "MIT",
   "scripts": {
-    "build": "webpack --config config/webpack.base.js",
+    "build": "webpack --config config/webpack.prod.js",
     "start": "cross-env NODE_ENV=development webpack-dev-server --config config/webpack.base.js"
   },
   "devDependencies": {
@@ -40,13 +40,18 @@
     "antd": "^4.4.3",
     "classnames": "^2.2.6",
     "dayjs": "^1.8.30",
+    "mini-css-extract-plugin": "^0.11.2",
     "ms": "^2.1.2",
+    "optimize-css-assets-webpack-plugin": "^5.0.4",
+    "postcss-safe-parser": "^5.0.2",
     "qs": "^6.9.4",
     "react": "^16.13.1",
     "react-dom": "^16.13.1",
     "react-redux": "^7.2.1",
     "react-router-dom": "^5.2.0",
     "redux": "^4.0.5",
-    "redux-logger": "^3.0.6"
+    "redux-logger": "^3.0.6",
+    "terser-webpack-plugin": "^4.2.2",
+    "webpack-merge": "^5.1.4"
   }
 }
