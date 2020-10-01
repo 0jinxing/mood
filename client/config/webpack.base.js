@@ -63,13 +63,6 @@ module.exports = {
     open: true,
     proxy: {
       '/api': 'http://127.0.0.1:3000'
-      // '/api': {
-      //   host: 'rqrn2gefbh.execute-api.ap-southeast-1.amazonaws.com',
-      //   target: 'https://rqrn2gefbh.execute-api.ap-southeast-1.amazonaws.com',
-      //   secure: false,
-      //   changeOrigin: true,
-      //   pathRewrite: { '^/api': '/Prod/api' }
-      // }
     }
   },
 

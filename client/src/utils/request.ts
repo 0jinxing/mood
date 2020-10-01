@@ -27,6 +27,9 @@ const request = async <T = Record<string, any>>(
   init: ExtendsRequestInit = {}
 ) => {
   let token = accessToken.get();
+
+  init = { mode: 'cors', ...init };
+
   if (token) {
     init = {
       ...init,
@@ -56,7 +59,7 @@ const request = async <T = Record<string, any>>(
 
     init = { ...init, body };
   }
-  
+
   let res = await fetch(input, init as RequestInit);
 
   if (res.ok) {
