@@ -64,8 +64,8 @@ module.exports = {
     proxy: {
       '/api': 'http://127.0.0.1:3000'
       // '/api': {
-      //   host: 'dytq0hfmm6.execute-api.ap-southeast-1.amazonaws.com',
-      //   target: 'https://dytq0hfmm6.execute-api.ap-southeast-1.amazonaws.com',
+      //   host: 'rqrn2gefbh.execute-api.ap-southeast-1.amazonaws.com',
+      //   target: 'https://rqrn2gefbh.execute-api.ap-southeast-1.amazonaws.com',
       //   secure: false,
       //   changeOrigin: true,
       //   pathRewrite: { '^/api': '/Prod/api' }
