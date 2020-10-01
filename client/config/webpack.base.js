@@ -1,4 +1,5 @@
 const path = require('path');
+const webpack = require('webpack');
 const HtmlPlugin = require('html-webpack-plugin');
 
 module.exports = {
@@ -47,6 +48,8 @@ module.exports = {
   },
 
   plugins: [
+    new webpack.EnvironmentPlugin(['URL_PREFIX']),
+    
     new HtmlPlugin({
       template: path.resolve('public/index.html'),
       filename: 'index.html',
