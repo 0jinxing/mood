@@ -42,8 +42,8 @@ class ParentComponent extends React.Component {
     console.log('ParentComponent render', this.state.count);
     return (
       <div>
+        <div>URL_PREFIX: {process.env.URL_PREFIX}</div>
         <div onClick={this.handleParentClick}>
-          {process.env.URL_PREFIX}
           ParentComponent {this.state.count}
         </div>
         <div>{this.state.arr.length}</div>
