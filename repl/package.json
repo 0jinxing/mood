@@ -1,6 +1,14 @@
 {
-  "name": "repl",
+  "name": "@mood/repl",
   "version": "1.0.0",
   "main": "index.js",
-  "license": "MIT"
+  "license": "MIT",
+  "dependencies": {
+    "inquirer": "^7.3.3",
+    "puppeteer": "^5.3.1"
+  },
+  "devDependencies": {
+    "@types/inquirer": "^7.3.1",
+    "@types/puppeteer": "^3.0.2"
+  }
 }

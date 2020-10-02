@@ -36,7 +36,7 @@
   },
   "dependencies": {
     "@ant-design/icons": "^4.2.1",
-    "@mood/player": "0.0.1",
+    "@mood/replay": "0.0.1",
     "antd": "^4.4.3",
     "classnames": "^2.2.6",
     "dayjs": "^1.8.30",
