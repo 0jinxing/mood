@@ -118,10 +118,10 @@ function record(options: RecordOptions<TEvent>): ListenerHandler {
               data: { source, positions }
             });
           },
-          mouseInteraction: (param) => {
+          mouseInteraction: (params) => {
             wrappedEmitWithTime({
               type: EventType.INCREMENTAL_SNAPSHOT,
-              data: { source: IncrementalSource.MOUSE_INTERACTION, ...param }
+              data: { source: IncrementalSource.MOUSE_INTERACTION, ...params }
             });
           },
 
@@ -139,24 +139,24 @@ function record(options: RecordOptions<TEvent>): ListenerHandler {
             });
           },
 
-          input: (param) => {
+          input: (params) => {
             wrappedEmitWithTime({
               type: EventType.INCREMENTAL_SNAPSHOT,
-              data: { source: IncrementalSource.INPUT, ...param }
+              data: { source: IncrementalSource.INPUT, ...params }
             });
           },
 
-          mediaInteraction: (param) => {
+          mediaInteraction: (params) => {
             wrappedEmitWithTime({
               type: EventType.INCREMENTAL_SNAPSHOT,
-              data: { source: IncrementalSource.MEDIA_INTERACTION, ...param }
+              data: { source: IncrementalSource.MEDIA_INTERACTION, ...params }
             });
           },
 
-          styleSheetRule: (param) => {
+          styleSheetRule: (params) => {
             wrappedEmitWithTime({
               type: EventType.INCREMENTAL_SNAPSHOT,
-              data: { source: IncrementalSource.STYLE_SHEETRULE, ...param }
+              data: { source: IncrementalSource.STYLE_SHEETRULE, ...params }
             });
           }
         },

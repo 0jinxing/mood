@@ -21,7 +21,7 @@ export function initMouseInteractionObserver(
   };
   Object.keys(MouseInteractions).forEach(
     (eventKey: keyof typeof MouseInteractions) => {
-      const eventName = eventKey.replace(/_/g, '').toLowerCase();
+      const eventName = eventKey;
       const handler = getHandler(eventKey);
       handlers.push(on(eventName, handler));
     }

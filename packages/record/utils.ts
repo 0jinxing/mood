@@ -6,7 +6,9 @@ export function on(
   fn: EventListenerOrEventListenerObject,
   $target: Document | Window = document
 ): ListenerHandler {
+  type = type.toLowerCase();
   const options = { capture: true, passive: true };
+  
   $target.addEventListener(type, fn, options);
   return () => $target.removeEventListener(type, fn, options);
 }

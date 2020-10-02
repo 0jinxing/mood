@@ -15,7 +15,7 @@ function initStyleSheetObserver(cb: StyleSheetRuleCallback): ListenerHandler {
     id && cb({ id, removes: [{ index }] });
     return deleteRule.apply(this, [index]);
   };
-
+  
   return () => {
     CSSStyleSheet.prototype.insertRule = insertRule;
     CSSStyleSheet.prototype.deleteRule = deleteRule;

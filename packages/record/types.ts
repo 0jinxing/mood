@@ -10,15 +10,15 @@ export enum EventType {
 }
 
 export enum MouseInteractions {
-  MOUSEUP = 'MOUSEUP',
-  MOUSEDOWN = 'MOUSEDOWN',
-  CLICK = 'CLICK',
-  CONTEXTMENU = 'CONTEXTMENU',
-  DBLCLICK = 'DBLCLICK',
-  FOCUS = 'FOCUS',
-  BLUR = 'BLUR',
-  TOUCHSTART = 'TOUCHSTART',
-  TOUCHEND = 'TOUCHEND'
+  MOUSEUP,
+  MOUSEDOWN,
+  CLICK,
+  CONTEXTMENU,
+  DBLCLICK,
+  FOCUS,
+  BLUR,
+  TOUCHSTART,
+  TOUCHEND
 }
 
 export enum IncrementalSource {

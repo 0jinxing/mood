@@ -1,12 +1,23 @@
 import { serializeWithId, transformAttr, TNode, mirror } from '@mood/snapshot';
-import { isAncestorRemoved, deepDelete, isAncestorInSet, isParentRemoved } from '../utils';
+import {
+  isAncestorRemoved,
+  deepDelete,
+  isAncestorInSet,
+  isParentRemoved
+} from '../utils';
 
-import { MutationCallBack, AttrCursor, RemovedNodeMutation, AddedNodeMutation } from '../types';
+import {
+  MutationCallBack,
+  AttrCursor,
+  RemovedNodeMutation,
+  AddedNodeMutation
+} from '../types';
 
 const genKey = (id: number, parentId: number) => `${id}@${parentId}`;
 
 function initMutationObserver(cb: MutationCallBack) {
-  const observer = new MutationObserver((mutations) => {
+
+  const observer = new MutationObserver(mutations => {
     const attrs: AttrCursor[] = [];
     const texts: Array<{ value: string; $el: Node }> = [];
     const removes: RemovedNodeMutation[] = [];
@@ -28,7 +39,7 @@ function initMutationObserver(cb: MutationCallBack) {
         addedSet.add($node);
         removedSet.delete($node);
       }
-      $node.childNodes.forEach(($childNode) => genAdds($childNode));
+      $node.childNodes.forEach($childNode => genAdds($childNode));
     };
 
     mutations.forEach(
@@ -47,7 +58,7 @@ function initMutationObserver(cb: MutationCallBack) {
 
           if (oldValue === value) return;
 
-          let current = attrs.find((a) => a.$el === target);
+          let current = attrs.find(attr => attr.$el === target);
           if (!current) {
             current = { $el: target, attributes: {} };
             attrs.push(current);
@@ -59,8 +70,8 @@ function initMutationObserver(cb: MutationCallBack) {
         }
         // childList
         else if (type === 'childList') {
-          addedNodes.forEach(($node) => genAdds($node, target));
-          removedNodes.forEach(($node) => {
+          addedNodes.forEach($node => genAdds($node, target));
+          removedNodes.forEach($node => {
             const id = mirror.getId($node);
             const parentId = mirror.getId(target);
 
@@ -118,7 +129,7 @@ function initMutationObserver(cb: MutationCallBack) {
       });
     };
 
-    movedSet.forEach(($node) => pushAdd($node));
+    movedSet.forEach($node => pushAdd($node));
 
     for (const $node of addedSet) {
       if (
@@ -136,7 +147,7 @@ function initMutationObserver(cb: MutationCallBack) {
     while (addQueue.length) {
       if (
         addQueue.every(
-          ($node) => !mirror.getId(($node.parentNode as Node) as TNode)
+          $node => !mirror.getId(($node.parentNode as Node) as TNode)
         )
       ) {
         /**
@@ -151,12 +162,12 @@ function initMutationObserver(cb: MutationCallBack) {
 
     const payload = {
       texts: texts
-        .map((text) => ({
+        .map(text => ({
           id: mirror.getId(text.$el as TNode),
           value: text.value
         }))
-        .filter((text) => mirror.has(text.id)),
-      attributes: attrs.map((attr) => ({
+        .filter(text => mirror.has(text.id)),
+      attributes: attrs.map(attr => ({
         id: mirror.getId(attr.$el as TNode),
         attributes: attr.attributes
       })),

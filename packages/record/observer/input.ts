@@ -21,11 +21,10 @@ function hookSetter<T>(
     isRevoked
       ? descriptor
       : {
+          ...descriptor,
           set(value) {
             // put hooked setter into event loop to avoid of set latency
-            setTimeout(() => {
-              descriptor.set!.call(this, value);
-            }, 0);
+            setTimeout(() => descriptor.set!.call(this, value));
             original && original.set && original.set.call(this, value);
           }
         }
@@ -49,29 +48,29 @@ function initInputObserver(callback: InputCallback): ListenerHandler {
   };
 
   const eventHandler = (event: Event) => {
-    const { target } = event;
+    const { target: $target } = event;
 
     if (
-      !(target instanceof HTMLTextAreaElement) &&
-      !(target instanceof HTMLSelectElement) &&
-      !(target instanceof HTMLInputElement)
+      !($target instanceof HTMLTextAreaElement) &&
+      !($target instanceof HTMLSelectElement) &&
+      !($target instanceof HTMLInputElement)
     ) {
       return;
     }
 
     const value: InputValue =
-      target instanceof HTMLInputElement
-        ? target.value || target.checked
-        : target.value;
-    cbWithDedup(target, value);
-    const inputType = target.type;
-    const name = target.name;
+      $target instanceof HTMLInputElement
+        ? $target.value || $target.checked
+        : $target.value;
+    cbWithDedup($target, value);
+    const inputType = $target.type;
+    const name = $target.name;
     if (inputType === 'radio' && name && value) {
-      const $$radio = document.querySelectorAll(
-        `input[type=radio][name=${name}]`
-      );
+      const selector = `input[type=radio][name=${name}]`;
+      const $$radio = document.querySelectorAll(selector);
+
       $$radio.forEach($el => {
-        $el !== target && cbWithDedup($el as HTMLInputElement, !value);
+        $el !== $target && cbWithDedup($el as HTMLInputElement, !value);
       });
     }
   };
@@ -90,8 +89,8 @@ function initInputObserver(callback: InputCallback): ListenerHandler {
     [HTMLTextAreaElement.prototype, 'value']
   ];
 
-  const hookHandlers = hookProperties.map(([$target, key]) =>
-    hookSetter<HTMLElement>($target, key, {
+  const hookHandlers = hookProperties.map(([prototype, key]) =>
+    hookSetter<HTMLElement>(prototype, key, {
       set() {
         eventHandler({ target: this } as Event);
       }
