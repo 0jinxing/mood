@@ -1,0 +1,14 @@
+.sider {
+  &:global.ant-layout-sider-collapsed {
+    .ant-menu,
+    .ant-menu-item {
+      width: 48px;
+    }
+    .ant-menu {
+      min-height: 100%;
+    }
+    .ant-menu-item {
+      padding: 0 16px;
+    }
+  }
+}

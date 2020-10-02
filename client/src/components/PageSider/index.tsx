@@ -8,6 +8,8 @@ import {
 } from '@ant-design/icons';
 import { useHistory, Link } from 'react-router-dom';
 
+import styles from './index.scss';
+
 const menu = [
   { label: 'Overview', path: '/overview', icon: <UserOutlined /> },
   { label: 'Instance', path: '/instance/list', icon: <UploadOutlined /> },
@@ -25,7 +27,12 @@ const PageSider: FC = () => {
   }, [pathname]);
 
   return (
-    <Layout.Sider theme="light" breakpoint="md">
+    <Layout.Sider
+      className={styles.sider}
+      theme="light"
+      breakpoint="lg"
+      collapsedWidth="48px"
+    >
       <Menu theme="light" mode="inline" selectedKeys={selectedKeys}>
         {menu.map(i => (
           <Menu.Item key={i.path} icon={i.icon}>

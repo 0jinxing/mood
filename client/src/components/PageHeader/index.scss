@@ -1,4 +1,8 @@
 .pageHeader {
+  &:global.ant-layout-header {
+    height: 48px;
+    line-height: 48px;
+  }
   padding-left: 24px;
   .logo {
     img {
@@ -6,12 +10,14 @@
       vertical-align: top;
       margin-right: 8px;
     }
-    line-height: 32px;
-    margin: 16px 28px 16px 0;
+    line-height: 48px;
     float: left;
     color: #fff;
     font-weight: lighter;
     font-size: 18px;
+    
+    display: flex;
+    align-items: center;
   }
 
   .user {

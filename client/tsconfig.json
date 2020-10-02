@@ -4,6 +4,7 @@
     "paths": {
       "@/*": ["src/*"]
     },
+    "declaration": true,
     "strictNullChecks": true,
     "moduleResolution": "node",
     "esModuleInterop": true,

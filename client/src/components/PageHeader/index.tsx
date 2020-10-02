@@ -1,31 +1,51 @@
 import React, { FC } from 'react';
 import { Layout } from 'antd';
-import { useSelector } from 'react-redux';
+import { Dispatch } from 'redux';
+import { connect } from 'react-redux';
 import { Link } from 'react-router-dom';
 
-import logo from '@/assets/logo.svg';
 import LINK from '@/constants/link';
 import { RootState } from '@/reducers';
+import { clearCurrent } from '@/actions/auth';
 
+import logo from '@/assets/logo.svg';
 import styles from './index.scss';
+import { AuthState } from '@/reducers/auth';
 
-const PageHeader: FC = () => {
-  const email = useSelector((state: RootState) => state.auth.email);
+const mapStateToProps = (state: RootState) => {
+  return { auth: state.auth };
+};
 
+const mapDispatchToProps = (dispatch: Dispatch) => {
+  return {
+    logout: () => {
+      dispatch(clearCurrent());
+    }
+  };
+};
+
+export type PageHeaderProps = {
+  auth: AuthState;
+  logout: () => void;
+};
+
+const PageHeader: FC<PageHeaderProps> = ({ auth, logout }) => {
   return (
     <Layout.Header className={styles.pageHeader}>
       <Link to={LINK.HOME} className={styles.logo}>
         <img src={logo} />
         MOOD
       </Link>
-      {email ? (
+      {auth.email ? (
         <div className={styles.user}>
-          <span className={styles.email}>{email}</span>
-          <span className={styles.logout}>[logout]</span>
+          <span className={styles.email}>{auth.email}</span>
+          <span className={styles.logout} onClick={logout}>
+            [logout]
+          </span>
         </div>
       ) : null}
     </Layout.Header>
   );
 };
 
-export default PageHeader;
+export default connect(mapStateToProps, mapDispatchToProps)(PageHeader);
