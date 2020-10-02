@@ -25,7 +25,7 @@ const PageSider: FC = () => {
   }, [pathname]);
 
   return (
-    <Layout.Sider theme="light">
+    <Layout.Sider theme="light" breakpoint="md">
       <Menu theme="light" mode="inline" selectedKeys={selectedKeys}>
         {menu.map(i => (
           <Menu.Item key={i.path} icon={i.icon}>

@@ -1,7 +1,10 @@
 import React, { useEffect } from 'react';
+import { Switch, Route, Redirect, useHistory } from 'react-router-dom';
+
 import PageSider from '@/components/PageSider';
 import PageContainer from '@/components/PageContainer';
-import { Switch, Route, Redirect, useHistory } from 'react-router-dom';
+import PageLoading from '@/components/PageLoading';
+
 import EventDetail from '@/routes/event/EventDetail';
 import EventList from '@/routes/event/EventList';
 import Overview from '@/routes/overview';
@@ -9,6 +12,7 @@ import InstanceDetail from '@/routes/instance/InstanceDetail';
 import InstanceList from '@/routes/instance/InstanceList';
 import { useSelector } from 'react-redux';
 import { RootState } from '@/reducers';
+
 import { LOADING_QUERY_CURRENT } from '@/constants/symbol';
 import LOADING from '@/constants/loading';
 import LINK from '@/constants/link';
@@ -29,7 +33,7 @@ const DashboardLayout = () => {
   }, [loading, email]);
 
   if (loading !== LOADING.DONE) {
-    return <div>PAGE LOADING</div>;
+    return <PageLoading />;
   }
 
   return (
