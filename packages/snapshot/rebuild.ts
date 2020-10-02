@@ -10,7 +10,7 @@ import { mirror } from './utils';
 function getTagName(node: ElementNode) {
   let tagName = node.tagName;
 
-  if (/LINK/i.test(tagName) && node.attributes._cssText) {
+  if (/LINK/i.test(tagName) && node.attributes.cssText) {
     tagName = 'STYLE';
   } else if (/SCRIPT/i.test(tagName)) {
     tagName = 'NOSCRIPT';
@@ -44,25 +44,22 @@ export function buildNode(
       ? $doc.createElementNS('http://www.w3.org/2000/svg', tagName)
       : $doc.createElement(tagName);
 
+    const SPECIAL_KEY = ['dataURL', 'mediaState', 'cssText'];
+    
     for (const [key, attrValue] of Object.entries(attributes)) {
       if (typeof attrValue === 'boolean' && !attrValue) continue;
       let value = attrValue === true ? '' : attrValue;
 
-      if (!key.startsWith('__')) {
-        const isTextarea = tagName === 'TEXTAREA' && key === 'value';
-        const isRemoteOrDynamicCss = tagName === 'STYLE' && key === '_cssText';
+      if (!SPECIAL_KEY.includes(key)) {
+        const isTextarea = /TEXTAREA/i.test(tagName) && key === 'value';
 
-        if (isRemoteOrDynamicCss) {
-          value = addHoverClass(value);
-        }
-
-        if (isTextarea || isRemoteOrDynamicCss) {
+        if (isTextarea) {
           const $child = $doc.createTextNode(value);
           $el.appendChild($child);
           continue;
         }
 
-        if (tagName === 'iframe' && key === 'src') continue;
+        if (/IFRAME/i.test(tagName) && key === 'src') continue;
 
         try {
           if (isSVG && key === 'xlink:href') {
@@ -74,41 +71,45 @@ export function buildNode(
           // skip invalid attribute
         }
       } else {
-        if (tagName === 'canvas' && key === '__dataURL') {
+        if (/STYLE/i.test(tagName) && key === 'cssText') {
+          value = addHoverClass(value);
+          const $child = $doc.createTextNode(value);
+          $el.appendChild($child);
+        } else if (/CANVAS/i.test(tagName) && key === 'dataURL') {
           const $image = $doc.createElement('img');
           $image.src = value;
           $image.addEventListener('load', () => {
             const ctx = ($el as HTMLCanvasElement).getContext('2d');
             if (ctx) ctx.drawImage($image, 0, 0, $image.width, $image.height);
           });
-        } else if (key === '__width') {
-          $el.style.width = value;
-        } else if (key === '__height') {
-          $el.style.height = value;
-        } else if (key === '__mediaState') {
+        } else if (key === 'mediaState' && $el instanceof HTMLMediaElement) {
           if (value === 'played') {
-            ($el as HTMLMediaElement).play();
+            $el.play();
           } else if (value === 'paused') {
-            ($el as HTMLMediaElement).pause();
+            $el.pause();
           }
         }
       }
     }
     return $el;
-  } else if (node.type === NodeType.TEXT_NODE) {
+  }
+
+  if (node.type === NodeType.TEXT_NODE) {
     const { isStyle, textContent } = node;
     return $doc.createTextNode(
       isStyle ? addHoverClass(textContent) : textContent
     );
   }
-  // CDATA or Comment
-  let $el: Node | null = null;
+
   if (node.type === NodeType.CDATA_SECTION_NODE) {
-    $el = $doc.createCDATASection(node.textContent);
-  } else if (node.type === NodeType.COMMENT_NODE) {
-    $el = $doc.createComment(node.textContent);
+    return $doc.createCDATASection(node.textContent);
   }
-  return $el;
+
+  if (node.type === NodeType.COMMENT_NODE) {
+    return $doc.createComment(node.textContent);
+  }
+
+  return null;
 }
 
 export function buildNodeWithSN(

@@ -114,7 +114,7 @@
             "type": 0,
             "tagName": "STYLE",
             "attributes": {
-              "_cssText": "body { width: 35em; margin: 0px auto; font-family: Tahoma, Verdana, Arial, sans-serif; }"
+              "cssText": "body { width: 35em; margin: 0px auto; font-family: Tahoma, Verdana, Arial, sans-serif; }"
             },
             "isSVG": false,
             "id": 13

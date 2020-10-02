@@ -17,7 +17,7 @@ function getCSSText(styleSheet: CSSStyleSheet): string {
   try {
     const rules = styleSheet.cssRules;
     return Array.from(rules).reduce(
-      (prev, cur) => prev + getCSSRuleText(cur),
+      (css, rule) => css + getCSSRuleText(rule),
       ''
     );
   } catch {
@@ -54,7 +54,7 @@ function serialize($node: Node, $doc: HTMLDocument): SerializedNode | null {
     for (const { name, value } of Array.from($node.attributes)) {
       attributes[name] = transformAttr(name, value);
     }
-    // link \ style => inline style & absolute url
+    // styleSheets link => inline style & absolute url
     if ($node instanceof HTMLLinkElement) {
       const styleSheet = Array.from($doc.styleSheets).find(
         sheet => sheet.href === $node.href
@@ -63,14 +63,14 @@ function serialize($node: Node, $doc: HTMLDocument): SerializedNode | null {
       if (cssText) {
         delete attributes.rel;
         delete attributes.href;
-        attributes._cssText = absoluteToStylesheet(cssText);
+        attributes.cssText = absoluteToStylesheet(cssText);
       }
     }
 
     if ($node instanceof HTMLStyleElement) {
       const cssText = getCSSText($node.sheet as CSSStyleSheet);
       if (cssText) {
-        attributes._cssText = absoluteToStylesheet(cssText);
+        attributes.cssText = absoluteToStylesheet(cssText);
       }
     }
 
@@ -103,7 +103,7 @@ function serialize($node: Node, $doc: HTMLDocument): SerializedNode | null {
       } catch {
         // @WARN cross
       }
-      attributes.__dataURL = dataURL;
+      attributes.dataURL = dataURL;
     }
 
     // handle audio and video
@@ -111,7 +111,7 @@ function serialize($node: Node, $doc: HTMLDocument): SerializedNode | null {
       $node instanceof HTMLAudioElement ||
       $node instanceof HTMLVideoElement
     ) {
-      attributes.__mediaState = $node.paused;
+      attributes.mediaState = $node.paused;
     }
     return {
       type: NodeType.ELEMENT_NODE,
@@ -156,17 +156,17 @@ export function serializeWithId(
   $node: Node | TNode,
   $doc: HTMLDocument
 ): SerializedNodeWithId | null {
-  const _serializedNode = serialize($node, $doc);
-  if (!_serializedNode) {
+  const serializedNode = serialize($node, $doc);
+  if (!serializedNode) {
     // @WARN not serialized
     return null;
   }
   const id = '__sn' in $node ? $node.__sn.id : genId();
-  const serializedNode = Object.assign(_serializedNode, { id });
-  ($node as TNode).__sn = serializedNode;
+  const nodeWithId = Object.assign(serializedNode, { id });
+  ($node as TNode).__sn = nodeWithId;
   mirror.idNodeMap[id] = $node as TNode;
 
-  return serializedNode;
+  return nodeWithId;
 }
 
 export function snapshot($doc: HTMLDocument): AddedNode[] {
