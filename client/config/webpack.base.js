@@ -70,7 +70,11 @@ module.exports = {
     port: 8080,
     open: true,
     proxy: {
-      '/api': 'http://127.0.0.1:3000'
+      '/api': {
+        target: 'https://report.ghoo.cc',
+        secure: false,
+        changeOrigin: true
+      }
     }
   },
 

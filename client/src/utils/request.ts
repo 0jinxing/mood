@@ -1,7 +1,7 @@
 import ms from 'ms';
-import Token from './token';
 import API from '@/constants/api';
 import qs from 'qs';
+import Token from './token';
 
 const accessToken = new Token('access');
 const refreshToken = new Token('refresh');
@@ -39,20 +39,18 @@ const request = async <T = Record<string, any>>(
 
   if (
     (!init?.method || /get/i.test(init?.method)) &&
-    init?.body !== undefined
+    init?.body !== undefined &&
+    typeof input === 'string'
   ) {
-    if (typeof input === 'string') {
-      const queryString =
-        typeof init.body === 'string' ? init.body : qs.stringify(init.body);
+    const queryString =
+      typeof init.body === 'string' ? init.body : qs.stringify(init.body);
 
-      delete init.body;
-
-      input =
-        input.indexOf('?') >= 0
-          ? `${input}&${queryString}`
-          : `${input}?${queryString}`;
-    }
     delete init.body;
+
+    input =
+      input.indexOf('?') >= 0
+        ? `${input}&${queryString}`
+        : `${input}?${queryString}`;
   } else if (init.body) {
     const body =
       typeof init?.body === 'object' ? JSON.stringify(init.body) : '';
