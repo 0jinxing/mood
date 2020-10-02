@@ -1,6 +1,6 @@
 import type { TEventWithTime } from 'packages/record';
 
-export type PlayerConfig = {
+export type ReplayerConfig = {
   speed: number;
   root: Element;
   loadTimeout: number;
@@ -16,11 +16,11 @@ export type ActionWithDelay = {
   delay: number;
 };
 
-export type PlayerMetaData = {
+export type ReplayerMetaData = {
   totalTime: number;
 };
 
-export enum PlayerEmitterEvent {
+export enum ReplayerEmitterEvent {
   START = 'START',
   PAUSE = 'PAUSE',
   RESUME = 'RESUME',
@@ -35,13 +35,13 @@ export enum PlayerEmitterEvent {
   EVENT_CAST = 'EVENT_CAST',
 }
 
-export type PlayerContext = {
+export type ReplayerContext = {
   events: TEventWithTime[];
   timeOffset: number;
   speed: number;
 };
 
-export enum PlayerEventType {
+export enum ReplayerEventType {
   PLAY = 'PLAY',
   PAUSE = 'PAUSE',
   RESUME = 'RESUME',
@@ -51,9 +51,9 @@ export enum PlayerEventType {
   BACK_TO_NORMAL = 'BACK_TO_NORMAL',
 }
 
-export type PlayerEvent = { type: PlayerEventType };
+export type ReplayerEvent = { type: ReplayerEventType };
 
-export type PlayerState = {
+export type ReplayerState = {
   value: 'inited' | 'playing' | 'paused' | 'ended' | 'skipping';
-  context: PlayerContext;
+  context: ReplayerContext;
 };

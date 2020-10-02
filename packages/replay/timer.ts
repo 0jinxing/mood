@@ -1,13 +1,13 @@
-import { PlayerConfig, ActionWithDelay } from './types';
+import { ReplayerConfig, ActionWithDelay } from './types';
 
 export default class Timer {
   public timeOffset: number = 0;
 
   private actions: ActionWithDelay[];
-  private config: PlayerConfig;
+  private config: ReplayerConfig;
   private raf: number;
 
-  constructor(config: PlayerConfig, actions: ActionWithDelay[] = []) {
+  constructor(config: ReplayerConfig, actions: ActionWithDelay[] = []) {
     this.actions = actions;
     this.config = config;
   }

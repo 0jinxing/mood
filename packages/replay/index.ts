@@ -15,15 +15,15 @@ import {
 } from '@mood/record';
 
 import Timer from './timer';
-import { createPlayerService } from './machine';
+import { createReplayerService } from './machine';
 import getInjectStyle from './styles/inject-style';
 
 import {
-  PlayerConfig,
-  PlayerEmitterEvent,
-  PlayerMetaData,
+  ReplayerConfig,
+  ReplayerEmitterEvent,
+  ReplayerMetaData,
   ActionWithDelay,
-  PlayerEventType
+  ReplayerEventType
 } from './types';
 
 import './styles/index.css';
@@ -35,7 +35,7 @@ const SKIP_TIME_INTERVAL = 5 * 1000;
 
 const REPLAY_CONSOLE_PREFIX = '[WARN]';
 
-const defaultConfig: PlayerConfig = {
+const defaultConfig: ReplayerConfig = {
   speed: 1,
   root: document.body,
   loadTimeout: 0,
@@ -46,28 +46,28 @@ const defaultConfig: PlayerConfig = {
   triggerFocus: true
 };
 
-export default class Player {
+export default class Replayer {
   public $wrapper: HTMLElement;
   public $iframe: HTMLIFrameElement;
   public timer: Timer;
 
   private $cursor: HTMLElement;
   private events: TEventWithTime[];
-  private config: PlayerConfig;
+  private config: ReplayerConfig;
   private emitter: typeof mitt.Emitter = mitt();
   private baselineTime: number = 0;
   private lastPlayedEvent: TEventWithTime;
   private nextUserInteractionEvent: TEventWithTime | null;
   private noramlSpeed: number = -1;
-  private service!: ReturnType<typeof createPlayerService>;
+  private service!: ReturnType<typeof createReplayerService>;
 
   constructor(
     events: Array<TEventWithTime>,
-    config: Partial<PlayerConfig> = defaultConfig
+    config: Partial<ReplayerConfig> = defaultConfig
   ) {
     if (events.length < 2) throw new Error('Replayer need at least 2 events.');
     this.config = Object.assign({}, defaultConfig, config);
-    this.service = createPlayerService({
+    this.service = createReplayerService({
       events,
       timeOffset: 0,
       speed: config.speed!
@@ -77,21 +77,21 @@ export default class Player {
     this.handleResize = this.handleResize.bind(this);
     this.timer = new Timer(this.config);
     this.setupDOM();
-    this.emitter.on(PlayerEmitterEvent.RESIZE, this.handleResize);
+    this.emitter.on(ReplayerEmitterEvent.RESIZE, this.handleResize);
   }
 
   public on(type: string, handler: typeof mitt.Handler) {
     this.emitter.on(type, handler);
   }
 
-  public setConfig(config: Partial<PlayerConfig>) {
+  public setConfig(config: Partial<ReplayerConfig>) {
     this.config = Object.assign({}, this.config, config);
     if (!this.config.skipInactive) {
       this.noramlSpeed = -1;
     }
   }
 
-  public getMetaData(): PlayerMetaData {
+  public getMetaData(): ReplayerMetaData {
     const firstEvent = this.events[0];
     const lastEvent = this.events[this.events.length - 1];
     return { totalTime: lastEvent.timestamp - firstEvent.timestamp };
@@ -117,7 +117,7 @@ export default class Player {
         actions.push({
           doAction: () => {
             castFn();
-            this.emitter.emit(PlayerEmitterEvent.EVENT_CAST, event);
+            this.emitter.emit(ReplayerEmitterEvent.EVENT_CAST, event);
           },
           delay: this.getDelay(event)
         });
@@ -125,14 +125,14 @@ export default class Player {
     }
     this.timer.addActions(actions);
     this.timer.start();
-    this.service.send({ type: PlayerEventType.PLAY });
-    this.emitter.emit(PlayerEmitterEvent.START);
+    this.service.send({ type: ReplayerEventType.PLAY });
+    this.emitter.emit(ReplayerEmitterEvent.START);
   }
 
   public pause() {
     this.timer.clear();
-    this.service.send({ type: PlayerEventType.PAUSE });
-    this.emitter.emit(PlayerEmitterEvent.PAUSE);
+    this.service.send({ type: ReplayerEventType.PAUSE });
+    this.emitter.emit(ReplayerEmitterEvent.PAUSE);
   }
 
   public resume(timeOffset = 0) {
@@ -155,8 +155,8 @@ export default class Player {
     }
     this.timer.addActions(actions);
     this.timer.start();
-    this.service.send({ type: PlayerEventType.RESUME });
-    this.emitter.emit(PlayerEmitterEvent.RESUME);
+    this.service.send({ type: ReplayerEventType.RESUME });
+    this.emitter.emit(ReplayerEmitterEvent.RESUME);
   }
 
   // TODO: add speed to mouse move timestamp calculation
@@ -294,7 +294,7 @@ export default class Player {
         if (!$target) break;
 
         const event = new Event(MouseInteractions[data.type].toLowerCase());
-        this.emitter.emit(PlayerEmitterEvent.MOUSE_INTERACTION, {
+        this.emitter.emit(ReplayerEmitterEvent.MOUSE_INTERACTION, {
           type: data.type,
           $target
         });
@@ -354,7 +354,7 @@ export default class Player {
       }
 
       case IncrementalSource.VIEWPORT_RESIZE: {
-        this.emitter.emit(PlayerEmitterEvent.RESIZE, {
+        this.emitter.emit(ReplayerEmitterEvent.RESIZE, {
           width: data.width,
           height: data.height
         });
@@ -455,7 +455,7 @@ export default class Player {
       case EventType.META: {
         castFn = () => {
           const { width, height } = event.data;
-          this.emitter.emit(PlayerEmitterEvent.RESIZE, { width, height });
+          this.emitter.emit(ReplayerEmitterEvent.RESIZE, { width, height });
         };
         break;
       }
@@ -494,7 +494,7 @@ export default class Player {
                 speed: Math.min(Math.round(skipTime / SKIP_TIME_INTERVAL), 360)
               };
               this.setConfig(payload);
-              this.emitter.emit(PlayerEmitterEvent.SKIP_START, payload);
+              this.emitter.emit(ReplayerEmitterEvent.SKIP_START, payload);
             }
           }
         };
@@ -510,7 +510,7 @@ export default class Player {
       this.lastPlayedEvent = event;
       if (event === this.events[this.events.length - 1]) {
         this.restoreSpeed();
-        this.emitter.emit(PlayerEmitterEvent.FINISH);
+        this.emitter.emit(ReplayerEmitterEvent.FINISH);
       }
     };
 
@@ -531,7 +531,7 @@ export default class Player {
     if (this.noramlSpeed === -1) return;
     const payload = { speed: this.noramlSpeed };
     this.setConfig(payload);
-    this.emitter.emit(PlayerEmitterEvent.SKIP_END, payload);
+    this.emitter.emit(ReplayerEmitterEvent.SKIP_END, payload);
     this.noramlSpeed = -1;
   }
 
@@ -551,7 +551,7 @@ export default class Player {
       $style.sheet.insertRule(injectStylesRules[ind], ind);
     }
 
-    this.emitter.emit(PlayerEmitterEvent.FULLSNAPSHOT_REBUILDED);
+    this.emitter.emit(ReplayerEmitterEvent.FULLSNAPSHOT_REBUILDED);
     this.waitForStylesheetLoad();
   }
 
@@ -566,7 +566,7 @@ export default class Player {
 
         if (unloadSheets.size === 0) {
           this.timer.clear();
-          this.emitter.emit(PlayerEmitterEvent.LOAD_STYLESHEET_END);
+          this.emitter.emit(ReplayerEmitterEvent.LOAD_STYLESHEET_END);
           timer = window.setTimeout(() => {
             if (this.service.state.matches('playing')) {
               this.resume(this.getCurrentTime());
@@ -581,7 +581,7 @@ export default class Player {
             if (this.service.state.matches('playing')) {
               this.resume(this.getCurrentTime());
             }
-            this.emitter.emit(PlayerEmitterEvent.LOAD_STYLESHEET_END);
+            this.emitter.emit(ReplayerEmitterEvent.LOAD_STYLESHEET_END);
             if (timer) {
               window.clearTimeout(timer);
             }

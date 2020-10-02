@@ -5,7 +5,7 @@ import {
   InterpreterStatus,
   StateMachine
 } from '@xstate/fsm';
-import type { PlayerContext, PlayerEvent, PlayerState } from './types';
+import type { ReplayerContext, ReplayerEvent, ReplayerState } from './types';
 
 export function toEventObject<E extends EventObject>(event: string | E): E {
   return (typeof event === 'string' ? { type: event } : event) as E;
@@ -72,8 +72,8 @@ export const interpret = <
   return service;
 };
 
-export function createPlayerService(context: PlayerContext) {
-  const playerMachine = createMachine<PlayerContext, PlayerEvent, PlayerState>({
+export function createReplayerService(context: ReplayerContext) {
+  const playerMachine = createMachine<ReplayerContext, ReplayerEvent, ReplayerState>({
     id: 'player',
     context,
     initial: 'inited',
