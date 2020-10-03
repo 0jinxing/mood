@@ -1,7 +1,7 @@
 {
   "name": "@mood/sdk",
   "version": "1.0.0",
-  "main": "index.js",
+  "main": "dist/index.cjs.js",
   "license": "MIT",
   "dependencies": {
     "@mood/record": "^0.0.1",

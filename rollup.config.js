@@ -51,7 +51,7 @@ const packageConfig = packages.reduce((config, pkg) => {
 
 const sdkConfig = [
   {
-    input: path.resolve('sdk/index.ts'),
+    input: path.resolve('sdk/src/index.ts'),
     plugins,
     output: [
       {
