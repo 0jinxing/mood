@@ -2,7 +2,7 @@
   "name": "@mood/replay",
   "version": "0.0.1",
   "description": "",
-  "main": "dist/cjs/index.js",
+  "main": "dist/index.cjs.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "publish": "npm publish --access public"

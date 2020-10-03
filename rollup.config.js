@@ -8,13 +8,13 @@ import { terser } from 'rollup-plugin-terser';
 
 const plugins = [
   resolve({ browser: true }),
-  commonjs(),
   typescript(),
+  commonjs(),
   postcss({ extract: true, minimize: true }),
   terser()
 ];
 
-const packages = ['record', 'replay', 'snapshot'];
+const packages = ['snapshot', 'record', 'replay'];
 
 const config = packages.reduce((config, pkg) => {
   return [
@@ -25,19 +25,19 @@ const config = packages.reduce((config, pkg) => {
       output: [
         {
           name: pkg,
-          file: path.resolve(`packages/${pkg}/dist/cjs/index.js`),
+          file: path.resolve(`packages/${pkg}/dist/index.cjs.js`),
           format: 'cjs',
           sourcemap: true
         },
         {
           name: pkg,
-          file: path.resolve(`packages/${pkg}/dist/esm/index.js`),
+          file: path.resolve(`packages/${pkg}/dist/index.esm.js`),
           format: 'esm',
           sourcemap: true
         },
         {
           name: pkg,
-          file: path.resolve(`packages/${pkg}/dist/iife/index.js`),
+          file: path.resolve(`packages/${pkg}/dist/index.iife.js`),
           format: 'iife',
           sourcemap: true
         }
