@@ -9,7 +9,7 @@ Resources:
       Handler: dist/lambda-entry-point.handler
       Runtime: nodejs12.x
       CodeUri: dist/deploy.zip
-      MemorySize: 1512
+      MemorySize: 256
       Policies: AWSLambdaBasicExecutionRole
       Timeout: 60
       Events:
