@@ -71,7 +71,8 @@ module.exports = {
     open: true,
     proxy: {
       '/api': {
-        target: 'https://report.ghoo.cc',
+        target: 'http://127.0.0.1:3000',
+        // target: 'https://report.ghoo.cc',
         secure: false,
         changeOrigin: true
       }

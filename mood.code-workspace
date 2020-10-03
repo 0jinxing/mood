@@ -1,6 +1,10 @@
 {
   "folders": [
     {
+      "name": "/",
+      "path": "."
+    },
+    {
       "name": "client",
       "path": "client"
     },
@@ -9,20 +13,12 @@
       "path": "service"
     },
     {
-      "name": "sdk",
-      "path": "sdk"
-    },
-    {
       "name": "packages",
       "path": "packages"
     },
     {
       "name": "repl",
       "path": "repl"
-    },
-    {
-      "name": "/",
-      "path": "."
     }
   ]
 }

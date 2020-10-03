@@ -14,7 +14,7 @@ const plugins = [
   terser()
 ];
 
-const packages = ['snapshot', 'record', 'replay'];
+const packages = ['sdk', 'snapshot', 'record', 'replay'];
 
 const config = packages.reduce((config, pkg) => {
   return [

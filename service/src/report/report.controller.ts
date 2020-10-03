@@ -10,8 +10,8 @@ export class ReportController {
 
   @Get()
   @UseGuards(AuthGuard)
-  query(@Body() { domain, instance, uid, type, skip, limit }: ReportQueryDTO) {
-    return this.reportService.query(domain, instance, uid, type, skip, limit);
+  query(@Body() { domain, uid, type, skip, limit }: ReportQueryDTO) {
+    return this.reportService.query(domain, uid, type, skip, limit);
   }
 
   @Post()
