@@ -4,7 +4,7 @@ import * as inquirer from 'inquirer';
 import * as puppeteer from 'puppeteer';
 
 function getCode(): string {
-  const bundlePath = path.resolve('../packages/record/dist/iife', 'index.js');
+  const bundlePath = path.resolve('../packages/record/dist', 'index.iife.js');
   return fs.readFileSync(bundlePath, 'utf8');
 }
 
@@ -113,7 +113,7 @@ function getCode(): string {
           <title>Record @${time}</title>
         </head>
         <body>
-          <script src="../packages/replay/dist/iife/index.js"></script>
+          <script src="../../packages/replay/dist/iife/index.js"></script>
           <script>
             /*<!--*/
             const events = ${JSON.stringify(events).replace(
@@ -121,7 +121,7 @@ function getCode(): string {
               '<\\/script>'
             )};
             /*-->*/
-            const replayer = new Player(events);
+            const replayer = new replay(events);
             replayer.play();
           </script>
         </body>

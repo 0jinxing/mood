@@ -7,9 +7,9 @@ import postcss from 'rollup-plugin-postcss';
 import { terser } from 'rollup-plugin-terser';
 
 const plugins = [
-  resolve({ browser: true }),
+  commonjs({ extensions: ['.js', '.ts'] }),
   typescript(),
-  commonjs(),
+  resolve(),
   postcss({ extract: true, minimize: true }),
   terser()
 ];
@@ -27,19 +27,22 @@ const config = packages.reduce((config, pkg) => {
           name: pkg,
           file: path.resolve(`packages/${pkg}/dist/index.cjs.js`),
           format: 'cjs',
-          sourcemap: true
+          sourcemap: true,
+          exports: 'auto'
         },
         {
           name: pkg,
           file: path.resolve(`packages/${pkg}/dist/index.esm.js`),
           format: 'esm',
-          sourcemap: true
+          sourcemap: true,
+          exports: 'auto'
         },
         {
           name: pkg,
           file: path.resolve(`packages/${pkg}/dist/index.iife.js`),
           format: 'iife',
-          sourcemap: true
+          sourcemap: true,
+          exports: 'auto'
         }
       ]
     }
