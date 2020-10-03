@@ -1,5 +1,5 @@
 {
-  "include": ["packages"],
+  "include": ["packages", "sdk"],
   "compilerOptions": {
     "module": "commonjs",
     "rootDir": ".",

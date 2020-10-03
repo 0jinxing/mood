@@ -14,9 +14,9 @@ const plugins = [
   terser()
 ];
 
-const packages = ['sdk', 'snapshot', 'record', 'replay'];
+const packages = ['snapshot', 'record', 'replay'];
 
-const config = packages.reduce((config, pkg) => {
+const packageConfig = packages.reduce((config, pkg) => {
   return [
     ...config,
     {
@@ -49,4 +49,34 @@ const config = packages.reduce((config, pkg) => {
   ];
 }, []);
 
-export default config;
+const sdkConfig = [
+  {
+    input: path.resolve('sdk/index.ts'),
+    plugins,
+    output: [
+      {
+        name: 'sdk',
+        file: path.resolve('sdk/dist/index.cjs.js'),
+        format: 'cjs',
+        sourcemap: true,
+        exports: 'auto'
+      },
+      {
+        name: 'sdk',
+        file: path.resolve('sdk/dist/index.esm.js'),
+        format: 'esm',
+        sourcemap: true,
+        exports: 'auto'
+      },
+      {
+        name: 'sdk',
+        file: path.resolve('sdk/dist/index.iife.js'),
+        format: 'iife',
+        sourcemap: true,
+        exports: 'auto'
+      }
+    ]
+  }
+];
+
+export default [...sdkConfig, ...packageConfig];
