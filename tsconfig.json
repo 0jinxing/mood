@@ -3,15 +3,15 @@
   "compilerOptions": {
     "module": "commonjs",
     "rootDir": ".",
-    "target": "ES5",
+    "baseUrl": ".",
+    "target": "es5",
     "lib": ["es2018", "dom"],
     "noImplicitAny": true,
     "strictNullChecks": true,
     "downlevelIteration": true,
     "removeComments": true,
     "preserveConstEnums": true,
-    "sourceMap": true,
-    "baseUrl": "."
+    "sourceMap": true
   },
   "compileOnSave": true
 }

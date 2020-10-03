@@ -17,7 +17,11 @@
       "path": "packages"
     },
     {
-      "name": "root",
+      "name": "repl",
+      "path": "repl"
+    },
+    {
+      "name": "/",
       "path": "."
     }
   ]
