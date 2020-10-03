@@ -94,7 +94,7 @@ function getCode(): string {
   }
 
   function saveEvents() {
-    const tempFolder = path.resolve('temp');
+    const tempFolder = path.resolve('dist');
     if (!fs.existsSync(tempFolder)) {
       fs.mkdirSync(tempFolder);
     }
@@ -111,9 +111,10 @@ function getCode(): string {
           <meta name="viewport" content="width=device-width, initial-scale=1.0" />
           <meta http-equiv="X-UA-Compatible" content="ie=edge" />
           <title>Record @${time}</title>
+          <link rel="stylesheet" href="../../packages/replay/dist/index.iife.css" />
         </head>
         <body>
-          <script src="../../packages/replay/dist/iife/index.js"></script>
+          <script src="../../packages/replay/dist/index.iife.js"></script>
           <script>
             /*<!--*/
             const events = ${JSON.stringify(events).replace(
