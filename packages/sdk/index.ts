@@ -1,3 +1,4 @@
+import { deflate } from 'pako';
 import record, { TEvent } from '@mood/record';
 
 let events: TEvent[] = [];
@@ -13,7 +14,10 @@ function mood() {
           mode: 'cors',
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ uid: 'imRV3EI3', events })
+          body: JSON.stringify({
+            uid: 'imRV3EI3',
+            data: deflate(JSON.stringify(events), { to: 'string' })
+          })
         });
         events = [];
       }

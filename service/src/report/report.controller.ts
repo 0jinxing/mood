@@ -1,8 +1,10 @@
-import { AuthGuard } from '@/auth/auth.guard';
 import { Body, Controller, Get, Post, UseGuards } from '@nestjs/common';
+import { inflate } from 'pako';
+import { AuthGuard } from '@/auth/auth.guard';
 import { ReportQueryDTO } from './dto/query.dto';
 import { ReportEventDTO } from './dto/report.dto';
 import { ReportService } from './report.service';
+import { TEvent } from '@mood/record';
 
 @Controller('event')
 export class ReportController {
@@ -15,7 +17,8 @@ export class ReportController {
   }
 
   @Post()
-  async report(@Body() { uid, events }: ReportEventDTO) {
+  async report(@Body() { uid, data }: ReportEventDTO) {
+    const events = JSON.parse(inflate(data, { to: 'string' })) as TEvent[];
     const res = await this.reportService.report(uid, events);
     return { count: res.length };
   }
