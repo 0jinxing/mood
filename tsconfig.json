@@ -1,5 +1,5 @@
 {
-  "include": ["packages", "sdk"],
+  "include": ["packages", "tracing"],
   "compilerOptions": {
     "module": "commonjs",
     "rootDir": ".",

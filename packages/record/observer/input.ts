@@ -21,7 +21,6 @@ function hookSetter<T>(
     isRevoked
       ? descriptor
       : {
-          ...descriptor,
           set(value) {
             // put hooked setter into event loop to avoid of set latency
             setTimeout(() => descriptor.set!.call(this, value));

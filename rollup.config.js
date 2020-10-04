@@ -49,28 +49,28 @@ const packageConfig = packages.reduce((config, pkg) => {
   ];
 }, []);
 
-const sdkConfig = [
+const tracingConfig = [
   {
-    input: path.resolve('sdk/src/index.ts'),
+    input: path.resolve('tracing/src/index.ts'),
     plugins,
     output: [
       {
-        name: 'sdk',
-        file: path.resolve('sdk/dist/index.cjs.js'),
+        name: 'tracing',
+        file: path.resolve('tracing/dist/index.cjs.js'),
         format: 'cjs',
         sourcemap: true,
         exports: 'auto'
       },
       {
-        name: 'sdk',
-        file: path.resolve('sdk/dist/index.esm.js'),
+        name: 'tracing',
+        file: path.resolve('tracing/dist/index.esm.js'),
         format: 'esm',
         sourcemap: true,
         exports: 'auto'
       },
       {
-        name: 'sdk',
-        file: path.resolve('sdk/dist/index.iife.js'),
+        name: 'tracing',
+        file: path.resolve('tracing/dist/index.iife.js'),
         format: 'iife',
         sourcemap: true,
         exports: 'auto'
@@ -79,4 +79,4 @@ const sdkConfig = [
   }
 ];
 
-export default [...sdkConfig, ...packageConfig];
+export default [...tracingConfig, ...packageConfig];

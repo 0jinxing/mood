@@ -4,5 +4,5 @@
 - client    # frontend
 - service   # backend
 - packages  # core
-- sdk       # client sdk
+- tracing   # client sdk
 ```
