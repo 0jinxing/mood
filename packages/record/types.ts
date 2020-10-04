@@ -192,8 +192,6 @@ export type TEvent =
 
 export type TEventWithTime = TEvent & { timestamp: number; delay?: number };
 
-export type TEventWithTimeAndMark = TEventWithTime & { v: string };
-
 export type ListenerHandler = () => void;
 
 export type AttrCursor = {
