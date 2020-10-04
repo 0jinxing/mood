@@ -5,7 +5,7 @@ export type ConsoleCaptureType = 'CONSOLE_ERROR' | 'CONSOLE_WARN';
 
 export type ConsoleCapture = {
   type: ConsoleCaptureType;
-  data: unknown;
+  data: { args: unknown[] };
 };
 
 export type ConsoleCaptureWithTime = ConsoleCapture & {
@@ -19,14 +19,14 @@ export function captureConsole(handler: CaptureConsoleHandler) {
   Object.defineProperty(window.console, 'error', {
     value: (...args: unknown[]) => {
       originConsoleError(...args);
-      handler({ type: 'CONSOLE_ERROR', data: args, timestamp: Date.now() });
+      handler({ type: 'CONSOLE_ERROR', data: { args }, timestamp: Date.now() });
     }
   });
 
   Object.defineProperty(window.console, 'warn', {
     value: (...args: unknown[]) => {
       originConsoleWarn(...args);
-      handler({ type: 'CONSOLE_WARN', data: args, timestamp: Date.now() });
+      handler({ type: 'CONSOLE_WARN', data: { args }, timestamp: Date.now() });
     }
   });
 }

@@ -2,14 +2,16 @@ import * as path from 'path';
 import typescript from '@rollup/plugin-typescript';
 import commonjs from '@rollup/plugin-commonjs';
 import resolve from '@rollup/plugin-node-resolve';
+import replace from '@rollup/plugin-replace';
 
 import postcss from 'rollup-plugin-postcss';
 import { terser } from 'rollup-plugin-terser';
 
 const plugins = [
+  replace({ 'process.env.NODE_ENV': JSON.stringify('production') }),
   commonjs({ extensions: ['.js', '.ts'] }),
   typescript(),
-  resolve(),
+  resolve({ browser: true }),
   postcss({ extract: true, minimize: true }),
   terser()
 ];

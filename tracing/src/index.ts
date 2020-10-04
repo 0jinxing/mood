@@ -1,9 +1,12 @@
 import { deflate } from 'pako';
 import record, { TEvent } from '@mood/record';
+import { currentSesstionId } from './utils/sessionId';
 
 let events: TEvent[] = [];
 
 function mood() {
+  const sessionId = currentSesstionId();
+  console.log(sessionId);
   record({
     emit: async event => {
       if (typeof event === 'string') return;

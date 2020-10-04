@@ -2,7 +2,7 @@ export type ErrorCaptureType = 'UNHANDLED_REJECTION' | 'GLOBAL_ERROR';
 
 export type ErrorCapture = {
   type: ErrorCaptureType;
-  data: string;
+  data: { message: string };
 };
 
 export type ErrorCaptureWithTime = ErrorCapture & { timestamp: number };
@@ -13,7 +13,7 @@ export function captureError(handler: CaptureErrorHandler) {
   window.addEventListener('error', ev => {
     handler({
       type: 'GLOBAL_ERROR',
-      data: ev.message,
+      data: { message: ev.message },
       timestamp: Date.now()
     });
   });
