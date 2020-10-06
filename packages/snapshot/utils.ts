@@ -32,7 +32,7 @@ export class Mirror {
 
 export const mirror = new Mirror();
 
-const URL_MATCH = /url\(["']?(.*?)["']?\)/;
+const URL_MATCH = /url\(["']?(.*?)["']?\)/ig;
 
 let baseUrl = '';
 export function absoluteToDoc(attrValue: string): string {
