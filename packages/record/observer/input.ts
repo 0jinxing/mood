@@ -1,19 +1,18 @@
 import { on } from '../utils';
 import { mirror } from '@mood/snapshot';
 
-import {
-  HookResetter,
-  InputValue,
-  InputCallback,
-  ListenerHandler
-} from '../types';
+export type InputValue = string | boolean;
+
+export type InputCallbackParam = { id: number; value: InputValue };
+
+export type InputCallback = (param: InputCallbackParam) => void;
 
 function hookSetter<T>(
   target: T,
   key: string | number | symbol,
   descriptor: PropertyDescriptor,
   isRevoked?: boolean
-): HookResetter {
+) {
   const original = Object.getOwnPropertyDescriptor(target, key);
   Object.defineProperty(
     target,
@@ -33,7 +32,7 @@ function hookSetter<T>(
 
 const lastInputValueMap: WeakMap<EventTarget, InputValue> = new WeakMap();
 
-function initInputObserver(callback: InputCallback): ListenerHandler {
+function initInputObserver(callback: InputCallback) {
   const cbWithDedup = (
     $target: HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement,
     value: InputValue
@@ -74,10 +73,7 @@ function initInputObserver(callback: InputCallback): ListenerHandler {
     }
   };
 
-  const handlers: Array<ListenerHandler | HookResetter> = [
-    'input',
-    'change'
-  ].map(eventName => {
+  const handlers = ['input', 'change'].map(eventName => {
     return on(eventName, eventHandler);
   });
 

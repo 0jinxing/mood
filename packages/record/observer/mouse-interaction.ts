@@ -1,16 +1,20 @@
 import { on } from '../utils';
 import { mirror } from '@mood/snapshot';
 
-import {
-  MouseInteractionCallBack,
-  ListenerHandler,
-  MouseInteractions
-} from '../types';
+import { MouseInteractions } from '../constant';
 
-export function initMouseInteractionObserver(
-  cb: MouseInteractionCallBack
-): ListenerHandler {
-  const handlers: ListenerHandler[] = [];
+export type MouseInteractionParam = {
+  type: MouseInteractions;
+  id: number;
+  x: number;
+  y: number;
+};
+
+export type MouseInteractionCallBack = (param: MouseInteractionParam) => void;
+
+export function initMouseInteractionObserver(cb: MouseInteractionCallBack) {
+  const handlers: VoidFunction[] = [];
+
   const getHandler = (eventKey: keyof typeof MouseInteractions) => {
     return (event: MouseEvent | TouchEvent) => {
       const id = mirror.getId(event.target as Node);
@@ -19,6 +23,7 @@ export function initMouseInteractionObserver(
       cb({ type: MouseInteractions[eventKey], id, x: clientX, y: clientY });
     };
   };
+  
   Object.keys(MouseInteractions).forEach(
     (eventKey: keyof typeof MouseInteractions) => {
       const eventName = eventKey;

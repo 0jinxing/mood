@@ -7,7 +7,7 @@ import initMediaInteractionObserver from './media-interaction';
 import initStyleSheetObserver from './style-sheet';
 import initMutationObserver from './mutation';
 
-import { ObserverParam, HooksParam, ListenerHandler } from '../types';
+import { ObserverParam, HooksParam } from '../types';
 
 export function mergeHooks(observer: ObserverParam, hooks: HooksParam) {
   Object.keys(hooks).forEach((key: keyof HooksParam) => {
@@ -22,7 +22,7 @@ export function mergeHooks(observer: ObserverParam, hooks: HooksParam) {
 export default function initObservers(
   observer: ObserverParam,
   hooks: HooksParam = {}
-): ListenerHandler {
+): Function {
   // apply hooks
   mergeHooks(observer, hooks);
 

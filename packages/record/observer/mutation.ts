@@ -1,4 +1,12 @@
-import { serializeWithId, transformAttr, TNode, mirror } from '@mood/snapshot';
+import {
+  serializeWithId,
+  transformAttr,
+  TNode,
+  mirror,
+  AddedNode,
+  Attributes
+} from '@mood/snapshot';
+
 import {
   isAncestorRemoved,
   deepDelete,
@@ -6,17 +14,40 @@ import {
   isParentRemoved
 } from '../utils';
 
-import {
-  MutationCallBack,
-  AttrCursor,
-  RemovedNodeMutation,
-  AddedNodeMutation
-} from '../types';
+export type AttrCursor = {
+  $el: Node;
+  attributes: Attributes;
+};
+
+export type AddedNodeMutation = AddedNode & { parentId: number };
+
+export type RemovedNodeMutation = {
+  id: number;
+  parentId: number;
+};
+
+export type TextMutation = {
+  id: number;
+  value: string | null;
+};
+
+export type AttrMutation = {
+  id: number;
+  attributes: Attributes;
+};
+
+export type MutationCallbackParam = {
+  texts: TextMutation[];
+  attributes: AttrMutation[];
+  removes: RemovedNodeMutation[];
+  adds: AddedNodeMutation[];
+};
+
+export type MutationCallBack = (m: MutationCallbackParam) => void;
 
 const genKey = (id: number, parentId: number) => `${id}@${parentId}`;
 
 function initMutationObserver(cb: MutationCallBack) {
-
   const observer = new MutationObserver(mutations => {
     const attrs: AttrCursor[] = [];
     const texts: Array<{ value: string; $el: Node }> = [];
@@ -46,11 +77,11 @@ function initMutationObserver(cb: MutationCallBack) {
       ({ type, target, oldValue, addedNodes, removedNodes, attributeName }) => {
         // characterData
         if (type === 'characterData') {
-          const value = target.textContent;
+          const value = target.textContent!;
 
           if (value === oldValue) return;
 
-          texts.push({ value: value!, $el: target });
+          texts.push({ value, $el: target });
         }
         // attributes
         else if (type === 'attributes') {

@@ -4,19 +4,22 @@ import rebuild, { buildNodeWithSN } from '@mood/snapshot/rebuild';
 import { mirror } from '@mood/snapshot';
 import {
   TEventWithTime,
-  EventType,
-  IncrementalSource,
   IncrementalSnapshotEvent,
-  MouseInteractions,
   FullSnapshotEvent,
-  ViewportResizeDimention,
-  IncrementalData,
-  AddedNodeMutation
+  IncrementalData
 } from '@mood/record';
 
 import Timer from './timer';
 import { createReplayerService } from './machine';
 import getInjectStyle from './styles/inject-style';
+
+import {
+  EventType,
+  IncrementalSource,
+  MouseInteractions
+} from '@mood/record/constant';
+import { AddedNodeMutation } from '@mood/record/observer/mutation';
+import { ViewportResizeDimention } from '@mood/record/observer/viewport-resize';
 
 import {
   ReplayerConfig,

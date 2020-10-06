@@ -1,30 +1,37 @@
 import { mirror } from '@mood/snapshot';
 import { on, throttle } from '../utils';
 
-import {
-  MousemoveCallBack,
-  ListenerHandler,
-  MousePosition,
-  IncrementalSource
-} from '../types';
+import { IncrementalSource } from '../constant';
 
-function initMouseMoveObserver(cb: MousemoveCallBack): ListenerHandler {
+export type MousePosition = {
+  id: number;
+  x: number;
+  y: number;
+  timeOffset: number;
+};
+
+export type MousemoveCallBack = (
+  p: MousePosition[],
+  source: IncrementalSource.MOUSE_MOVE | IncrementalSource.TOUCH_MOVE
+) => void;
+
+function initMouseMoveObserver(cb: MousemoveCallBack) {
   let positions: MousePosition[] = [];
   let timeBaseline: number = 0;
   const throttleCb = throttle((isTouch: boolean) => {
     const totalOffset = Date.now() - timeBaseline!;
     cb(
-      positions.map((p) => {
-        p.timeOffset -= totalOffset;
-        return p;
-      }),
+      positions.map(({ timeOffset, ...rest }) => ({
+        ...rest,
+        timeOffset: timeOffset - totalOffset
+      })),
+      
       isTouch ? IncrementalSource.TOUCH_MOVE : IncrementalSource.MOUSE_MOVE
     );
-    // @MARK cleanup
     positions = [];
   }, 500);
   const updatePosition = throttle<MouseEvent | TouchEvent>(
-    (event) => {
+    event => {
       const { target } = event;
       const { clientX, clientY } =
         event instanceof TouchEvent ? event.changedTouches[0] : event;
@@ -45,7 +52,7 @@ function initMouseMoveObserver(cb: MousemoveCallBack): ListenerHandler {
     on('mousemove', updatePosition),
     on('touchmove', updatePosition)
   ];
-  return () => handlers.forEach((h) => h());
+  return () => handlers.forEach(h => h());
 }
 
 export default initMouseMoveObserver;

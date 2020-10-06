@@ -1,37 +1,14 @@
-import { Attributes, AddedNode } from '@mood/snapshot';
+import { AddedNode } from '@mood/snapshot';
+import { EventType, IncrementalSource } from './constant';
 
-export enum EventType {
-  DOM_CONTENT_LOADED,
-  LOADED,
-  FULL_SNAPSHOT,
-  INCREMENTAL_SNAPSHOT,
-  META,
-  CUSTOM
-}
-
-export enum MouseInteractions {
-  MOUSEUP,
-  MOUSEDOWN,
-  CLICK,
-  CONTEXTMENU,
-  DBLCLICK,
-  FOCUS,
-  BLUR,
-  TOUCHSTART,
-  TOUCHEND
-}
-
-export enum IncrementalSource {
-  MUTATION,
-  MOUSE_MOVE,
-  MOUSE_INTERACTION,
-  SCROLL,
-  VIEWPORT_RESIZE,
-  INPUT,
-  TOUCH_MOVE,
-  MEDIA_INTERACTION,
-  STYLE_SHEETRULE
-}
+import { InputCallback, InputCallbackParam } from './observer/input';
+import { MediaInteractionCallback, MediaInteractionParam } from './observer/media-interaction';
+import { MouseInteractionCallBack, MouseInteractionParam } from './observer/mouse-interaction';
+import { MousemoveCallBack, MousePosition } from './observer/mouse-move';
+import { MutationCallBack, MutationCallbackParam } from './observer/mutation';
+import { ScrollCallback, ScrollPosition } from './observer/scroll';
+import { StyleSheetRuleCallback, StyleSheetRuleParam } from './observer/style-sheet';
+import { ViewportResizeCallback, ViewportResizeDimention } from './observer/viewport-resize';
 
 export type DomContentLoadedEvent = {
   type: EventType.DOM_CONTENT_LOADED;
@@ -49,93 +26,19 @@ export type FullSnapshotEvent = {
   };
 };
 
-export type TextMutation = {
-  id: number;
-  value: string | null;
-};
-
-export type AttrMutation = {
-  id: number;
-  attributes: Attributes;
-};
-
-export type RemovedNodeMutation = {
-  id: number;
-  parentId: number;
-};
-
-export class AddedNodeMutation extends AddedNode {
-  parentId: number;
-}
-
-export type MutationCallbackParam = {
-  texts: TextMutation[];
-  attributes: AttrMutation[];
-  removes: RemovedNodeMutation[];
-  adds: AddedNodeMutation[];
-};
-
-type MouseInteractionParam = {
-  type: MouseInteractions;
-  id: number;
-  x: number;
-  y: number;
-};
-
 export type MouseInteractionData = {
   source: IncrementalSource.MOUSE_INTERACTION;
 } & MouseInteractionParam;
 
-export type ScrollPosition = {
-  id: number;
-  x: number;
-  y: number;
-};
-
 export type ScrollData = { source: IncrementalSource.SCROLL } & ScrollPosition;
-
-export type ViewportResizeDimention = {
-  width: number;
-  height: number;
-};
 
 export type ViewportResizeData = {
   source: IncrementalSource.VIEWPORT_RESIZE;
 } & ViewportResizeDimention;
 
-export type InputValue = string | boolean;
-
-export type InputCallbackParam = { id: number; value: InputValue };
-
-export type InputData = {
-  source: IncrementalSource.INPUT;
-} & InputCallbackParam;
-
-export type MediaInteractions = 'play' | 'pause';
-
-export type MediaInteractionParam = {
-  id: number;
-  type: MediaInteractions;
-};
-
 export type MediaInteractionData = {
   source: IncrementalSource.MEDIA_INTERACTION;
 } & MediaInteractionParam;
-
-export type StyleSheetDeleteRule = {
-  index: number;
-};
-
-export type StyleSheetAddRule = {
-  rule: string;
-  index?: number;
-};
-
-export type StyleSheetRuleParam = {
-  id: number;
-  removes?: StyleSheetDeleteRule[];
-  adds?: StyleSheetAddRule[];
-};
 
 export type StyleSheetRuleData = {
   source: IncrementalSource.STYLE_SHEETRULE;
@@ -145,12 +48,9 @@ export type MutationData = {
   source: IncrementalSource.MUTATION;
 } & MutationCallbackParam;
 
-export type MousePosition = {
-  id: number;
-  x: number;
-  y: number;
-  timeOffset: number;
-};
+export type InputData = {
+  source: IncrementalSource.INPUT;
+} & InputCallbackParam;
 
 export type MousemoveData = {
   source: IncrementalSource.MOUSE_MOVE | IncrementalSource.TOUCH_MOVE;
@@ -192,36 +92,6 @@ export type TEvent =
 
 export type TEventWithTime = TEvent & { timestamp: number; delay?: number };
 
-export type ListenerHandler = () => void;
-
-export type AttrCursor = {
-  $el: Node;
-  attributes: Attributes;
-};
-
-export type MutationCallBack = (m: MutationCallbackParam) => void;
-
-export type HookResetter = () => void;
-
-export type MousemoveCallBack = (
-  p: MousePosition[],
-  source: IncrementalSource.MOUSE_MOVE | IncrementalSource.TOUCH_MOVE
-) => void;
-
-export type MouseInteractionCallBack = (param: MouseInteractionParam) => void;
-
-export type ScrollCallback = (position: ScrollPosition) => void;
-
-export type ViewportResizeCallback = (
-  dimention: ViewportResizeDimention
-) => void;
-
-export type InputCallback = (param: InputCallbackParam) => void;
-
-export type MediaInteractionCallback = (param: MediaInteractionParam) => void;
-
-export type StyleSheetRuleCallback = (param: StyleSheetRuleParam) => void;
-
 export type ObserverParam = {
   mutation: MutationCallBack;
   mousemove: MousemoveCallBack;
@@ -234,10 +104,3 @@ export type ObserverParam = {
 };
 
 export type HooksParam = Partial<ObserverParam>;
-
-export type RecordOptions<T> = {
-  emit: (e: T | string, isCheckout?: true) => void;
-  hooks?: HooksParam;
-  checkoutEveryNth?: number;
-  checkoutEveryNms?: number;
-};

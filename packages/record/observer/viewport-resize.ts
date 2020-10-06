@@ -1,8 +1,15 @@
 import { queryWindowHeight, queryWindowWidth, on, throttle } from '../utils';
 
-import { ViewportResizeCallback, ListenerHandler } from '../types';
+export type ViewportResizeDimention = {
+  width: number;
+  height: number;
+};
 
-function initViewportResizeObserver(cb: ViewportResizeCallback): ListenerHandler {
+export type ViewportResizeCallback = (
+  dimention: ViewportResizeDimention
+) => void;
+
+function initViewportResizeObserver(cb: ViewportResizeCallback): Function {
   const updateDimension = throttle(() => {
     const height = queryWindowHeight();
     const width = queryWindowWidth();

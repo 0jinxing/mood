@@ -3,14 +3,15 @@ import { snapshot } from '@mood/snapshot';
 import initObservers from './observer';
 import { on, queryWindowHeight, queryWindowWidth } from './utils';
 
-import {
-  TEvent,
-  TEventWithTime,
-  RecordOptions,
-  ListenerHandler,
-  EventType,
-  IncrementalSource
-} from './types';
+import { TEvent, TEventWithTime, HooksParam } from './types';
+import { EventType, IncrementalSource } from './constant';
+
+export type RecordOptions<T> = {
+  emit: (e: T | string, isCheckout?: true) => void;
+  hooks?: HooksParam;
+  checkoutEveryNth?: number;
+  checkoutEveryNms?: number;
+};
 
 function withTimestamp(e: TEvent): TEventWithTime {
   return { ...e, timestamp: Date.now() };
@@ -19,7 +20,7 @@ function withTimestamp(e: TEvent): TEventWithTime {
 let wrappedEmit!: (e: TEventWithTime, isCheckout?: true) => void;
 let wrappedEmitWithTime!: (e: TEvent, isCheckout?: true) => void;
 
-function record(options: RecordOptions<TEvent>): ListenerHandler {
+function record(options: RecordOptions<TEvent>) {
   const { emit, hooks, checkoutEveryNms, checkoutEveryNth } = options;
 
   let lastFullSnapshotEvent: TEventWithTime;
@@ -94,7 +95,7 @@ function record(options: RecordOptions<TEvent>): ListenerHandler {
     });
   };
 
-  const handlers: ListenerHandler[] = [];
+  const handlers: Function[] = [];
   handlers.push(
     on('DOMContentLoaded', () => {
       wrappedEmitWithTime({ type: EventType.DOM_CONTENT_LOADED });
@@ -106,7 +107,7 @@ function record(options: RecordOptions<TEvent>): ListenerHandler {
     handlers.push(
       initObservers(
         {
-          mutation: (m) => {
+          mutation: m => {
             wrappedEmitWithTime({
               type: EventType.INCREMENTAL_SNAPSHOT,
               data: { source: IncrementalSource.MUTATION, ...m }
@@ -118,42 +119,42 @@ function record(options: RecordOptions<TEvent>): ListenerHandler {
               data: { source, positions }
             });
           },
-          mouseInteraction: (params) => {
+          mouseInteraction: params => {
             wrappedEmitWithTime({
               type: EventType.INCREMENTAL_SNAPSHOT,
               data: { source: IncrementalSource.MOUSE_INTERACTION, ...params }
             });
           },
 
-          scroll: (position) => {
+          scroll: position => {
             wrappedEmitWithTime({
               type: EventType.INCREMENTAL_SNAPSHOT,
               data: { source: IncrementalSource.SCROLL, ...position }
             });
           },
 
-          viewportResize: (dimention) => {
+          viewportResize: dimention => {
             wrappedEmitWithTime({
               type: EventType.INCREMENTAL_SNAPSHOT,
               data: { source: IncrementalSource.VIEWPORT_RESIZE, ...dimention }
             });
           },
 
-          input: (params) => {
+          input: params => {
             wrappedEmitWithTime({
               type: EventType.INCREMENTAL_SNAPSHOT,
               data: { source: IncrementalSource.INPUT, ...params }
             });
           },
 
-          mediaInteraction: (params) => {
+          mediaInteraction: params => {
             wrappedEmitWithTime({
               type: EventType.INCREMENTAL_SNAPSHOT,
               data: { source: IncrementalSource.MEDIA_INTERACTION, ...params }
             });
           },
 
-          styleSheetRule: (params) => {
+          styleSheetRule: params => {
             wrappedEmitWithTime({
               type: EventType.INCREMENTAL_SNAPSHOT,
               data: { source: IncrementalSource.STYLE_SHEETRULE, ...params }
@@ -184,7 +185,7 @@ function record(options: RecordOptions<TEvent>): ListenerHandler {
   }
 
   return () => {
-    handlers.forEach((h) => h());
+    handlers.forEach(h => h());
   };
 }
 

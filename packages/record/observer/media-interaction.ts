@@ -1,7 +1,14 @@
 import { on } from '../utils';
 import { TNode, mirror } from '@mood/snapshot';
 
-import { MediaInteractionCallback, MediaInteractions } from '../types';
+export type MediaInteractions = 'play' | 'pause';
+
+export type MediaInteractionParam = {
+  id: number;
+  type: MediaInteractions;
+};
+
+export type MediaInteractionCallback = (param: MediaInteractionParam) => void;
 
 function initMediaInteractionObserver(cb: MediaInteractionCallback) {
   const handler = (type: MediaInteractions) => (event: Event) => {
@@ -10,7 +17,7 @@ function initMediaInteractionObserver(cb: MediaInteractionCallback) {
   };
   const handlers = [on('play', handler('play')), on('pause', handler('pause'))];
   return () => {
-    handlers.forEach((h) => h());
+    handlers.forEach(h => h());
   };
 }
 
