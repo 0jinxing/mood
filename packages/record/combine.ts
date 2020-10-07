@@ -11,65 +11,27 @@ import fetchObserve from './observer/request-fetch';
 import logObserve from './observer/log';
 import errorObserve from './observer/global-error';
 
-import { ObserveParam, HooksParam } from './types';
+import { EmitFn } from './types';
 
-export function mergeHooks(observer: ObserveParam, hooks: HooksParam) {
-  Object.keys(hooks).forEach((key: keyof HooksParam) => {
-    observer[key] = (...args: any[]) => {
-      observer[key].apply(null, args);
-      // apply hook fn
-      hooks[key]?.apply(null, args);
-    };
-  });
-}
+const observers = [
+  mutationObserve,
+  mouseMoveObserve,
+  mouseInteractionObserve,
+  scrollObserve,
+  viewportResizeObserve,
+  inputObserve,
+  mediaInteractionObserve,
+  styleSheetObserve,
+  logObserve,
+  xhrObserve,
+  fetchObserve,
+  errorObserve
+];
 
-export default function observe(
-  observer: ObserveParam,
-  hooks: HooksParam = {}
-): Function {
-  // apply hooks
-  mergeHooks(observer, hooks);
-
-  const {
-    mutation,
-    mousemove,
-    mouseInteraction,
-    scroll,
-    viewportResize,
-    input,
-    mediaInteraction,
-    styleSheetRule,
-    log,
-    xhrRequest,
-    fetchRequest,
-    globalError
-  } = observer;
-
-  const mutationObserver = mutationObserve(mutation);
-  const mousemoveHandler = mouseMoveObserve(mousemove);
-  const mouseInteractionHandler = mouseInteractionObserve(mouseInteraction);
-  const scrollHandler = scrollObserve(scroll);
-  const viewportResizeHandler = viewportResizeObserve(viewportResize);
-  const inputHandler = inputObserve(input);
-  const mediaInteractionHandler = mediaInteractionObserve(mediaInteraction);
-  const styleSheetObserver = styleSheetObserve(styleSheetRule);
-  const logObserver = logObserve(log);
-  const xhrObserver = xhrObserve(xhrRequest);
-  const fetchObserver = fetchObserve(fetchRequest);
-  const errorObserver = errorObserve(globalError);
+export default function observe(emit: EmitFn) {
+  const handlers = observers.map(o => o(emit));
 
   return () => {
-    mutationObserver();
-    mousemoveHandler();
-    mouseInteractionHandler();
-    scrollHandler();
-    viewportResizeHandler();
-    inputHandler();
-    mediaInteractionHandler();
-    styleSheetObserver();
-    xhrObserver();
-    fetchObserver();
-    logObserver();
-    errorObserver();
+    handlers.forEach(h => h());
   };
 }

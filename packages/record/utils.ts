@@ -5,7 +5,6 @@ export function on(
   fn: EventListenerOrEventListenerObject,
   $target: Document | Window = document
 ): VoidFunction {
-  type = type.toLowerCase();
   const options = { capture: true, passive: true };
 
   $target.addEventListener(type, fn, options);

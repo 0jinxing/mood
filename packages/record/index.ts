@@ -3,12 +3,11 @@ import { snapshot } from '@mood/snapshot';
 import observe from './combine';
 import { on, queryWindowHeight, queryWindowWidth } from './utils';
 
-import { TEvent, TEventWithTime, HooksParam, IncrementalData } from './types';
+import { TEvent, TEventWithTime, EmitFn } from './types';
 import { EventType } from './constant';
 
 export type RecordOptions<T> = {
   emit: (e: T | string, isCheckout?: true) => void;
-  hooks?: HooksParam;
   checkoutEveryNth?: number;
   checkoutEveryNms?: number;
 };
@@ -21,7 +20,7 @@ let wrappedEmit!: (e: TEventWithTime, isCheckout?: true) => void;
 let wrappedEmitWithTime!: (e: TEvent, isCheckout?: true) => void;
 
 function record(options: RecordOptions<TEvent>) {
-  const { emit, hooks, checkoutEveryNms, checkoutEveryNth } = options;
+  const { emit, checkoutEveryNms, checkoutEveryNth } = options;
 
   let lastFullSnapshotEvent: TEventWithTime;
   let incrementalSnapshotCount = 0;
@@ -52,7 +51,7 @@ function record(options: RecordOptions<TEvent>) {
     wrappedEmit(withTimestamp(event), isCheckout);
   };
 
-  const incEmitWithTime = (data: IncrementalData) => {
+  const incEmitWithTime: EmitFn = data => {
     wrappedEmitWithTime({ type: EventType.INCREMENTAL_SNAPSHOT, data });
   };
 
@@ -108,25 +107,7 @@ function record(options: RecordOptions<TEvent>) {
 
   const initial = () => {
     takeFullSnapshot();
-    handlers.push(
-      observe(
-        {
-          mutation: incEmitWithTime,
-          mousemove: incEmitWithTime,
-          mouseInteraction: incEmitWithTime,
-          scroll: incEmitWithTime,
-          viewportResize: incEmitWithTime,
-          input: incEmitWithTime,
-          mediaInteraction: incEmitWithTime,
-          styleSheetRule: incEmitWithTime,
-          xhrRequest: incEmitWithTime,
-          fetchRequest: incEmitWithTime,
-          log: incEmitWithTime,
-          globalError: incEmitWithTime
-        },
-        hooks
-      )
-    );
+    handlers.push(observe(incEmitWithTime));
   };
 
   if (

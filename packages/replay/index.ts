@@ -292,26 +292,27 @@ export default class Replayer {
         const $target = mirror.getNode<HTMLElement>(data.id);
         if (!$target) break;
 
-        const event = new Event(MouseInteractions[data.act].toLowerCase());
+        const event = new Event(MouseInteractions[data.act]);
+
         this.emitter.emit(ReplayerEmitterEvent.MOUSE_INTERACTION, {
           type: data.act,
           $target
         });
         const { triggerFocus } = this.config;
         switch (data.act) {
-          case MouseInteractions.BLUR: {
+          case MouseInteractions.blur: {
             $target.blur && $target.blur();
             break;
           }
-          case MouseInteractions.FOCUS: {
+          case MouseInteractions.focus: {
             if (triggerFocus && $target.focus) {
               $target.focus({ preventScroll: true });
             }
             break;
           }
-          case MouseInteractions.CLICK:
-          case MouseInteractions.TOUCHEND:
-          case MouseInteractions.TOUCHSTART: {
+          case MouseInteractions.click:
+          case MouseInteractions.touchend:
+          case MouseInteractions.touchstart: {
             if (!isSync) {
               this.moveAndHover(data.x, data.y, data.id);
               this.$cursor.classList.remove('active');

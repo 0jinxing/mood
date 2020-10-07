@@ -7,18 +7,6 @@ export enum EventType {
   CUSTOM
 }
 
-export enum MouseInteractions {
-  MOUSEUP,
-  MOUSEDOWN,
-  CLICK,
-  CONTEXTMENU,
-  DBLCLICK,
-  FOCUS,
-  BLUR,
-  TOUCHSTART,
-  TOUCHEND
-}
-
 export enum IncrementalSource {
   MUTATION,
   MOUSE_MOVE,
@@ -33,4 +21,16 @@ export enum IncrementalSource {
   REQUEST_XHR,
   REQUEST_FETCH,
   GLOBAL_ERROR
+}
+
+export enum MouseInteractions {
+  mouseup,
+  mousedown,
+  click,
+  contexemenu,
+  dbclick,
+  focus,
+  blur,
+  touchstart,
+  touchend
 }
