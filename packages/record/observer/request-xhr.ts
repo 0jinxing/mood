@@ -1,19 +1,19 @@
 import { hookSetter } from '../utils';
 
-export type XhrCallbackParams = {
+export type XhrCbParam = {
   method: string;
   url: string;
   statusText?: string;
 };
 
-export type XhrCallback = (params: XhrCallbackParams) => void;
+export type XhrCb = (param: XhrCbParam) => void;
 
 const xmlHttp = XMLHttpRequest;
 const originOpen = xmlHttp.prototype.open;
 const originSend = xmlHttp.prototype.send;
 
-function initXhrObserver(cb: XhrCallback) {
-  const dataMap = new WeakMap<XhrCallbackParams>();
+function xhrObserve(cb: XhrCb) {
+  const dataMap = new WeakMap<XhrCbParam>();
 
   const openHandler = hookSetter(xmlHttp.prototype, 'open', {
     get() {
@@ -57,4 +57,4 @@ function initXhrObserver(cb: XhrCallback) {
   };
 }
 
-export default initXhrObserver;
+export default xhrObserve;

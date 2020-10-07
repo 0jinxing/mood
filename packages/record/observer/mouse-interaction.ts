@@ -3,16 +3,16 @@ import { mirror } from '@mood/snapshot';
 
 import { MouseInteractions } from '../constant';
 
-export type MouseInteractionParam = {
+export type MouseInteractionCbParam = {
   type: MouseInteractions;
   id: number;
   x: number;
   y: number;
 };
 
-export type MouseInteractionCallBack = (param: MouseInteractionParam) => void;
+export type MouseInteractionCb = (param: MouseInteractionCbParam) => void;
 
-function initMouseInteractionObserver(cb: MouseInteractionCallBack) {
+function mouseInteractionObserve(cb: MouseInteractionCb) {
   const handlers: VoidFunction[] = [];
 
   const getHandler = (eventKey: keyof typeof MouseInteractions) => {
@@ -36,4 +36,4 @@ function initMouseInteractionObserver(cb: MouseInteractionCallBack) {
   };
 }
 
-export default initMouseInteractionObserver;
+export default mouseInteractionObserve;

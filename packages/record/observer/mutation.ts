@@ -36,18 +36,18 @@ export type AttrMutation = {
   attributes: Attributes;
 };
 
-export type MutationCallbackParam = {
+export type MutationCbParam = {
   texts: TextMutation[];
   attributes: AttrMutation[];
   removes: RemovedNodeMutation[];
   adds: AddedNodeMutation[];
 };
 
-export type MutationCallBack = (m: MutationCallbackParam) => void;
+export type MutationCb = (param: MutationCbParam) => void;
 
 const genKey = (id: number, parentId: number) => `${id}@${parentId}`;
 
-function initMutationObserver(cb: MutationCallBack) {
+function mutationObserve(cb: MutationCb) {
   const observer = new MutationObserver(mutations => {
     const attrs: AttrCursor[] = [];
     const texts: Array<{ value: string; $el: Node }> = [];
@@ -224,7 +224,10 @@ function initMutationObserver(cb: MutationCallBack) {
     childList: true,
     subtree: true
   });
-  return observer;
+
+  return () => {
+    observer.disconnect();
+  };
 }
 
-export default initMutationObserver;
+export default mutationObserve;

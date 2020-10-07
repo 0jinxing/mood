@@ -9,15 +9,15 @@ export type StyleSheetAddRule = {
   index?: number;
 };
 
-export type StyleSheetRuleParam = {
+export type StyleSheetCbParam = {
   id: number;
   removes?: StyleSheetDeleteRule[];
   adds?: StyleSheetAddRule[];
 };
 
-export type StyleSheetRuleCallback = (param: StyleSheetRuleParam) => void;
+export type StyleSheetCb = (param: StyleSheetCbParam) => void;
 
-function initStyleSheetObserver(cb: StyleSheetRuleCallback): Function {
+function styleSheetObserve(cb: StyleSheetCb) {
   const insertRule = CSSStyleSheet.prototype.insertRule;
   CSSStyleSheet.prototype.insertRule = function (rule: string, index?: number) {
     const id = mirror.getId(this.ownerNode as Node | TNode);
@@ -38,4 +38,4 @@ function initStyleSheetObserver(cb: StyleSheetRuleCallback): Function {
   };
 }
 
-export default initStyleSheetObserver;
+export default styleSheetObserve;

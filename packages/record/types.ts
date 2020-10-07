@@ -1,30 +1,30 @@
 import { AddedNode } from '@mood/snapshot';
 import { EventType, IncrementalSource } from './constant';
-import { ErrorCallback, ErrorCallbackParams } from './observer/error';
-import { FetchCallback, FetchCallbackParams } from './observer/fetch';
+import { ErrorCb, ErrorCbParam } from './observer/global-error';
+import { FetchCb, FetchCbParam } from './observer/request-fetch';
 
-import { InputCallback, InputCallbackParam } from './observer/input';
-import { LogCallback, LogCallbackParams } from './observer/log';
+import { InputCb, InputCbParam } from './observer/input';
+import { LogCb, LogCbParam } from './observer/log';
 import {
-  MediaInteractionCallback,
-  MediaInteractionParam
+  MediaInteractionCb,
+  MediaInteractionCbParam
 } from './observer/media-interaction';
 import {
-  MouseInteractionCallBack,
-  MouseInteractionParam
+  MouseInteractionCb,
+  MouseInteractionCbParam
 } from './observer/mouse-interaction';
-import { MousemoveCallBack, MousePosition } from './observer/mouse-move';
-import { MutationCallBack, MutationCallbackParam } from './observer/mutation';
-import { ScrollCallback, ScrollPosition } from './observer/scroll';
+import { MousemoveCb, MousePosition } from './observer/mouse-move';
+import { MutationCb, MutationCbParam } from './observer/mutation';
+import { ScrollCb, ScrollCbParam } from './observer/scroll';
 import {
-  StyleSheetRuleCallback,
-  StyleSheetRuleParam
+  StyleSheetCb,
+  StyleSheetCbParam
 } from './observer/style-sheet';
 import {
-  ViewportResizeCallback,
-  ViewportResizeDimention
+  ViewportResizeCb,
+  ViewportResizeCbParam
 } from './observer/viewport-resize';
-import { XhrCallback, XhrCallbackParams } from './observer/xhr';
+import { XhrCb, XhrCbParam } from './observer/request-xhr';
 
 export type DomContentLoadedEvent = {
   type: EventType.DOM_CONTENT_LOADED;
@@ -44,46 +44,46 @@ export type FullSnapshotEvent = {
 
 export type MouseInteractionData = {
   source: IncrementalSource.MOUSE_INTERACTION;
-} & MouseInteractionParam;
+} & MouseInteractionCbParam;
 
-export type ScrollData = { source: IncrementalSource.SCROLL } & ScrollPosition;
+export type ScrollData = { source: IncrementalSource.SCROLL } & ScrollCbParam;
 
 export type ViewportResizeData = {
   source: IncrementalSource.VIEWPORT_RESIZE;
-} & ViewportResizeDimention;
+} & ViewportResizeCbParam;
 
 export type MediaInteractionData = {
   source: IncrementalSource.MEDIA_INTERACTION;
-} & MediaInteractionParam;
+} & MediaInteractionCbParam;
 
 export type StyleSheetRuleData = {
   source: IncrementalSource.STYLE_SHEETRULE;
-} & StyleSheetRuleParam;
+} & StyleSheetCbParam;
 
 export type MutationData = {
   source: IncrementalSource.MUTATION;
-} & MutationCallbackParam;
+} & MutationCbParam;
 
 export type InputData = {
   source: IncrementalSource.INPUT;
-} & InputCallbackParam;
+} & InputCbParam;
 
 export type MousemoveData = {
   source: IncrementalSource.MOUSE_MOVE | IncrementalSource.TOUCH_MOVE;
   positions: MousePosition[];
 };
 
-export type XhrData = { source: IncrementalSource.XHR } & XhrCallbackParams;
+export type XhrData = { source: IncrementalSource.XHR } & XhrCbParam;
 
 export type FetchData = {
   source: IncrementalSource.FETCH;
-} & FetchCallbackParams;
+} & FetchCbParam;
 
-export type LogData = { source: IncrementalSource.LOG } & LogCallbackParams;
+export type LogData = { source: IncrementalSource.LOG } & LogCbParam;
 
 export type ErrorData = {
   source: IncrementalSource.ERROR;
-} & ErrorCallbackParams;
+} & ErrorCbParam;
 
 export type IncrementalData =
   | MutationData
@@ -124,20 +124,19 @@ export type TEvent =
 
 export type TEventWithTime = TEvent & { timestamp: number; delay?: number };
 
-export type ObserverParam = {
-  mutation: MutationCallBack;
-  mousemove: MousemoveCallBack;
-  mouseInteraction: MouseInteractionCallBack;
-  scroll: ScrollCallback;
-  viewportResize: ViewportResizeCallback;
-  input: InputCallback;
-  mediaInteraction: MediaInteractionCallback;
-  styleSheetRule: StyleSheetRuleCallback;
-
-  xhr: XhrCallback;
-  fetch: FetchCallback;
-  log: LogCallback;
-  error: ErrorCallback;
+export type ObserveParam = {
+  mutation: MutationCb;
+  mousemove: MousemoveCb;
+  mouseInteraction: MouseInteractionCb;
+  scroll: ScrollCb;
+  viewportResize: ViewportResizeCb;
+  input: InputCb;
+  mediaInteraction: MediaInteractionCb;
+  styleSheetRule: StyleSheetCb;
+  xhrRequest: XhrCb;
+  fetchRequest: FetchCb;
+  log: LogCb;
+  globalError: ErrorCb;
 };
 
-export type HooksParam = Partial<ObserverParam>;
+export type HooksParam = Partial<ObserveParam>;

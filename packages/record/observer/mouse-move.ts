@@ -10,12 +10,12 @@ export type MousePosition = {
   timeOffset: number;
 };
 
-export type MousemoveCallBack = (
+export type MousemoveCb = (
   p: MousePosition[],
   source: IncrementalSource.MOUSE_MOVE | IncrementalSource.TOUCH_MOVE
 ) => void;
 
-function initMouseMoveObserver(cb: MousemoveCallBack) {
+function mouseMoveObserve(cb: MousemoveCb) {
   let positions: MousePosition[] = [];
   let timeBaseline: number = 0;
   const throttleCb = throttle((isTouch: boolean) => {
@@ -55,4 +55,4 @@ function initMouseMoveObserver(cb: MousemoveCallBack) {
   return () => handlers.forEach(h => h());
 }
 
-export default initMouseMoveObserver;
+export default mouseMoveObserve;

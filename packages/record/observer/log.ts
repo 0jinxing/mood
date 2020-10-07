@@ -2,22 +2,22 @@ import { hookSetter, plain } from '../utils';
 
 export type LogLevel = 'log' | 'warn' | 'error' | 'debug';
 
-export type LogCallbackParams = {
+export type LogCbParam = {
   type: LogLevel;
   args: unknown;
 };
 
-export const LOG_LEVEL: Array<LogLevel> = ['log', 'warn', 'error', 'debug'];
+export const LOG_LEVELS: Array<LogLevel> = ['log', 'warn', 'error', 'debug'];
 
-export type LogCallback = (params: LogCallbackParams) => void;
+export type LogCb = (param: LogCbParam) => void;
 
-const origin = LOG_LEVEL.reduce((origin, key) => {
+const origin = LOG_LEVELS.reduce((origin, key) => {
   origin[key] = console[key];
   return origin;
 }, {} as typeof console);
 
-function initLogObserver(cb: LogCallback) {
-  const handlers = LOG_LEVEL.map(key => {
+function logObserve(cb: LogCb) {
+  const handlers = LOG_LEVELS.map(key => {
     return hookSetter(console, key, {
       get() {
         return (...args: unknown[]) => {
@@ -32,4 +32,4 @@ function initLogObserver(cb: LogCallback) {
   return () => handlers.forEach(h => h());
 }
 
-export default initLogObserver;
+export default logObserve;

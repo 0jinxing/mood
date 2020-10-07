@@ -3,13 +3,13 @@ import { mirror } from '@mood/snapshot';
 
 export type InputValue = string | boolean;
 
-export type InputCallbackParam = { id: number; value: InputValue };
+export type InputCbParam = { id: number; value: InputValue };
 
-export type InputCallback = (param: InputCallbackParam) => void;
+export type InputCb = (param: InputCbParam) => void;
 
 const lastInputValueMap: WeakMap<EventTarget, InputValue> = new WeakMap();
 
-function initInputObserver(callback: InputCallback) {
+function inputObserve(callback: InputCb) {
   const cbWithDedup = (
     $target: HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement,
     value: InputValue
@@ -75,4 +75,4 @@ function initInputObserver(callback: InputCallback) {
   };
 }
 
-export default initInputObserver;
+export default inputObserve;

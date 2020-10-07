@@ -1,15 +1,15 @@
 import { on, throttle } from '../utils';
 import { mirror, TNode } from '@mood/snapshot';
 
-export type ScrollPosition = {
+export type ScrollCbParam = {
   id: number;
   x: number;
   y: number;
 };
 
-export type ScrollCallback = (position: ScrollPosition) => void;
+export type ScrollCb = (param: ScrollCbParam) => void;
 
-function initScrollObserver(cb: ScrollCallback): Function {
+function scrollObserve(cb: ScrollCb) {
   const updatePosition = throttle<UIEvent>(event => {
     const { target } = event;
     const id = mirror.getId(target as Node | TNode);
@@ -20,4 +20,4 @@ function initScrollObserver(cb: ScrollCallback): Function {
   return on('scroll', updatePosition);
 }
 
-export default initScrollObserver;
+export default scrollObserve;

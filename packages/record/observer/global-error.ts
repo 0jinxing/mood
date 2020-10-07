@@ -1,10 +1,10 @@
-export type ErrorCallbackParams = {
+export type ErrorCbParam = {
   message: string;
 };
 
-export type ErrorCallback = (params: ErrorCallbackParams) => void;
+export type ErrorCb = (param: ErrorCbParam) => void;
 
-function initErrorObserver(cb: ErrorCallback) {
+function errorObserve(cb: ErrorCb) {
   const errorHandler = (ev: ErrorEvent | PromiseRejectionEvent) => {
     if (ev instanceof ErrorEvent) {
       cb({ message: ev.message });
@@ -23,4 +23,4 @@ function initErrorObserver(cb: ErrorCallback) {
   };
 }
 
-export default initErrorObserver;
+export default errorObserve;

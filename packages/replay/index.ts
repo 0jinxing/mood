@@ -15,7 +15,7 @@ import getInjectStyle from './styles/inject-style';
 
 import { EventType, IncrementalSource, MouseInteractions } from '@mood/record/constant';
 import { AddedNodeMutation } from '@mood/record/observer/mutation';
-import { ViewportResizeDimention } from '@mood/record/observer/viewport-resize';
+import { ViewportResizeCbParam } from '@mood/record/observer/viewport-resize';
 
 import {
   ReplayerConfig,
@@ -605,7 +605,7 @@ export default class Replayer {
     this.$wrapper.appendChild(this.$iframe);
   }
 
-  private handleResize(dimension: ViewportResizeDimention) {
+  private handleResize(dimension: ViewportResizeCbParam) {
     this.$iframe.width = `${dimension.width}px`;
     this.$iframe.height = `${dimension.height}px`;
   }

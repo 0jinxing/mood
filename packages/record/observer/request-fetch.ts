@@ -1,16 +1,16 @@
 import { hookSetter } from '../utils';
 
-export type FetchCallbackParams = {
+export type FetchCbParam = {
   input: RequestInfo;
   init?: RequestInit;
   error: Error | null;
 };
 
-export type FetchCallback = (params: FetchCallbackParams) => void;
+export type FetchCb = (param: FetchCbParam) => void;
 
 const originFetch = fetch;
 
-function initFetchObserver(cb: FetchCallback) {
+function fetchObserve(cb: FetchCb) {
   return hookSetter(window, 'fetch', {
     get() {
       return async (input: RequestInfo, init?: RequestInit) => {
@@ -29,4 +29,4 @@ function initFetchObserver(cb: FetchCallback) {
   });
 }
 
-export default initFetchObserver;
+export default fetchObserve;

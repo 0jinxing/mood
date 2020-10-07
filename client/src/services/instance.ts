@@ -14,10 +14,10 @@ export type Instance = {
   updatedAt: string;
 };
 
-export const queryInstance = (params: QueryInstanceListParams) => {
+export const queryInstance = (param: QueryInstanceListParams) => {
   return request<{ list: Instance[]; total: number }>(API.INSTANCE, {
     headers: { 'Content-Type': 'application/json' },
-    body: params
+    body: param
   });
 };
 
@@ -25,20 +25,20 @@ type CreateInstanceParams = {
   domain: string;
 };
 
-export const createInstance = (params: CreateInstanceParams) => {
+export const createInstance = (param: CreateInstanceParams) => {
   return request(API.INSTANCE, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: params
+    body: param
   });
 };
 
 type DeleteInstanceParams = string | string[];
 
-export const deleteInstance = (params: DeleteInstanceParams) => {
+export const deleteInstance = (param: DeleteInstanceParams) => {
   return request(API.INSTANCE, {
     method: 'DELETE',
     headers: { 'Content-Type': 'application/json' },
-    body: params
+    body: param
   });
 };

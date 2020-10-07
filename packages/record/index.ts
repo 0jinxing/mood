@@ -1,6 +1,6 @@
 import { snapshot } from '@mood/snapshot';
 
-import initObservers from './observer';
+import observe from './combine';
 import { on, queryWindowHeight, queryWindowWidth } from './utils';
 
 import { TEvent, TEventWithTime, HooksParam, IncrementalData } from './types';
@@ -109,7 +109,7 @@ function record(options: RecordOptions<TEvent>) {
   const initial = () => {
     takeFullSnapshot();
     handlers.push(
-      initObservers(
+      observe(
         {
           mutation: m => {
             incEmitWithTime({ source: IncrementalSource.MUTATION, ...m });
@@ -119,10 +119,10 @@ function record(options: RecordOptions<TEvent>) {
             incEmitWithTime({ source, positions });
           },
 
-          mouseInteraction: params => {
+          mouseInteraction: param => {
             incEmitWithTime({
               source: IncrementalSource.MOUSE_INTERACTION,
-              ...params
+              ...param
             });
           },
 
@@ -137,38 +137,38 @@ function record(options: RecordOptions<TEvent>) {
             });
           },
 
-          input: params => {
-            incEmitWithTime({ source: IncrementalSource.INPUT, ...params });
+          input: param => {
+            incEmitWithTime({ source: IncrementalSource.INPUT, ...param });
           },
 
-          mediaInteraction: params => {
+          mediaInteraction: param => {
             incEmitWithTime({
               source: IncrementalSource.MEDIA_INTERACTION,
-              ...params
+              ...param
             });
           },
 
-          styleSheetRule: params => {
+          styleSheetRule: param => {
             incEmitWithTime({
               source: IncrementalSource.STYLE_SHEETRULE,
-              ...params
+              ...param
             });
           },
 
-          xhr: params => {
-            incEmitWithTime({ source: IncrementalSource.XHR, ...params });
+          xhrRequest: param => {
+            incEmitWithTime({ source: IncrementalSource.XHR, ...param });
           },
 
-          fetch: params => {
-            incEmitWithTime({ source: IncrementalSource.FETCH, ...params });
+          fetchRequest: param => {
+            incEmitWithTime({ source: IncrementalSource.FETCH, ...param });
           },
 
-          log: params => {
-            incEmitWithTime({ source: IncrementalSource.LOG, ...params });
+          log: param => {
+            incEmitWithTime({ source: IncrementalSource.LOG, ...param });
           },
 
-          error: params => {
-            incEmitWithTime({ source: IncrementalSource.ERROR, ...params });
+          globalError: param => {
+            incEmitWithTime({ source: IncrementalSource.ERROR, ...param });
           }
         },
         hooks
