@@ -1,4 +1,4 @@
-import { hookSetter, plain } from '../utils';
+import { plain } from '../utils';
 
 export type LogLevel = 'log' | 'warn' | 'error' | 'debug';
 
@@ -18,18 +18,19 @@ const origin = LOG_LEVELS.reduce((origin, key) => {
 
 function logObserve(cb: LogCb) {
   const handlers = LOG_LEVELS.map(key => {
-    return hookSetter(console, key, {
-      get() {
-        return (...args: unknown[]) => {
-          setTimeout(() => cb({ type: key, args: plain(args) }));
-          
-          return origin[key].apply(console, args);
-        };
-      }
-    });
+    console[key] = function (...args: unknown[]) {
+      setTimeout(() => cb({ type: key, args: plain(args) }));
+      return origin[key].apply(console, args);
+    };
+
+    return () => {
+      LOG_LEVELS.forEach(key => (console[key] = origin[key]));
+    };
   });
 
-  return () => handlers.forEach(h => h());
+  return () => {
+    handlers.forEach(h => h());
+  };
 }
 
 export default logObserve;

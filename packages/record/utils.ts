@@ -66,10 +66,6 @@ export function hookSetter<T>(
             original && original.set && original.set.call(this, value);
             // put hooked setter into event loop to avoid of set latency
             setTimeout(() => descriptor.set!.call(this, value));
-          },
-          get() {
-            const getter = descriptor.get || original?.get;
-            return getter?.call(this);
           }
         }
   );
