@@ -12,7 +12,7 @@ export type MouseInteractionParam = {
 
 export type MouseInteractionCallBack = (param: MouseInteractionParam) => void;
 
-export function initMouseInteractionObserver(cb: MouseInteractionCallBack) {
+function initMouseInteractionObserver(cb: MouseInteractionCallBack) {
   const handlers: VoidFunction[] = [];
 
   const getHandler = (eventKey: keyof typeof MouseInteractions) => {
@@ -23,7 +23,7 @@ export function initMouseInteractionObserver(cb: MouseInteractionCallBack) {
       cb({ type: MouseInteractions[eventKey], id, x: clientX, y: clientY });
     };
   };
-  
+
   Object.keys(MouseInteractions).forEach(
     (eventKey: keyof typeof MouseInteractions) => {
       const eventName = eventKey;

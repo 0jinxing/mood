@@ -1,9 +1,9 @@
 export enum EventType {
-  DOM_CONTENT_LOADED,
+  META,
   LOADED,
+  DOM_CONTENT_LOADED,
   FULL_SNAPSHOT,
   INCREMENTAL_SNAPSHOT,
-  META,
   CUSTOM
 }
 
@@ -28,5 +28,9 @@ export enum IncrementalSource {
   INPUT,
   TOUCH_MOVE,
   MEDIA_INTERACTION,
-  STYLE_SHEETRULE
+  STYLE_SHEETRULE,
+  XHR,
+  FETCH,
+  LOG,
+  ERROR
 }

@@ -13,11 +13,7 @@ import Timer from './timer';
 import { createReplayerService } from './machine';
 import getInjectStyle from './styles/inject-style';
 
-import {
-  EventType,
-  IncrementalSource,
-  MouseInteractions
-} from '@mood/record/constant';
+import { EventType, IncrementalSource, MouseInteractions } from '@mood/record/constant';
 import { AddedNodeMutation } from '@mood/record/observer/mutation';
 import { ViewportResizeDimention } from '@mood/record/observer/viewport-resize';
 

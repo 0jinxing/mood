@@ -1,14 +1,30 @@
 import { AddedNode } from '@mood/snapshot';
 import { EventType, IncrementalSource } from './constant';
+import { ErrorCallback, ErrorCallbackParams } from './observer/error';
+import { FetchCallback, FetchCallbackParams } from './observer/fetch';
 
 import { InputCallback, InputCallbackParam } from './observer/input';
-import { MediaInteractionCallback, MediaInteractionParam } from './observer/media-interaction';
-import { MouseInteractionCallBack, MouseInteractionParam } from './observer/mouse-interaction';
+import { LogCallback, LogCallbackParams } from './observer/log';
+import {
+  MediaInteractionCallback,
+  MediaInteractionParam
+} from './observer/media-interaction';
+import {
+  MouseInteractionCallBack,
+  MouseInteractionParam
+} from './observer/mouse-interaction';
 import { MousemoveCallBack, MousePosition } from './observer/mouse-move';
 import { MutationCallBack, MutationCallbackParam } from './observer/mutation';
 import { ScrollCallback, ScrollPosition } from './observer/scroll';
-import { StyleSheetRuleCallback, StyleSheetRuleParam } from './observer/style-sheet';
-import { ViewportResizeCallback, ViewportResizeDimention } from './observer/viewport-resize';
+import {
+  StyleSheetRuleCallback,
+  StyleSheetRuleParam
+} from './observer/style-sheet';
+import {
+  ViewportResizeCallback,
+  ViewportResizeDimention
+} from './observer/viewport-resize';
+import { XhrCallback, XhrCallbackParams } from './observer/xhr';
 
 export type DomContentLoadedEvent = {
   type: EventType.DOM_CONTENT_LOADED;
@@ -57,6 +73,18 @@ export type MousemoveData = {
   positions: MousePosition[];
 };
 
+export type XhrData = { source: IncrementalSource.XHR } & XhrCallbackParams;
+
+export type FetchData = {
+  source: IncrementalSource.FETCH;
+} & FetchCallbackParams;
+
+export type LogData = { source: IncrementalSource.LOG } & LogCallbackParams;
+
+export type ErrorData = {
+  source: IncrementalSource.ERROR;
+} & ErrorCallbackParams;
+
 export type IncrementalData =
   | MutationData
   | MousemoveData
@@ -65,7 +93,11 @@ export type IncrementalData =
   | ViewportResizeData
   | InputData
   | MediaInteractionData
-  | StyleSheetRuleData;
+  | StyleSheetRuleData
+  | XhrData
+  | FetchData
+  | LogData
+  | ErrorData;
 
 export type IncrementalSnapshotEvent = {
   type: EventType.INCREMENTAL_SNAPSHOT;
@@ -101,6 +133,11 @@ export type ObserverParam = {
   input: InputCallback;
   mediaInteraction: MediaInteractionCallback;
   styleSheetRule: StyleSheetRuleCallback;
+
+  xhr: XhrCallback;
+  fetch: FetchCallback;
+  log: LogCallback;
+  error: ErrorCallback;
 };
 
 export type HooksParam = Partial<ObserverParam>;

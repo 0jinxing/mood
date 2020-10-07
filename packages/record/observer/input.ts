@@ -1,4 +1,4 @@
-import { on } from '../utils';
+import { hookSetter, on } from '../utils';
 import { mirror } from '@mood/snapshot';
 
 export type InputValue = string | boolean;
@@ -6,29 +6,6 @@ export type InputValue = string | boolean;
 export type InputCallbackParam = { id: number; value: InputValue };
 
 export type InputCallback = (param: InputCallbackParam) => void;
-
-function hookSetter<T>(
-  target: T,
-  key: string | number | symbol,
-  descriptor: PropertyDescriptor,
-  isRevoked?: boolean
-) {
-  const original = Object.getOwnPropertyDescriptor(target, key);
-  Object.defineProperty(
-    target,
-    key,
-    isRevoked
-      ? descriptor
-      : {
-          set(value) {
-            // put hooked setter into event loop to avoid of set latency
-            setTimeout(() => descriptor.set!.call(this, value));
-            original && original.set && original.set.call(this, value);
-          }
-        }
-  );
-  return () => hookSetter(target, key, original || {}, true);
-}
 
 const lastInputValueMap: WeakMap<EventTarget, InputValue> = new WeakMap();
 

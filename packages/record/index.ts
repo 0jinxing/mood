@@ -3,7 +3,7 @@ import { snapshot } from '@mood/snapshot';
 import initObservers from './observer';
 import { on, queryWindowHeight, queryWindowWidth } from './utils';
 
-import { TEvent, TEventWithTime, HooksParam } from './types';
+import { TEvent, TEventWithTime, HooksParam, IncrementalData } from './types';
 import { EventType, IncrementalSource } from './constant';
 
 export type RecordOptions<T> = {
@@ -52,12 +52,16 @@ function record(options: RecordOptions<TEvent>) {
     wrappedEmit(withTimestamp(event), isCheckout);
   };
 
+  const incEmitWithTime = (data: IncrementalData) => {
+    wrappedEmitWithTime({ type: EventType.INCREMENTAL_SNAPSHOT, data });
+  };
+
   const takeFullSnapshot = (isCheckout?: true) => {
     wrappedEmitWithTime(
       {
         type: EventType.META,
         data: {
-          href: window.location.href,
+          href: location.href,
           width: queryWindowWidth(),
           height: queryWindowHeight()
         }
@@ -108,57 +112,63 @@ function record(options: RecordOptions<TEvent>) {
       initObservers(
         {
           mutation: m => {
-            wrappedEmitWithTime({
-              type: EventType.INCREMENTAL_SNAPSHOT,
-              data: { source: IncrementalSource.MUTATION, ...m }
-            });
+            incEmitWithTime({ source: IncrementalSource.MUTATION, ...m });
           },
+
           mousemove: (positions, source) => {
-            wrappedEmitWithTime({
-              type: EventType.INCREMENTAL_SNAPSHOT,
-              data: { source, positions }
-            });
+            incEmitWithTime({ source, positions });
           },
+
           mouseInteraction: params => {
-            wrappedEmitWithTime({
-              type: EventType.INCREMENTAL_SNAPSHOT,
-              data: { source: IncrementalSource.MOUSE_INTERACTION, ...params }
+            incEmitWithTime({
+              source: IncrementalSource.MOUSE_INTERACTION,
+              ...params
             });
           },
 
           scroll: position => {
-            wrappedEmitWithTime({
-              type: EventType.INCREMENTAL_SNAPSHOT,
-              data: { source: IncrementalSource.SCROLL, ...position }
-            });
+            incEmitWithTime({ source: IncrementalSource.SCROLL, ...position });
           },
 
           viewportResize: dimention => {
-            wrappedEmitWithTime({
-              type: EventType.INCREMENTAL_SNAPSHOT,
-              data: { source: IncrementalSource.VIEWPORT_RESIZE, ...dimention }
+            incEmitWithTime({
+              source: IncrementalSource.VIEWPORT_RESIZE,
+              ...dimention
             });
           },
 
           input: params => {
-            wrappedEmitWithTime({
-              type: EventType.INCREMENTAL_SNAPSHOT,
-              data: { source: IncrementalSource.INPUT, ...params }
-            });
+            incEmitWithTime({ source: IncrementalSource.INPUT, ...params });
           },
 
           mediaInteraction: params => {
-            wrappedEmitWithTime({
-              type: EventType.INCREMENTAL_SNAPSHOT,
-              data: { source: IncrementalSource.MEDIA_INTERACTION, ...params }
+            incEmitWithTime({
+              source: IncrementalSource.MEDIA_INTERACTION,
+              ...params
             });
           },
 
           styleSheetRule: params => {
-            wrappedEmitWithTime({
-              type: EventType.INCREMENTAL_SNAPSHOT,
-              data: { source: IncrementalSource.STYLE_SHEETRULE, ...params }
+            incEmitWithTime({
+              source: IncrementalSource.STYLE_SHEETRULE,
+              ...params
             });
+          },
+
+          xhr: params => {
+            incEmitWithTime({ source: IncrementalSource.XHR, ...params });
+          },
+
+          fetch: params => {
+            incEmitWithTime({ source: IncrementalSource.FETCH, ...params });
+          },
+
+          log: params => {
+            incEmitWithTime({ source: IncrementalSource.LOG, ...params });
+          },
+
+          error: params => {
+            incEmitWithTime({ source: IncrementalSource.ERROR, ...params });
           }
         },
         hooks

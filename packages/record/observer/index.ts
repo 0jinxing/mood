@@ -6,6 +6,10 @@ import initMouseMoveObserver from './mouse-move';
 import initMediaInteractionObserver from './media-interaction';
 import initStyleSheetObserver from './style-sheet';
 import initMutationObserver from './mutation';
+import initXhrObserver from './xhr';
+import initFetchObserver from './fetch';
+import initLogObserver from './log';
+import initErrorObserver from './error';
 
 import { ObserverParam, HooksParam } from '../types';
 
@@ -34,7 +38,12 @@ export default function initObservers(
     viewportResize,
     input,
     mediaInteraction,
-    styleSheetRule
+    styleSheetRule,
+
+    xhr,
+    fetch,
+    log,
+    error
   } = observer;
 
   const mutationObserver = initMutationObserver(mutation);
@@ -57,6 +66,14 @@ export default function initObservers(
 
   const styleSheetObserver = initStyleSheetObserver(styleSheetRule);
 
+  const xhrObserver = initXhrObserver(xhr);
+
+  const fetchObserver = initFetchObserver(fetch);
+
+  const logObserver = initLogObserver(log);
+
+  const errorObserver = initErrorObserver(error);
+
   return () => {
     mutationObserver.disconnect();
     mousemoveHandler();
@@ -66,5 +83,10 @@ export default function initObservers(
     inputHandler();
     mediaInteractionHandler();
     styleSheetObserver();
+
+    xhrObserver();
+    fetchObserver();
+    logObserver();
+    errorObserver();
   };
 }

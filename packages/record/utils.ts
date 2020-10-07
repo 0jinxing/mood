@@ -41,6 +41,41 @@ export function throttle<T>(
   };
 }
 
+export function plain(obj: unknown): unknown {
+  try {
+    return JSON.parse(JSON.stringify(obj));
+  } catch {
+    return Object.toString.call(obj);
+  }
+}
+
+export function hookSetter<T>(
+  target: T,
+  key: string | number | symbol,
+  descriptor: PropertyDescriptor,
+  isRevoked?: boolean
+) {
+  const original = Object.getOwnPropertyDescriptor(target, key);
+  Object.defineProperty(
+    target,
+    key,
+    isRevoked
+      ? descriptor
+      : {
+          set(value) {
+            original && original.set && original.set.call(this, value);
+            // put hooked setter into event loop to avoid of set latency
+            setTimeout(() => descriptor.set!.call(this, value));
+          },
+          get() {
+            const getter = descriptor.get || original?.get;
+            return getter?.call(this);
+          }
+        }
+  );
+  return () => hookSetter(target, key, original || {}, true);
+}
+
 // viewport
 
 export function queryWindowHeight(): number {
