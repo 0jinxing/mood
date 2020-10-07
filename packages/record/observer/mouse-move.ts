@@ -10,24 +10,28 @@ export type MousePosition = {
   timeOffset: number;
 };
 
-export type MousemoveCb = (
-  p: MousePosition[],
-  source: IncrementalSource.MOUSE_MOVE | IncrementalSource.TOUCH_MOVE
-) => void;
+export type MousemoveCbParam = {
+  source: IncrementalSource.MOUSE_MOVE | IncrementalSource.TOUCH_MOVE;
+  positions: MousePosition[];
+};
+
+export type MousemoveCb = (param: MousemoveCbParam) => void;
 
 function mouseMoveObserve(cb: MousemoveCb) {
   let positions: MousePosition[] = [];
   let timeBaseline: number = 0;
   const throttleCb = throttle((isTouch: boolean) => {
     const totalOffset = Date.now() - timeBaseline!;
-    cb(
-      positions.map(({ timeOffset, ...rest }) => ({
+    cb({
+      positions: positions.map(({ timeOffset, ...rest }) => ({
         ...rest,
         timeOffset: timeOffset - totalOffset
       })),
-      
-      isTouch ? IncrementalSource.TOUCH_MOVE : IncrementalSource.MOUSE_MOVE
-    );
+      source: isTouch
+        ? IncrementalSource.TOUCH_MOVE
+        : IncrementalSource.MOUSE_MOVE
+    });
+
     positions = [];
   }, 500);
   const updatePosition = throttle<MouseEvent | TouchEvent>(

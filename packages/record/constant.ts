@@ -29,8 +29,8 @@ export enum IncrementalSource {
   TOUCH_MOVE,
   MEDIA_INTERACTION,
   STYLE_SHEETRULE,
-  XHR,
-  FETCH,
   LOG,
-  ERROR
+  REQUEST_XHR,
+  REQUEST_FETCH,
+  GLOBAL_ERROR
 }

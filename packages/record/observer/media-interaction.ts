@@ -1,19 +1,27 @@
 import { on } from '../utils';
 import { TNode, mirror } from '@mood/snapshot';
+import { IncrementalSource } from '../constant';
 
 export type MediaInteractions = 'play' | 'pause';
 
 export type MediaInteractionCbParam = {
+  source: IncrementalSource.MEDIA_INTERACTION;
+  act: MediaInteractions;
   id: number;
-  type: MediaInteractions;
 };
 
 export type MediaInteractionCb = (param: MediaInteractionCbParam) => void;
 
 function mediaInteractionObserve(cb: MediaInteractionCb) {
-  const handler = (type: MediaInteractions) => (event: Event) => {
+  const handler = (act: MediaInteractions) => (event: Event) => {
     const { target } = event;
-    target && cb({ type, id: mirror.getId(target as TNode) });
+    if (target) {
+      cb({
+        source: IncrementalSource.MEDIA_INTERACTION,
+        id: mirror.getId(target as TNode),
+        act
+      });
+    }
   };
   const handlers = [on('play', handler('play')), on('pause', handler('pause'))];
   return () => {

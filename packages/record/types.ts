@@ -73,16 +73,16 @@ export type MousemoveData = {
   positions: MousePosition[];
 };
 
-export type XhrData = { source: IncrementalSource.XHR } & XhrCbParam;
+export type XhrData = { source: IncrementalSource.REQUEST_XHR } & XhrCbParam;
 
 export type FetchData = {
-  source: IncrementalSource.FETCH;
+  source: IncrementalSource.REQUEST_FETCH;
 } & FetchCbParam;
 
 export type LogData = { source: IncrementalSource.LOG } & LogCbParam;
 
 export type ErrorData = {
-  source: IncrementalSource.ERROR;
+  source: IncrementalSource.GLOBAL_ERROR;
 } & ErrorCbParam;
 
 export type IncrementalData =

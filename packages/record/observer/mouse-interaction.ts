@@ -1,10 +1,11 @@
 import { on } from '../utils';
 import { mirror } from '@mood/snapshot';
 
-import { MouseInteractions } from '../constant';
+import { IncrementalSource, MouseInteractions } from '../constant';
 
 export type MouseInteractionCbParam = {
-  type: MouseInteractions;
+  source: IncrementalSource.MOUSE_INTERACTION;
+  act: MouseInteractions;
   id: number;
   x: number;
   y: number;
@@ -18,9 +19,17 @@ function mouseInteractionObserve(cb: MouseInteractionCb) {
   const getHandler = (eventKey: keyof typeof MouseInteractions) => {
     return (event: MouseEvent | TouchEvent) => {
       const id = mirror.getId(event.target as Node);
+
       const { clientX, clientY } =
         event instanceof TouchEvent ? event.changedTouches[0] : event;
-      cb({ type: MouseInteractions[eventKey], id, x: clientX, y: clientY });
+        
+      cb({
+        source: IncrementalSource.MOUSE_INTERACTION,
+        act: MouseInteractions[eventKey],
+        id,
+        x: clientX,
+        y: clientY
+      });
     };
   };
 

@@ -1,4 +1,6 @@
+import { IncrementalSource } from '../constant';
 export type FetchCbParam = {
+  source: IncrementalSource.REQUEST_FETCH;
   input: RequestInfo;
   init?: RequestInit;
   error: Error | null;
@@ -18,7 +20,9 @@ function fetchObserve(cb: FetchCb) {
       error = err;
       throw err;
     } finally {
-      setTimeout(() => cb({ input, init, error }));
+      setTimeout(() =>
+        cb({ source: IncrementalSource.REQUEST_FETCH, input, init, error })
+      );
     }
   };
 

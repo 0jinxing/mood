@@ -292,13 +292,13 @@ export default class Replayer {
         const $target = mirror.getNode<HTMLElement>(data.id);
         if (!$target) break;
 
-        const event = new Event(MouseInteractions[data.type].toLowerCase());
+        const event = new Event(MouseInteractions[data.act].toLowerCase());
         this.emitter.emit(ReplayerEmitterEvent.MOUSE_INTERACTION, {
-          type: data.type,
+          type: data.act,
           $target
         });
         const { triggerFocus } = this.config;
-        switch (data.type) {
+        switch (data.act) {
           case MouseInteractions.BLUR: {
             $target.blur && $target.blur();
             break;
@@ -364,13 +364,13 @@ export default class Replayer {
         const $target = mirror.getNode<HTMLMediaElement>(data.id);
         if (!$target) break;
 
-        if (data.type === 'play') {
+        if (data.act === 'play') {
           if ($target.readyState >= HTMLMediaElement.HAVE_CURRENT_DATA) {
             $target.play();
           } else {
             $target.addEventListener('canplay', () => $target.play());
           }
-        } else if (data.type === 'pause') {
+        } else if (data.act === 'pause') {
           $target.pause();
         }
         break;

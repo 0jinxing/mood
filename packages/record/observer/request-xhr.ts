@@ -1,4 +1,7 @@
+import { IncrementalSource } from '../constant';
+
 export type XhrCbParam = {
+  source: IncrementalSource.REQUEST_XHR;
   method: string;
   url: string;
   statusText?: string;
@@ -34,7 +37,12 @@ function xhrObserve(cb: XhrCb) {
 
       req.addEventListener('readystatechange', () => {
         if (req.readyState === 4) {
-          cb({ method, url, statusText: req.statusText });
+          cb({
+            source: IncrementalSource.REQUEST_XHR,
+            method,
+            url,
+            statusText: req.statusText
+          });
         }
       });
     }

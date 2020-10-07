@@ -1,4 +1,5 @@
 import { mirror, TNode } from '@mood/snapshot';
+import { IncrementalSource } from '../constant';
 
 export type StyleSheetDeleteRule = {
   index: number;
@@ -10,6 +11,7 @@ export type StyleSheetAddRule = {
 };
 
 export type StyleSheetCbParam = {
+  source: IncrementalSource.STYLE_SHEETRULE;
   id: number;
   removes?: StyleSheetDeleteRule[];
   adds?: StyleSheetAddRule[];
@@ -21,14 +23,24 @@ function styleSheetObserve(cb: StyleSheetCb) {
   const insertRule = CSSStyleSheet.prototype.insertRule;
   CSSStyleSheet.prototype.insertRule = function (rule: string, index?: number) {
     const id = mirror.getId(this.ownerNode as Node | TNode);
-    id && cb({ id, adds: [{ rule, index }] });
+    id &&
+      cb({
+        source: IncrementalSource.STYLE_SHEETRULE,
+        id,
+        adds: [{ rule, index }]
+      });
     return insertRule.apply(this, [rule, index]);
   };
 
   const deleteRule = CSSStyleSheet.prototype.deleteRule;
   CSSStyleSheet.prototype.deleteRule = function (index: number) {
     const id = mirror.getId(this.ownerNode as TNode);
-    id && cb({ id, removes: [{ index }] });
+    id &&
+      cb({
+        source: IncrementalSource.STYLE_SHEETRULE,
+        id,
+        removes: [{ index }]
+      });
     return deleteRule.apply(this, [index]);
   };
 

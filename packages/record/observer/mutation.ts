@@ -14,6 +14,8 @@ import {
   isParentRemoved
 } from '../utils';
 
+import { IncrementalSource } from '../constant';
+
 export type AttrCursor = {
   $el: Node;
   attributes: Attributes;
@@ -37,6 +39,7 @@ export type AttrMutation = {
 };
 
 export type MutationCbParam = {
+  source: IncrementalSource.MUTATION;
   texts: TextMutation[];
   attributes: AttrMutation[];
   removes: RemovedNodeMutation[];
@@ -191,17 +194,21 @@ function mutationObserve(cb: MutationCb) {
       pushAdd(addQueue.shift()!);
     }
 
-    const payload = {
+    const payload: MutationCbParam = {
+      source: IncrementalSource.MUTATION,
+
       texts: texts
         .map(text => ({
           id: mirror.getId(text.$el as TNode),
           value: text.value
         }))
         .filter(text => mirror.has(text.id)),
+
       attributes: attrs.map(attr => ({
         id: mirror.getId(attr.$el as TNode),
         attributes: attr.attributes
       })),
+      
       removes,
       adds
     };

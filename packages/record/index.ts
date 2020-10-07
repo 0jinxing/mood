@@ -4,7 +4,7 @@ import observe from './combine';
 import { on, queryWindowHeight, queryWindowWidth } from './utils';
 
 import { TEvent, TEventWithTime, HooksParam, IncrementalData } from './types';
-import { EventType, IncrementalSource } from './constant';
+import { EventType } from './constant';
 
 export type RecordOptions<T> = {
   emit: (e: T | string, isCheckout?: true) => void;
@@ -111,65 +111,18 @@ function record(options: RecordOptions<TEvent>) {
     handlers.push(
       observe(
         {
-          mutation: m => {
-            incEmitWithTime({ source: IncrementalSource.MUTATION, ...m });
-          },
-
-          mousemove: (positions, source) => {
-            incEmitWithTime({ source, positions });
-          },
-
-          mouseInteraction: param => {
-            incEmitWithTime({
-              source: IncrementalSource.MOUSE_INTERACTION,
-              ...param
-            });
-          },
-
-          scroll: position => {
-            incEmitWithTime({ source: IncrementalSource.SCROLL, ...position });
-          },
-
-          viewportResize: dimention => {
-            incEmitWithTime({
-              source: IncrementalSource.VIEWPORT_RESIZE,
-              ...dimention
-            });
-          },
-
-          input: param => {
-            incEmitWithTime({ source: IncrementalSource.INPUT, ...param });
-          },
-
-          mediaInteraction: param => {
-            incEmitWithTime({
-              source: IncrementalSource.MEDIA_INTERACTION,
-              ...param
-            });
-          },
-
-          styleSheetRule: param => {
-            incEmitWithTime({
-              source: IncrementalSource.STYLE_SHEETRULE,
-              ...param
-            });
-          },
-
-          xhrRequest: param => {
-            incEmitWithTime({ source: IncrementalSource.XHR, ...param });
-          },
-
-          fetchRequest: param => {
-            incEmitWithTime({ source: IncrementalSource.FETCH, ...param });
-          },
-
-          log: param => {
-            incEmitWithTime({ source: IncrementalSource.LOG, ...param });
-          },
-
-          globalError: param => {
-            incEmitWithTime({ source: IncrementalSource.ERROR, ...param });
-          }
+          mutation: incEmitWithTime,
+          mousemove: incEmitWithTime,
+          mouseInteraction: incEmitWithTime,
+          scroll: incEmitWithTime,
+          viewportResize: incEmitWithTime,
+          input: incEmitWithTime,
+          mediaInteraction: incEmitWithTime,
+          styleSheetRule: incEmitWithTime,
+          xhrRequest: incEmitWithTime,
+          fetchRequest: incEmitWithTime,
+          log: incEmitWithTime,
+          globalError: incEmitWithTime
         },
         hooks
       )

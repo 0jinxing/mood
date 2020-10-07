@@ -1,4 +1,7 @@
+import { IncrementalSource } from '../constant';
+
 export type ErrorCbParam = {
+  source: IncrementalSource.GLOBAL_ERROR;
   message: string;
 };
 
@@ -7,10 +10,10 @@ export type ErrorCb = (param: ErrorCbParam) => void;
 function errorObserve(cb: ErrorCb) {
   const errorHandler = (ev: ErrorEvent | PromiseRejectionEvent) => {
     if (ev instanceof ErrorEvent) {
-      cb({ message: ev.message });
+      cb({ source: IncrementalSource.GLOBAL_ERROR, message: ev.message });
     }
     if (ev instanceof PromiseRejectionEvent) {
-      cb({ message: ev.reason });
+      cb({ source: IncrementalSource.GLOBAL_ERROR, message: ev.reason });
     }
   };
 

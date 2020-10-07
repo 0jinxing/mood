@@ -1,15 +1,20 @@
-import { hookSetter, on } from '../utils';
 import { mirror } from '@mood/snapshot';
+import { IncrementalSource } from '../constant';
+import { hookSetter, on } from '../utils';
 
 export type InputValue = string | boolean;
 
-export type InputCbParam = { id: number; value: InputValue };
+export type InputCbParam = {
+  source: IncrementalSource.INPUT;
+  id: number;
+  value: InputValue;
+};
 
 export type InputCb = (param: InputCbParam) => void;
 
 const lastInputValueMap: WeakMap<EventTarget, InputValue> = new WeakMap();
 
-function inputObserve(callback: InputCb) {
+function inputObserve(cb: InputCb) {
   const cbWithDedup = (
     $target: HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement,
     value: InputValue
@@ -18,7 +23,7 @@ function inputObserve(callback: InputCb) {
     if (!lastInputValue || lastInputValue !== value) {
       lastInputValueMap.set($target, value);
       const id = mirror.getId($target);
-      callback({ value, id });
+      cb({ source: IncrementalSource.INPUT, value, id });
     }
   };
 
