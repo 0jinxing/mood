@@ -13,7 +13,11 @@ import Timer from './timer';
 import { createReplayerService } from './machine';
 import getInjectStyle from './styles/inject-style';
 
-import { EventType, IncrementalSource, MouseInteractions } from '@mood/record/constant';
+import {
+  EventType,
+  IncrementalSource,
+  MouseInteractions
+} from '@mood/record/constant';
 import { AddedNodeMutation } from '@mood/record/observer/mutation';
 import { ViewportResizeCbParam } from '@mood/record/observer/viewport-resize';
 
@@ -44,6 +48,26 @@ const defaultConfig: ReplayerConfig = {
   insertStyleRules: [],
   triggerFocus: true
 };
+
+const {
+  MOUSE_MOVE,
+  MOUSE_INTERACTION,
+  SCROLL,
+  VIEWPORT_RESIZE,
+  INPUT,
+  TOUCH_MOVE,
+  MEDIA_INTERACTION
+} = IncrementalSource;
+
+const UserInteraction = [
+  MOUSE_MOVE,
+  MOUSE_INTERACTION,
+  SCROLL,
+  VIEWPORT_RESIZE,
+  INPUT,
+  TOUCH_MOVE,
+  MEDIA_INTERACTION
+];
 
 export default class Replayer {
   public $wrapper: HTMLElement;
@@ -521,10 +545,7 @@ export default class Replayer {
     if (event.type !== EventType.INCREMENTAL_SNAPSHOT) {
       return false;
     }
-    return (
-      event.data.source > IncrementalSource.MUTATION &&
-      event.data.source <= IncrementalSource.INPUT
-    );
+    return UserInteraction.includes(event.data.source);
   }
 
   private restoreSpeed() {
