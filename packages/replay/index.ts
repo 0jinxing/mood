@@ -59,7 +59,7 @@ const {
   MEDIA_INTERACTION
 } = IncrementalSource;
 
-const UserInteraction = [
+const userInteractions = [
   MOUSE_MOVE,
   MOUSE_INTERACTION,
   SCROLL,
@@ -545,7 +545,7 @@ export default class Replayer {
     if (event.type !== EventType.INCREMENTAL_SNAPSHOT) {
       return false;
     }
-    return UserInteraction.includes(event.data.source);
+    return userInteractions.includes(event.data.source);
   }
 
   private restoreSpeed() {
