@@ -1,4 +1,5 @@
 import * as mittProxy from 'mitt';
+import type { MittStatic, Handler } from 'mitt';
 
 import rebuild, { buildNodeWithSN } from '@mood/snapshot/rebuild';
 import { mirror } from '@mood/snapshot';
@@ -31,7 +32,7 @@ import {
 
 import './styles/index.css';
 
-const mitt = (mittProxy as any).default || mittProxy;
+const mitt: MittStatic = (mittProxy as any).default || mittProxy;
 
 const SKIP_TIME_THRESHOLD = 10 * 1000;
 const SKIP_TIME_INTERVAL = 5 * 1000;
@@ -77,7 +78,7 @@ export default class Replayer {
   private $cursor: HTMLElement;
   private events: TEventWithTime[];
   private config: ReplayerConfig;
-  private emitter: typeof mitt.Emitter = mitt();
+  private emitter = mitt();
   private baselineTime: number = 0;
   private lastPlayedEvent: TEventWithTime;
   private nextUserInteractionEvent: TEventWithTime | null;
@@ -103,7 +104,7 @@ export default class Replayer {
     this.emitter.on(ReplayerEmitterEvent.RESIZE, this.handleResize);
   }
 
-  public on(type: string, handler: typeof mitt.Handler) {
+  public on(type: string, handler: Handler) {
     this.emitter.on(type, handler);
   }
 
