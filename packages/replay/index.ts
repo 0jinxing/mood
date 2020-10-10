@@ -11,7 +11,7 @@ import {
 } from '@mood/record';
 
 import Timer from './timer';
-import { createReplayerService } from './machine';
+import { createReplayerService } from './fsm';
 import getInjectStyle from './styles/inject-style';
 
 import {
@@ -26,8 +26,7 @@ import {
   ReplayerConfig,
   ReplayerEmitterEvent,
   ReplayerMetaData,
-  ActionWithDelay,
-  ReplayerEventType
+  ActionWithDelay
 } from './types';
 
 import './styles/index.css';
@@ -45,7 +44,6 @@ const defaultConfig: ReplayerConfig = {
   loadTimeout: 0,
   skipInactive: false,
   showDebug: false,
-  liveMode: false,
   insertStyleRules: [],
   triggerFocus: true
 };
@@ -149,13 +147,13 @@ export default class Replayer {
     }
     this.timer.addActions(actions);
     this.timer.start();
-    this.service.send({ type: ReplayerEventType.PLAY });
+    this.service.send({ type: 'play' });
     this.emitter.emit(ReplayerEmitterEvent.START);
   }
 
   public pause() {
     this.timer.clear();
-    this.service.send({ type: ReplayerEventType.PAUSE });
+    this.service.send({ type: 'pause' });
     this.emitter.emit(ReplayerEmitterEvent.PAUSE);
   }
 
@@ -179,7 +177,7 @@ export default class Replayer {
     }
     this.timer.addActions(actions);
     this.timer.start();
-    this.service.send({ type: ReplayerEventType.RESUME });
+    this.service.send({ type: 'resume' });
     this.emitter.emit(ReplayerEmitterEvent.RESUME);
   }
 

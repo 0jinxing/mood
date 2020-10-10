@@ -6,7 +6,6 @@ export type ReplayerConfig = {
   loadTimeout: number;
   skipInactive: boolean;
   showDebug: boolean;
-  liveMode: boolean;
   insertStyleRules: string[];
   triggerFocus: boolean;
 };
@@ -21,18 +20,18 @@ export type ReplayerMetaData = {
 };
 
 export enum ReplayerEmitterEvent {
-  START = 'START',
-  PAUSE = 'PAUSE',
-  RESUME = 'RESUME',
-  RESIZE = 'RESIZE',
-  FINISH = 'FINISH',
-  FULLSNAPSHOT_REBUILDED = 'FULLSNAPSHOT_REBUILDED',
-  LOAD_STYLESHEET_START = 'LOAD_STYLESHEET_START',
-  LOAD_STYLESHEET_END = 'LOAD_STYLESHEET_END',
-  SKIP_START = 'SKIP_START',
-  SKIP_END = 'SKIP_END',
-  MOUSE_INTERACTION = 'MOUSE_INTERACTION',
-  EVENT_CAST = 'EVENT_CAST',
+  START = 'start',
+  PAUSE = 'pause',
+  RESUME = 'resume',
+  RESIZE = 'resize',
+  FINISH = 'finish',
+  FULLSNAPSHOT_REBUILDED = 'fullsnapshot_rebuilded',
+  LOAD_STYLESHEET_START = 'load_stylesheet_start',
+  LOAD_STYLESHEET_END = 'load_stylesheet_end',
+  SKIP_START = 'skip_start',
+  SKIP_END = 'skip_end',
+  MOUSE_INTERACTION = 'mouse_interaction',
+  EVENT_CAST = 'event_cast'
 }
 
 export type ReplayerContext = {
@@ -41,19 +40,29 @@ export type ReplayerContext = {
   speed: number;
 };
 
-export enum ReplayerEventType {
-  PLAY = 'PLAY',
-  PAUSE = 'PAUSE',
-  RESUME = 'RESUME',
-  END = 'END',
-  REPLAY = 'REPLAY',
-  FAST_FORWARD = 'FAST_FORWARD',
-  BACK_TO_NORMAL = 'BACK_TO_NORMAL',
-}
+export type ReplayerEventType =
+  | 'play'
+  | 'pause'
+  | 'resume'
+  | 'end'
+  | 'replay'
+  | 'fast_forward'
+  | 'back_to_normal';
 
 export type ReplayerEvent = { type: ReplayerEventType };
 
-export type ReplayerState = {
-  value: 'inited' | 'playing' | 'paused' | 'ended' | 'skipping';
-  context: ReplayerContext;
-};
+export type ReplayerState =
+  | 'inited'
+  | 'playing'
+  | 'paused'
+  | 'ended'
+  | 'skipping';
+
+export type ReplayerStates = Record<
+  ReplayerState,
+  {
+    on: {
+      [key in ReplayerEventType]?: ReplayerState;
+    };
+  }
+>;

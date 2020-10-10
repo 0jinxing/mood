@@ -47,7 +47,7 @@ export default class Timer {
           break;
         }
       }
-      if (actions.length > 0 || this.config.liveMode) {
+      if (actions.length > 0) {
         this.raf = requestAnimationFrame(check);
       }
     };
