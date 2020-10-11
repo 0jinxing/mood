@@ -5,7 +5,6 @@ export type ReplayerConfig = {
   root: Element;
   loadTimeout: number;
   skipInactive: boolean;
-  showDebug: boolean;
   insertStyleRules: string[];
   triggerFocus: boolean;
 };

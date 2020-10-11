@@ -43,7 +43,6 @@ const defaultConfig: ReplayerConfig = {
   root: document.body,
   loadTimeout: 0,
   skipInactive: false,
-  showDebug: false,
   insertStyleRules: [],
   triggerFocus: true
 };
@@ -80,7 +79,7 @@ export default class Replayer {
   private baselineTime: number = 0;
   private lastPlayedEvent: TEventWithTime;
   private nextUserInteractionEvent: TEventWithTime | null;
-  private noramlSpeed: number = -1;
+  private normalSpeed: number = -1;
   private service!: ReturnType<typeof createReplayerService>;
 
   constructor(
@@ -109,7 +108,7 @@ export default class Replayer {
   public setConfig(config: Partial<ReplayerConfig>) {
     this.config = Object.assign({}, this.config, config);
     if (!this.config.skipInactive) {
-      this.noramlSpeed = -1;
+      this.normalSpeed = -1;
     }
   }
 
@@ -510,7 +509,7 @@ export default class Replayer {
               }
             }
             if (this.nextUserInteractionEvent) {
-              this.noramlSpeed = this.config.speed;
+              this.normalSpeed = this.config.speed;
               const skipTime =
                 this.nextUserInteractionEvent.delay! - event.delay!;
               const payload = {
@@ -548,11 +547,11 @@ export default class Replayer {
   }
 
   private restoreSpeed() {
-    if (this.noramlSpeed === -1) return;
-    const payload = { speed: this.noramlSpeed };
+    if (this.normalSpeed === -1) return;
+    const payload = { speed: this.normalSpeed };
     this.setConfig(payload);
     this.emitter.emit(ReplayerEmitterEvent.SKIP_END, payload);
-    this.noramlSpeed = -1;
+    this.normalSpeed = -1;
   }
 
   private rebuildFullSnapshot(event: TEventWithTime & FullSnapshotEvent) {
