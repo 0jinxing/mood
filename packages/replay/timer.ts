@@ -1,42 +1,36 @@
-import { ReplayerConfig, ActionWithDelay } from './types';
+import { ActionWithDelay } from './types';
 
 export default class Timer {
   public timeOffset: number = 0;
-
-  private actions: ActionWithDelay[];
-  private config: ReplayerConfig;
   private raf: number;
 
-  constructor(config: ReplayerConfig, actions: ActionWithDelay[] = []) {
-    this.actions = actions;
-    this.config = config;
+  constructor(
+    private speed: number = 1,
+    private actions: ActionWithDelay[] = []
+  ) {}
+
+  public setSpeed(speed = 1) {
+    this.speed = speed;
   }
 
-  /**
-   * Add an action after the timer starts.
-   * @param action
-   */
   public addAction(action: ActionWithDelay) {
     const index = this.findActionIndex(action);
     this.actions.splice(index, 0, action);
   }
 
-  /**
-   * Add all actions before the timer starts
-   * @param actions
-   */
   public addActions(actions: ActionWithDelay[]) {
     this.actions.push(...actions);
   }
 
   public start() {
-    const { actions, config } = this;
+    const { actions, speed } = this;
+
     actions.sort((a1, a2) => a1.delay - a2.delay);
     this.timeOffset = 0;
     let lastTimestamp = performance.now();
 
     const check = (time: number) => {
-      this.timeOffset += (time - lastTimestamp) * config.speed;
+      this.timeOffset += (time - lastTimestamp) * speed;
       lastTimestamp = time;
       while (actions.length) {
         const action = actions[0];

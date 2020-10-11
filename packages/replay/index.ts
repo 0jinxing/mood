@@ -69,10 +69,10 @@ const userInteractions = [
 
 export default class Replayer {
   public $wrapper: HTMLElement;
-  public $iframe: HTMLIFrameElement;
-  public timer: Timer;
-
   private $cursor: HTMLElement;
+  public $iframe: HTMLIFrameElement;
+
+  public timer: Timer;
   private events: TEventWithTime[];
   private config: ReplayerConfig;
   private emitter = mitt();
@@ -96,7 +96,7 @@ export default class Replayer {
     this.service.start();
     this.events = events;
     this.handleResize = this.handleResize.bind(this);
-    this.timer = new Timer(this.config);
+    this.timer = new Timer(this.config.speed);
     this.setupDOM();
     this.emitter.on(ReplayerEmitterEvent.RESIZE, this.handleResize);
   }
@@ -110,6 +110,7 @@ export default class Replayer {
     if (!this.config.skipInactive) {
       this.normalSpeed = -1;
     }
+    this.timer.setSpeed(this.config.speed);
   }
 
   public getMetaData(): ReplayerMetaData {
