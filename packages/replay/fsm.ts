@@ -1,10 +1,41 @@
+import { TEventWithTime } from '@mood/record';
 import { createMachine, interpret } from '@xstate/fsm';
 
-import { ReplayerEvent, ReplayerStates } from './types';
-import type { ReplayerContext } from './types';
+export type MachineContext = {
+  events: TEventWithTime[];
+  timeOffset: number;
+  speed: number;
+};
 
-export function createReplayerService(context: ReplayerContext) {
-  const states: ReplayerStates = {
+export type MachineEventType =
+  | 'play'
+  | 'pause'
+  | 'resume'
+  | 'end'
+  | 'replay'
+  | 'fast_forward'
+  | 'back_to_normal';
+
+export type MachineEvent = { type: MachineEventType };
+
+export type MachineState =
+  | 'inited'
+  | 'playing'
+  | 'paused'
+  | 'ended'
+  | 'skipping';
+
+export type MachineStates = Record<
+  MachineState,
+  {
+    on: {
+      [key in MachineEventType]?: MachineState;
+    };
+  }
+>;
+
+function createReplayerService(context: MachineContext) {
+  const states: MachineStates = {
     inited: { on: { play: 'playing' } },
     playing: {
       on: { pause: 'paused', end: 'ended', fast_forward: 'skipping' }
@@ -14,7 +45,7 @@ export function createReplayerService(context: ReplayerContext) {
     ended: { on: { replay: 'playing' } }
   };
 
-  const machine = createMachine<ReplayerContext, ReplayerEvent>({
+  const machine = createMachine<MachineContext, MachineEvent>({
     id: 'player',
     context,
     initial: 'inited',
@@ -23,3 +54,5 @@ export function createReplayerService(context: ReplayerContext) {
   const service = interpret(machine);
   return service;
 }
+
+export default createReplayerService;

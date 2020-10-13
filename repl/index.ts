@@ -122,7 +122,7 @@ function getCode(): string {
               '<\\/script>'
             )};
             /*-->*/
-            const replayer = new replay(events);
+            const replayer = replay(events);
             replayer.play();
           </script>
         </body>

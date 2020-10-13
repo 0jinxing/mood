@@ -3,15 +3,9 @@ import type { MittStatic, Handler } from 'mitt';
 
 import rebuild, { buildNodeWithSN } from '@mood/snapshot/rebuild';
 import { mirror } from '@mood/snapshot';
-import {
-  TEventWithTime,
-  IncrementalSnapshotEvent,
-  FullSnapshotEvent,
-  IncrementalData
-} from '@mood/record';
-
+import { TEventWithTime, FullSnapshotEvent } from '@mood/record';
 import Timer from './timer';
-import { createReplayerService } from './fsm';
+import createReplayerService from './fsm';
 import getInjectStyle from './styles/inject-style';
 
 import {
@@ -429,6 +423,68 @@ class Player {
     }
   }
 
+  private rebuildFullSnapshot(event: TEventWithTime & FullSnapshotEvent) {
+    const contentDocument = this.$iframe.contentDocument!;
+
+    rebuild(event.data.adds, contentDocument);
+
+    const $style = document.createElement('style');
+    const { documentElement, head } = contentDocument;
+    documentElement.insertBefore($style, head);
+    const injectStylesRules = getInjectStyle().concat(
+      this.config.insertStyleRules
+    );
+
+    for (let ind = 0; ind < injectStylesRules.length && $style.sheet; ind++) {
+      $style.sheet.insertRule(injectStylesRules[ind], ind);
+    }
+
+    this.emit('fullsnapshot_rebuilded');
+  }
+
+  private getCastFn(event: TEventWithTime, isSync = false) {
+    let castFn: Function;
+    switch (event.type) {
+      case EventType.DOM_CONTENT_LOADED:
+      case EventType.LOADED: {
+        break;
+      }
+      case EventType.META: {
+        castFn = () => {
+          const { width, height } = event.data;
+          this.emit('resize', { width, height });
+        };
+        break;
+      }
+      case EventType.FULL_SNAPSHOT: {
+        castFn = () => {
+          this.rebuildFullSnapshot(event);
+          this.$iframe.contentWindow!.scrollTo(event.data.offset);
+        };
+        break;
+      }
+      case EventType.INCREMENTAL_SNAPSHOT: {
+        castFn = () => {
+          this.applyIncremental(event, isSync);
+        };
+        break;
+      }
+    }
+
+    const wrappedCastFn = () => {
+      if (castFn) {
+        castFn();
+      }
+
+      this.lastPlayedEvent = event;
+      if (event === this.events[this.events.length - 1]) {
+        this.emit('finish');
+      }
+    };
+
+    return wrappedCastFn;
+  }
+
   public getMetaData(): PlayerMetaData {
     const firstEvent = this.events[0];
     const lastEvent = this.events[this.events.length - 1];
@@ -443,6 +499,54 @@ class Player {
     this.timer.clear();
     this.service.send({ type: 'pause' });
     this.emit('pause');
+  }
+
+  public play(timeOffset = 0) {
+    this.timer.clear();
+    this.baselineTime = this.events[0].timestamp + timeOffset;
+    const actions: ActionWithDelay[] = [];
+    for (const event of this.events) {
+      const isSync = event.timestamp < this.baselineTime;
+      const castFn = this.getCastFn(event, isSync);
+      if (isSync) castFn();
+      else {
+        actions.push({
+          doAction: () => {
+            castFn();
+            this.emit('event_cast', event);
+          },
+          delay: this.getDelay(event)
+        });
+      }
+    }
+    this.timer.addActions(actions);
+    this.timer.start();
+    this.service.send({ type: 'play' });
+    this.emit('start');
+  }
+
+  public resume(timeOffset = 0) {
+    this.timer.clear();
+    this.baselineTime = this.events[0].timestamp + timeOffset;
+    const actions: ActionWithDelay[] = [];
+
+    for (const event of this.events) {
+      if (
+        event.timestamp <= this.lastPlayedEvent.timestamp ||
+        event === this.lastPlayedEvent
+      ) {
+        continue;
+      }
+      const castFn = this.getCastFn(event);
+      actions.push({
+        doAction: castFn,
+        delay: this.getDelay(event)
+      });
+    }
+    this.timer.addActions(actions);
+    this.timer.start();
+    this.service.send({ type: 'resume' });
+    this.emit('resume');
   }
 }
 
