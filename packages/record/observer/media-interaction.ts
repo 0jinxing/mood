@@ -4,13 +4,13 @@ import { IncrementalSource } from '../constant';
 
 export type MediaInteractions = 'play' | 'pause';
 
-export type MediaInteractionCbParam = {
+export type MediaInteractionData = {
   source: IncrementalSource.MEDIA_INTERACTION;
   act: MediaInteractions;
   id: number;
 };
 
-export type MediaInteractionCb = (param: MediaInteractionCbParam) => void;
+export type MediaInteractionCb = (param: MediaInteractionData) => void;
 
 function mediaInteractionObserve(cb: MediaInteractionCb) {
   const handler = (act: MediaInteractions) => (event: Event) => {

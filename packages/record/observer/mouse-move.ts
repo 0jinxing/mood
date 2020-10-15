@@ -10,12 +10,12 @@ export type MousePosition = {
   timeOffset: number;
 };
 
-export type MousemoveCbParam = {
+export type MouseMoveData = {
   source: IncrementalSource.MOUSE_MOVE | IncrementalSource.TOUCH_MOVE;
   positions: MousePosition[];
 };
 
-export type MousemoveCb = (param: MousemoveCbParam) => void;
+export type MousemoveCb = (param: MouseMoveData) => void;
 
 function mouseMoveObserve(cb: MousemoveCb) {
   let positions: MousePosition[] = [];

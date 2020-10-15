@@ -1,20 +1,20 @@
 import { IncrementalSource } from '../constant';
 
-export type XhrCbParam = {
+export type XhrData = {
   source: IncrementalSource.REQUEST_XHR;
   method: string;
   url: string;
   statusText?: string;
 };
 
-export type XhrCb = (param: XhrCbParam) => void;
+export type XhrCb = (param: XhrData) => void;
 
 const xmlHttp = XMLHttpRequest;
 const originOpen = xmlHttp.prototype.open;
 const originSend = xmlHttp.prototype.send;
 
 function xhrObserve(cb: XhrCb) {
-  const dataMap = new WeakMap<XhrCbParam>();
+  const dataMap = new WeakMap<XhrData>();
 
   xmlHttp.prototype.open = function (
     method: string,

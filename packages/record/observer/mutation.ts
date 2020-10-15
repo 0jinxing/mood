@@ -38,7 +38,7 @@ export type AttrMutation = {
   attributes: Attributes;
 };
 
-export type MutationCbParam = {
+export type MutationData = {
   source: IncrementalSource.MUTATION;
   texts: TextMutation[];
   attributes: AttrMutation[];
@@ -46,7 +46,7 @@ export type MutationCbParam = {
   adds: AddedNodeMutation[];
 };
 
-export type MutationCb = (param: MutationCbParam) => void;
+export type MutationCb = (param: MutationData) => void;
 
 const genKey = (id: number, parentId: number) => `${id}@${parentId}`;
 
@@ -194,7 +194,7 @@ function mutationObserve(cb: MutationCb) {
       pushAdd(addQueue.shift()!);
     }
 
-    const payload: MutationCbParam = {
+    const payload: MutationData = {
       source: IncrementalSource.MUTATION,
 
       texts: texts

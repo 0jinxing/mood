@@ -3,7 +3,7 @@ import { mirror } from '@mood/snapshot';
 
 import { IncrementalSource, MouseInteractions } from '../constant';
 
-export type MouseInteractionCbParam = {
+export type MouseInteractionData = {
   source: IncrementalSource.MOUSE_INTERACTION;
   act: MouseInteractions;
   id: number;
@@ -11,7 +11,7 @@ export type MouseInteractionCbParam = {
   y: number;
 };
 
-export type MouseInteractionCb = (param: MouseInteractionCbParam) => void;
+export type MouseInteractionCb = (param: MouseInteractionData) => void;
 
 function mouseInteractionObserve(cb: MouseInteractionCb) {
   const handlers: VoidFunction[] = [];

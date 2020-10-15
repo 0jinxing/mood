@@ -3,7 +3,7 @@ import { snapshot } from '@mood/snapshot';
 import observe from './combine';
 import { on, queryWindowHeight, queryWindowWidth } from './utils';
 
-import { TEvent, TEventWithTime, EmitFn } from './types';
+import { TEvent, TEventWithTime, EmitHandle } from './types';
 import { EventType } from './constant';
 
 export type RecordOptions<T> = {
@@ -51,19 +51,17 @@ function record(options: RecordOptions<TEvent>) {
     wrappedEmit(withTimestamp(event), isCheckout);
   };
 
-  const incEmitWithTime: EmitFn = data => {
-    wrappedEmitWithTime({ type: EventType.INCREMENTAL_SNAPSHOT, data });
+  const incEmitWithTime: EmitHandle = data => {
+    wrappedEmitWithTime({ type: EventType.INCREMENTAL_SNAPSHOT, ...data });
   };
 
   const takeFullSnapshot = (isCheckout?: true) => {
     wrappedEmitWithTime(
       {
         type: EventType.META,
-        data: {
-          href: location.href,
-          width: queryWindowWidth(),
-          height: queryWindowHeight()
-        }
+        href: location.href,
+        width: queryWindowWidth(),
+        height: queryWindowHeight()
       },
       isCheckout
     );
@@ -76,24 +74,22 @@ function record(options: RecordOptions<TEvent>) {
 
     wrappedEmitWithTime({
       type: EventType.FULL_SNAPSHOT,
-      data: {
-        adds,
-        offset: {
-          left:
-            window.pageXOffset !== undefined
-              ? window.pageXOffset
-              : document?.documentElement.scrollLeft ||
-                document?.body?.parentElement?.scrollLeft ||
-                document?.body.scrollLeft ||
-                0,
-          top:
-            window.pageYOffset !== undefined
-              ? window.pageYOffset
-              : document?.documentElement.scrollTop ||
-                document?.body?.parentElement?.scrollTop ||
-                document?.body.scrollTop ||
-                0
-        }
+      adds,
+      offset: {
+        left:
+          window.pageXOffset !== undefined
+            ? window.pageXOffset
+            : document?.documentElement.scrollLeft ||
+              document?.body?.parentElement?.scrollLeft ||
+              document?.body.scrollLeft ||
+              0,
+        top:
+          window.pageYOffset !== undefined
+            ? window.pageYOffset
+            : document?.documentElement.scrollTop ||
+              document?.body?.parentElement?.scrollTop ||
+              document?.body.scrollTop ||
+              0
       }
     });
   };
@@ -137,7 +133,7 @@ export function addCustomEvent<T>(tag: string, payload: T) {
   if (!wrappedEmitWithTime) {
     throw new Error('please add custom event after start recording');
   }
-  wrappedEmitWithTime({ type: EventType.CUSTOM, data: { tag, payload } });
+  wrappedEmitWithTime({ type: EventType.CUSTOM, tag, payload });
 }
 
 export * from './types';

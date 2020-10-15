@@ -1,12 +1,12 @@
 import { IncrementalSource } from '../constant';
-export type FetchCbParam = {
+export type FetchData = {
   source: IncrementalSource.REQUEST_FETCH;
   input: RequestInfo;
   init?: RequestInit;
   error: Error | null;
 };
 
-export type FetchCb = (param: FetchCbParam) => void;
+export type FetchCb = (param: FetchData) => void;
 
 const originFetch = fetch;
 

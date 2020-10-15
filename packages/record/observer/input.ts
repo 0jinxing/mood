@@ -4,13 +4,13 @@ import { hookSetter, on } from '../utils';
 
 export type InputValue = string | boolean;
 
-export type InputCbParam = {
+export type InputData = {
   source: IncrementalSource.INPUT;
   id: number;
   value: InputValue;
 };
 
-export type InputCb = (param: InputCbParam) => void;
+export type InputCb = (param: InputData) => void;
 
 const lastInputValueMap: WeakMap<EventTarget, InputValue> = new WeakMap();
 

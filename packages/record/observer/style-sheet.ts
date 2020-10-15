@@ -10,14 +10,14 @@ export type StyleSheetAddRule = {
   index?: number;
 };
 
-export type StyleSheetCbParam = {
+export type StyleSheetData = {
   source: IncrementalSource.STYLE_SHEETRULE;
   id: number;
   removes?: StyleSheetDeleteRule[];
   adds?: StyleSheetAddRule[];
 };
 
-export type StyleSheetCb = (param: StyleSheetCbParam) => void;
+export type StyleSheetCb = (param: StyleSheetData) => void;
 
 function styleSheetObserve(cb: StyleSheetCb) {
   const insertRule = CSSStyleSheet.prototype.insertRule;

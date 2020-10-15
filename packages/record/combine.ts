@@ -11,7 +11,7 @@ import fetchObserve from './observer/request-fetch';
 import logObserve from './observer/log';
 import errorObserve from './observer/global-error';
 
-import { EmitFn } from './types';
+import { EmitHandle } from './types';
 
 const observers = [
   mutationObserve,
@@ -28,7 +28,7 @@ const observers = [
   errorObserve
 ];
 
-export default function observe(emit: EmitFn) {
+export default function observe(emit: EmitHandle) {
   const handlers = observers.map(o => o(emit));
 
   return () => {

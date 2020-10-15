@@ -1,11 +1,11 @@
 import { IncrementalSource } from '../constant';
 
-export type ErrorCbParam = {
+export type ErrorData = {
   source: IncrementalSource.GLOBAL_ERROR;
   message: string;
 };
 
-export type ErrorCb = (param: ErrorCbParam) => void;
+export type ErrorCb = (param: ErrorData) => void;
 
 function errorObserve(cb: ErrorCb) {
   const errorHandler = (ev: ErrorEvent | PromiseRejectionEvent) => {

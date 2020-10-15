@@ -2,14 +2,14 @@ import { on, throttle } from '../utils';
 import { mirror, TNode } from '@mood/snapshot';
 import { IncrementalSource } from '../constant';
 
-export type ScrollCbParam = {
+export type ScrollData = {
   source: IncrementalSource.SCROLL;
   id: number;
   x: number;
   y: number;
 };
 
-export type ScrollCb = (param: ScrollCbParam) => void;
+export type ScrollCb = (param: ScrollData) => void;
 
 function scrollObserve(cb: ScrollCb) {
   const updatePosition = throttle<UIEvent>(event => {

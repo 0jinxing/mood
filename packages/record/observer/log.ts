@@ -3,7 +3,7 @@ import { plain } from '../utils';
 
 export type LogLevel = 'log' | 'warn' | 'error' | 'debug';
 
-export type LogCbParam = {
+export type LogData = {
   source: IncrementalSource.LOG;
   level: LogLevel;
   args: unknown;
@@ -11,7 +11,7 @@ export type LogCbParam = {
 
 export const LOG_LEVELS: Array<LogLevel> = ['log', 'warn', 'error', 'debug'];
 
-export type LogCb = (param: LogCbParam) => void;
+export type LogCb = (param: LogData) => void;
 
 const origin = LOG_LEVELS.reduce((origin, key) => {
   origin[key] = console[key];

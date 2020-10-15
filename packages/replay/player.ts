@@ -14,7 +14,7 @@ import {
   MouseInteractions
 } from '@mood/record/constant';
 import { AddedNodeMutation } from '@mood/record/observer/mutation';
-import { ViewportResizeCbParam } from '@mood/record/observer/viewport-resize';
+import { ViewportResizeData } from '@mood/record/observer/viewport-resize';
 
 import { ActionWithDelay } from './types';
 
@@ -134,7 +134,7 @@ class Player {
     this.timer.setSpeed(this.config.speed);
   }
 
-  private handleResize(dimension: ViewportResizeCbParam) {
+  private handleResize(dimension: ViewportResizeData) {
     this.$iframe.width = `${dimension.width}px`;
     this.$iframe.height = `${dimension.height}px`;
   }
@@ -146,9 +146,9 @@ class Player {
   private getDelay(event: TEventWithTime): number {
     if (
       event.type === EventType.INCREMENTAL_SNAPSHOT &&
-      (event.data.source === MOUSE_MOVE || event.data.source === TOUCH_MOVE)
+      (event.source === MOUSE_MOVE || event.source === TOUCH_MOVE)
     ) {
-      const firstOffset = event.data.positions[0].timeOffset;
+      const firstOffset = event.positions[0].timeOffset;
       const firstTimestamp = event.timestamp + firstOffset;
       return firstTimestamp - this.baselineTime;
     }
@@ -185,11 +185,11 @@ class Player {
     event: TEventWithTime & { type: EventType.INCREMENTAL_SNAPSHOT },
     isSync: boolean
   ) {
-    const { data, timestamp } = event;
+    const { timestamp } = event;
 
-    switch (data.source) {
+    switch (event.source) {
       case MUTATION: {
-        data.removes.forEach(rm => {
+        event.removes.forEach(rm => {
           const $el = mirror.getNode(rm.id);
           const $parent = mirror.getNode(rm.parentId);
           if (!$el) {
@@ -240,7 +240,7 @@ class Player {
           }
         };
 
-        data.adds.forEach(add => {
+        event.adds.forEach(add => {
           appendNode(add);
         });
 
@@ -255,7 +255,7 @@ class Player {
           appendNode(mutation);
         }
 
-        data.texts.forEach(mutation => {
+        event.texts.forEach(mutation => {
           const $target = mirror.getNode(mutation.id);
           if (!$target) {
             return;
@@ -263,7 +263,7 @@ class Player {
           $target.textContent = mutation.value;
         });
 
-        data.attributes.forEach(mutation => {
+        event.attributes.forEach(mutation => {
           const $target = mirror.getNode<Element>(mutation.id);
           if (!$target) {
             return;
@@ -282,10 +282,10 @@ class Player {
 
       case MOUSE_MOVE: {
         if (isSync) {
-          const lastPosition = data.positions[data.positions.length - 1];
+          const lastPosition = event.positions[event.positions.length - 1];
           this.moveAndHover(lastPosition.x, lastPosition.y, lastPosition.id);
         } else {
-          data.positions.forEach(mutation => {
+          event.positions.forEach(mutation => {
             const action = {
               doAction: () => {
                 this.moveAndHover(mutation.x, mutation.y, mutation.id);
@@ -299,14 +299,12 @@ class Player {
       }
 
       case MOUSE_INTERACTION: {
-        const $target = mirror.getNode<HTMLElement>(data.id);
+        const $target = mirror.getNode<HTMLElement>(event.id);
         if (!$target) break;
 
-        const event = new Event(MouseInteractions[data.act]);
+        this.emit('mouse_interaction', { type: event.act, $target });
 
-        this.emit('mouse_interaction', { type: data.act, $target });
-
-        switch (data.act) {
+        switch (event.act) {
           case MouseInteractions.blur: {
             // TODO
             break;
@@ -319,7 +317,7 @@ class Player {
           case MouseInteractions.touchend:
           case MouseInteractions.touchstart: {
             if (!isSync) {
-              this.moveAndHover(data.x, data.y, data.id);
+              this.moveAndHover(event.x, event.y, event.id);
               this.$cursor.classList.remove('active');
               setTimeout(() => {
                 this.$cursor.classList.add('active');
@@ -328,26 +326,27 @@ class Player {
             break;
           }
           default: {
-            $target.dispatchEvent(event);
+            const ev = new Event(MouseInteractions[event.act]);
+            $target.dispatchEvent(ev);
           }
         }
         break;
       }
 
       case SCROLL: {
-        const $target = mirror.getNode<HTMLElement>(data.id);
+        const $target = mirror.getNode<HTMLElement>(event.id);
         if (!$target) break;
 
         if (($target as Node) === this.$iframe.contentDocument) {
           this.$iframe.contentWindow!.scrollTo({
-            top: data.y,
-            left: data.x,
+            top: event.y,
+            left: event.x,
             behavior: isSync ? 'auto' : 'smooth'
           });
         } else {
           try {
-            $target.scrollTop = data.y;
-            $target.scrollLeft = data.x;
+            $target.scrollTop = event.y;
+            $target.scrollLeft = event.x;
           } catch (err) {
             /**
              * Seldomly we may found scroll target was removed before
@@ -359,47 +358,47 @@ class Player {
       }
 
       case VIEWPORT_RESIZE: {
-        this.emit('resize', { width: data.width, height: data.height });
+        this.emit('resize', { width: event.width, height: event.height });
         break;
       }
 
       case MEDIA_INTERACTION: {
-        const $target = mirror.getNode<HTMLMediaElement>(data.id);
+        const $target = mirror.getNode<HTMLMediaElement>(event.id);
         if (!$target) break;
 
-        if (data.act === 'play') {
+        if (event.act === 'play') {
           if ($target.readyState >= HTMLMediaElement.HAVE_CURRENT_DATA) {
             $target.play();
           } else {
             $target.addEventListener('canplay', () => $target.play());
           }
-        } else if (data.act === 'pause') {
+        } else if (event.act === 'pause') {
           $target.pause();
         }
         break;
       }
 
       case INPUT: {
-        const $target = mirror.getNode<HTMLInputElement>(data.id);
+        const $target = mirror.getNode<HTMLInputElement>(event.id);
 
         if (!$target) break;
 
-        if (typeof data.value === 'boolean') {
-          $target.checked = data.value;
+        if (typeof event.value === 'boolean') {
+          $target.checked = event.value;
         } else {
-          $target.value = data.value;
+          $target.value = event.value;
         }
         break;
       }
 
       case STYLE_SHEETRULE: {
-        const $target = mirror.getNode<HTMLStyleElement>(data.id);
+        const $target = mirror.getNode<HTMLStyleElement>(event.id);
         if (!$target) break;
 
         const styleSheet = <CSSStyleSheet>$target.sheet;
 
-        if (data.adds) {
-          data.adds.forEach(({ rule, index }) => {
+        if (event.adds) {
+          event.adds.forEach(({ rule, index }) => {
             const insertIndex =
               index === undefined
                 ? undefined
@@ -415,8 +414,8 @@ class Player {
           });
         }
 
-        if (data.removes) {
-          data.removes.forEach(({ index }) => styleSheet.deleteRule(index));
+        if (event.removes) {
+          event.removes.forEach(({ index }) => styleSheet.deleteRule(index));
         }
         break;
       }
@@ -426,7 +425,7 @@ class Player {
   private rebuildFullSnapshot(event: TEventWithTime & FullSnapshotEvent) {
     const contentDocument = this.$iframe.contentDocument!;
 
-    rebuild(event.data.adds, contentDocument);
+    rebuild(event.adds, contentDocument);
 
     const $style = document.createElement('style');
     const { documentElement, head } = contentDocument;
@@ -451,7 +450,7 @@ class Player {
       }
       case EventType.META: {
         castFn = () => {
-          const { width, height } = event.data;
+          const { width, height } = event;
           this.emit('resize', { width, height });
         };
         break;
@@ -459,7 +458,7 @@ class Player {
       case EventType.FULL_SNAPSHOT: {
         castFn = () => {
           this.rebuildFullSnapshot(event);
-          this.$iframe.contentWindow!.scrollTo(event.data.offset);
+          this.$iframe.contentWindow!.scrollTo(event.offset);
         };
         break;
       }
