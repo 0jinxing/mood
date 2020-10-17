@@ -67,13 +67,6 @@ function serialize($node: Node, $doc: HTMLDocument): SerializedNode | null {
       }
     }
 
-    if ($node instanceof HTMLStyleElement) {
-      const cssText = getCSSText($node.sheet as CSSStyleSheet);
-      if (cssText) {
-        attributes.cssText = absoluteToStylesheet(cssText);
-      }
-    }
-
     // handle form fields
     if ($node instanceof HTMLInputElement) {
       const type = attributes.type;
