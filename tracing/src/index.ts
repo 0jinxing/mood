@@ -1,18 +1,22 @@
 import record from '@mood/record';
-import { currentSesstionId } from './utils/sessionId';
-import getStorage from './storage';
+import getStorage, { StorageConfig } from './storage';
+import getReport, { ReportCofig } from './report';
 
-async function mood() {
-  const sessionId = currentSesstionId();
-  console.log(sessionId);
-  const db = getStorage();
+export type TracingConfig = {
+  report: ReportCofig;
+  storage?: StorageConfig;
+};
+
+async function tracing(config: TracingConfig) {
+  const storage = getStorage(config.storage);
+  const report = getReport(config.report);
 
   record({
     emit: async event => {
       if (typeof event === 'string') return;
-      db.add([{ ...event, timestamp: Date.now() }]);
+      const res = storage.add([event]);
     }
   });
 }
 
-export default mood;
+export default tracing;
