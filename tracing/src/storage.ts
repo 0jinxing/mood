@@ -1,31 +1,20 @@
 import { TEventWithTime } from '@mood/record';
-import { openDB, deleteDB, DBSchema, IDBPDatabase } from 'idb';
+import { openDB, deleteDB, DBSchema } from 'idb';
+import { TEventWithTimeAndSession } from './types';
+import { currentSesstionId } from './utils/sessionId';
 
-const DB_NAME = 'mood_db';
+const DB_NAME = 'mood_db@@event';
 const DB_VERSION = 1;
-const EXPIRES = 0; // 0.5d
-
-export type DBStorage = {
-  last: number;
-  db$: Promise<IDBPDatabase<MoodDBSchema>>;
-
-  get: (
-    query: number | IDBKeyRange
-  ) => Promise<TEventWithTimeAndPk | TEventWithTimeAndPk[]>;
-  add: (events: TEventWithTimeAndPk[]) => void;
-  clear: () => void;
-};
-
-export type TEventWithTimeAndPk = TEventWithTime & { _pk?: number };
 
 export interface MoodDBSchema extends DBSchema {
   events: {
-    value: TEventWithTimeAndPk;
+    value: TEventWithTimeAndSession;
     key: number;
     indexes: {
       type: number;
       source: number;
       timestamp: number;
+      session: string;
     };
   };
 }
@@ -47,30 +36,35 @@ async function getDB() {
   return db;
 }
 
-let storage: DBStorage;
+export type StorageConfig = {
+  expires: number;
+};
+const defaultConfig = { expires: 1000 * 60 * 60 * 12 };
 
-function getDbStorage() {
-  if (storage) return storage;
+function getDbStorage(partialConfig?: Partial<StorageConfig>) {
+  const config = Object.assign({}, defaultConfig, partialConfig);
+
   const db$ = getDB();
-  storage = {
+  const storage = {
     db$,
     last: 0,
-    async get(query: number | IDBKeyRange) {
-      const db = await db$;
-      return db.getAll('events', query);
-    },
 
     async add(events: TEventWithTime[]) {
       const db = await db$;
 
       const tx = db.transaction('events', 'readwrite');
-      await Promise.all(events.map(e => tx.db.add('events', e)));
+      const result = await Promise.all(
+        events.map(e =>
+          tx.db.add('events', { ...e, session: currentSesstionId() })
+        )
+      );
       await tx.done;
+      return result;
     },
 
     async clear() {
       const db = await db$;
-      const range = IDBKeyRange.upperBound(Date.now() - EXPIRES);
+      const range = IDBKeyRange.upperBound(Date.now() - config.expires);
 
       const tx = db.transaction('events', 'readwrite');
       const events = await tx.db.getAllFromIndex('events', 'timestamp', range);

@@ -6,8 +6,8 @@ import { on, queryWindowHeight, queryWindowWidth } from './utils';
 import { TEvent, TEventWithTime, EmitHandle } from './types';
 import { EventType } from './constant';
 
-export type RecordOptions<T> = {
-  emit: (e: T | string, isCheckout?: true) => void;
+export type RecordOptions = {
+  emit: (e: TEventWithTime | string, isCheckout?: true) => void;
   checkoutEveryNth?: number;
   checkoutEveryNms?: number;
 };
@@ -19,7 +19,7 @@ function withTimestamp(e: TEvent): TEventWithTime {
 let wrappedEmit!: (e: TEventWithTime, isCheckout?: true) => void;
 let wrappedEmitWithTime!: (e: TEvent, isCheckout?: true) => void;
 
-function record(options: RecordOptions<TEvent>) {
+function record(options: RecordOptions) {
   const { emit, checkoutEveryNms, checkoutEveryNth } = options;
 
   let lastFullSnapshotEvent: TEventWithTime;
