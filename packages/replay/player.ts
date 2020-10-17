@@ -4,17 +4,14 @@ import type { MittStatic, Handler } from 'mitt';
 import rebuild, { buildNodeWithSN } from '@mood/snapshot/rebuild';
 import { mirror } from '@mood/snapshot';
 import { TEventWithTime, FullSnapshotEvent } from '@mood/record';
+import { EventType, IncrementalSource } from '@mood/record/constant';
+
+import { AddedNodeMutation } from '@mood/record/observer/mutation';
+import { ViewportResizeData } from '@mood/record/observer/viewport-resize';
+
 import Timer from './timer';
 import createReplayerService from './fsm';
 import getInjectStyle from './styles/inject-style';
-
-import {
-  EventType,
-  IncrementalSource,
-  MouseInteractions
-} from '@mood/record/constant';
-import { AddedNodeMutation } from '@mood/record/observer/mutation';
-import { ViewportResizeData } from '@mood/record/observer/viewport-resize';
 
 import { ActionWithDelay } from './types';
 
@@ -54,7 +51,7 @@ export type PlayerEmitterEvent =
   | 'resume'
   | 'resize'
   | 'finish'
-  | 'fullsnapshot_rebuilded'
+  | 'full_snapshot_rebuilded'
   | 'load_stylesheet_start'
   | 'load_stylesheet_end'
   | 'skip_start'
@@ -81,7 +78,6 @@ class Player {
   private lastPlayedEvent: TEventWithTime;
   private service!: ReturnType<typeof createReplayerService>;
 
-  private nextUserInteractionEvent: TEventWithTime | null = null;
   private config: PlayerConfig = defaultConfig;
 
   constructor(
@@ -305,17 +301,17 @@ class Player {
         this.emit('mouse_interaction', { type: event.act, $target });
 
         switch (event.act) {
-          case MouseInteractions.blur: {
+          case 'blur': {
             // TODO
             break;
           }
-          case MouseInteractions.focus: {
+          case 'focus': {
             // TODO
             break;
           }
-          case MouseInteractions.click:
-          case MouseInteractions.touchend:
-          case MouseInteractions.touchstart: {
+          case 'click':
+          case 'touchend':
+          case 'touchstart': {
             if (!isSync) {
               this.moveAndHover(event.x, event.y, event.id);
               this.$cursor.classList.remove('active');
@@ -326,7 +322,7 @@ class Player {
             break;
           }
           default: {
-            const ev = new Event(MouseInteractions[event.act]);
+            const ev = new Event(event.act);
             $target.dispatchEvent(ev);
           }
         }
@@ -438,7 +434,7 @@ class Player {
       $style.sheet.insertRule(injectStylesRules[ind], ind);
     }
 
-    this.emit('fullsnapshot_rebuilded');
+    this.emit('full_snapshot_rebuilded');
   }
 
   private getCastFn(event: TEventWithTime, isSync = false) {

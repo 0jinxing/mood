@@ -40,12 +40,33 @@ export function throttle<T>(
   };
 }
 
-export function plain(obj: unknown): unknown {
-  try {
-    return JSON.parse(JSON.stringify(obj));
-  } catch {
-    return Object.toString.call(obj);
+export function plain(val: any): unknown {
+  switch (typeof val) {
+    case 'number':
+    case 'boolean':
+    case 'string':
+    case 'undefined': {
+      return val;
+    }
+    case 'object': {
+      if (Symbol.iterator in val) {
+        const reslut = [];
+        for (const i of val) {
+          reslut.push(plain(i));
+        }
+        return reslut;
+      } else if (val instanceof RegExp) {
+        return `RegExp: ${val.source}/${val.flags ?? '[none]'}`;
+      } else if (val) {
+        return Object.getOwnPropertyNames(val).reduce(
+          (obj: any, key) => Object.assign({}, obj, { [key]: plain(val[key]) }),
+          {}
+        );
+      }
+    }
   }
+
+  return Object.prototype.toString.call(val);
 }
 
 export function hookSetter<T>(

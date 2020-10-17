@@ -1,9 +1,11 @@
 import { IncrementalSource } from '../constant';
+import { plain } from '../utils';
+
 export type FetchData = {
   source: IncrementalSource.REQUEST_FETCH;
-  input: RequestInfo;
-  init?: RequestInit;
-  error: Error | null;
+  input: unknown;
+  init?: unknown;
+  error?: unknown;
 };
 
 export type FetchCb = (param: FetchData) => void;
@@ -21,7 +23,12 @@ function fetchObserve(cb: FetchCb) {
       throw err;
     } finally {
       setTimeout(() =>
-        cb({ source: IncrementalSource.REQUEST_FETCH, input, init, error })
+        cb({
+          source: IncrementalSource.REQUEST_FETCH,
+          error: plain(error),
+          input: plain(input),
+          init: plain(init)
+        })
       );
     }
   };

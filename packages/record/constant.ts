@@ -22,15 +22,3 @@ export enum IncrementalSource {
   REQUEST_FETCH,
   GLOBAL_ERROR
 }
-
-export enum MouseInteractions {
-  mouseup,
-  mousedown,
-  click,
-  contexemenu,
-  dbclick,
-  focus,
-  blur,
-  touchstart,
-  touchend
-}
