@@ -49,7 +49,7 @@ export function plain(val: any): unknown {
       return val;
     }
     case 'object': {
-      if (Symbol.iterator in val) {
+      if (val && Symbol.iterator in val) {
         const reslut = [];
         for (const i of val) {
           reslut.push(plain(i));

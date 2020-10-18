@@ -3,24 +3,24 @@ import { TEventWithTime } from '@mood/record';
 import { TEventWithTimeAndSession } from './types';
 import { currentSesstionId } from './utils/sessionId';
 
-export type ReportCofig = {
+export type ReportOptions = {
   url: string;
   uid: string;
 };
 
-export function getReport(config: ReportCofig) {
-  return function (events: TEventWithTimeAndSession[]) {
+export function getReport(options: ReportOptions) {
+  return function (events: Array<TEventWithTime | TEventWithTimeAndSession>) {
     const pickEvents: TEventWithTime[] = events
-      .filter(ev => ev.session === currentSesstionId())
+      .filter(ev => !('session' in ev) || ev.session === currentSesstionId())
       .map(ev => ({ ...ev, session: undefined }));
 
     const data = {
-      uid: config.uid,
+      uid: options.uid,
       session: currentSesstionId(),
       data: deflate(JSON.stringify(pickEvents), { to: 'string' })
     };
 
-    return fetch(config.url, {
+    return fetch(options.url, {
       mode: 'cors',
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },

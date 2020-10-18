@@ -21,6 +21,9 @@ async function bootstrap() {
 
   nestApp.setGlobalPrefix('api');
 
+  nestApp.use(express.json({ limit: '50mb' }));
+  nestApp.use(express.urlencoded({ extended: true, limit: '50mb' }));
+
   nestApp.enableCors();
   await nestApp.init();
 

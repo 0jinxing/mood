@@ -36,13 +36,14 @@ async function getDB() {
   return db;
 }
 
-export type StorageConfig = {
+export type StorageOptions = {
   expires: number;
 };
-const defaultConfig = { expires: 1000 * 60 * 60 * 12 };
 
-function getDbStorage(partialConfig?: Partial<StorageConfig>) {
-  const config = Object.assign({}, defaultConfig, partialConfig);
+const defaultOptions = { expires: 1000 * 60 * 60 * 12 };
+
+function getDbStorage(partialOpts?: Partial<StorageOptions>) {
+  const config = Object.assign({}, defaultOptions, partialOpts);
 
   const db$ = getDB();
   const storage = {

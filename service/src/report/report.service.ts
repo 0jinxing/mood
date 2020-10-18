@@ -1,7 +1,8 @@
-import { ForbiddenException, Injectable } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { Model } from 'mongoose';
 import { InjectModel } from '@nestjs/mongoose';
-import { TEvent, EventType } from '@mood/record';
+import { TEvent } from '@mood/record';
+import { EventType } from '@mood/record/constant';
 import { Report } from './report.schema';
 import { genQueryConditions } from '@/_common/conditions';
 import { AuthService } from '@/auth/auth.service';

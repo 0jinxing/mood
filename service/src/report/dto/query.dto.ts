@@ -1,4 +1,4 @@
-import { EventType } from '@mood/record';
+import { EventType } from '@mood/record/constant';
 
 export class ReportQueryDTO {
   domain?: string;
