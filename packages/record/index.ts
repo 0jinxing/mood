@@ -7,7 +7,7 @@ import { TEvent, TEventWithTime, EmitHandle } from './types';
 import { EventType } from './constant';
 
 export type RecordOptions = {
-  emit: (e: TEventWithTime | string, isCheckout?: true) => void;
+  emit: (e: TEventWithTime, isCheckout?: true) => void;
   checkoutEveryNth?: number;
   checkoutEveryNms?: number;
 };

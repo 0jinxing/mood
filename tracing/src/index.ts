@@ -28,7 +28,6 @@ async function tracing(options: TracingOptions) {
 
   record({
     emit: async ev => {
-      if (typeof ev === 'string') return;
       if (ev.type === EventType.FULL_SNAPSHOT || ev.type === EventType.CUSTOM) {
         await report([ev]);
         lastFullSnapshotEv = ev;
