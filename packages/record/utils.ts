@@ -92,6 +92,10 @@ export function hookSetter<T>(
   return () => hookSetter(target, key, original || {}, true);
 }
 
+export function isNativeFun(fun: Function) {
+  return /\[native\s+code\]/i.test(fun.toString());
+}
+
 // viewport
 
 export function queryWindowHeight(): number {
