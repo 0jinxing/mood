@@ -1,49 +1,80 @@
 import record, { RecordOptions, TEventWithTime } from '@mood/record';
-import getStorage, { StorageOptions } from './storage';
-import getReport, { ReportOptions } from './report';
 import { EventType, IncrementalSource } from '@mood/record/constant';
+import getReport, { ReportOptions } from './report';
 
 export type TracingOptions = {
   report: ReportOptions;
   record: Omit<RecordOptions, 'emit'>;
-  storage: StorageOptions;
 };
 
 async function tracing(options: TracingOptions) {
-  const storage = getStorage(options.storage);
   const report = getReport(options.report);
-  let lastFullSnapshotEv: TEventWithTime | null = null;
 
-  async function reportLast() {
-    const db = await storage.db$;
-    const tx = db.transaction('events');
-    const range = IDBKeyRange.lowerBound(lastFullSnapshotEv?.timestamp);
-    const events = await tx.db.getAllFromIndex('events', 'timestamp', range);
-
-    await report([...events]);
-    await Promise.all(events.map(ev => tx.db.delete('events', ev._pk!)));
-    console.log(events.length);
-    await tx.done;
+  function isSelfEvent(ev: TEventWithTime) {
+    if (ev.type === EventType.INCREMENTAL_SNAPSHOT) {
+      if (ev.source === IncrementalSource.REQUEST_FETCH) {
+        return (
+          typeof ev.input === 'string' && ev.input.includes(options.report.url)
+        );
+      } else if (ev.source === IncrementalSource.REQUEST_XHR) {
+        return ev.url.includes(options.report.url);
+      }
+    }
+    return false;
   }
 
+  let lastFullSnapshotEvent: TEventWithTime | null = null;
+  let events: TEventWithTime[] = [];
   record({
     emit: async ev => {
-      if (ev.type === EventType.FULL_SNAPSHOT || ev.type === EventType.CUSTOM) {
-        await report([ev]);
-        lastFullSnapshotEv = ev;
-        return;
-      } else if (ev.type === EventType.INCREMENTAL_SNAPSHOT) {
-        const globalErr = ev.source === IncrementalSource.GLOBAL_ERROR;
-        
-        const logErr =
-          ev.source === IncrementalSource.LOG && ev.level === 'error';
+      if (isSelfEvent(ev)) return;
+      switch (ev.type) {
+        case EventType.CUSTOM: {
+          report([ev]);
+          break;
+        }
 
-        if (globalErr || logErr) {
-          await Promise.all([reportLast(), report([ev])]);
-          return;
+        case EventType.FULL_SNAPSHOT: {
+          if (
+            !lastFullSnapshotEvent ||
+            Date.now() - lastFullSnapshotEvent.timestamp > 1000 * 60 * 5
+          ) {
+            report([ev]);
+            lastFullSnapshotEvent = ev;
+            events = [];
+          }
+          break;
+        }
+
+        case EventType.INCREMENTAL_SNAPSHOT: {
+          const reportSource = [
+            IncrementalSource.GLOBAL_ERROR,
+            IncrementalSource.LOG,
+            IncrementalSource.REQUEST_FETCH,
+            IncrementalSource.REQUEST_XHR
+          ];
+          if (reportSource.includes(ev.source)) {
+            report([ev]);
+          } else {
+            events.push(ev);
+          }
+
+          const consoleErr =
+            ev.source === IncrementalSource.LOG && ev.level === 'error';
+
+          const globalErr = ev.source === IncrementalSource.GLOBAL_ERROR;
+
+          if (consoleErr || globalErr) {
+            report(events);
+            events = [];
+          }
+          break;
+        }
+
+        default: {
+          report([ev]);
         }
       }
-      storage.add([ev]);
     },
     ...options.record
   });

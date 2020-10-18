@@ -1,6 +1,6 @@
+import 'whatwg-fetch';
 import { deflate } from 'pako';
 import { TEventWithTime } from '@mood/record';
-import { TEventWithTimeAndSession } from './types';
 import { currentSesstionId } from './utils/sessionId';
 
 export type ReportOptions = {
@@ -9,23 +9,19 @@ export type ReportOptions = {
 };
 
 export function getReport(options: ReportOptions) {
-  return function (events: Array<TEventWithTime | TEventWithTimeAndSession>) {
-    const pickEvents: TEventWithTime[] = events
-      .filter(ev => !('session' in ev) || ev.session === currentSesstionId())
-      .map(ev => ({ ...ev, session: undefined }));
-
+  return function (events: Array<TEventWithTime>) {
     const data = {
       uid: options.uid,
       session: currentSesstionId(),
-      data: deflate(JSON.stringify(pickEvents), { to: 'string' })
+      data: deflate(JSON.stringify(events), { to: 'string' })
     };
 
-    return fetch(options.url, {
+    fetch(options.url, {
       mode: 'cors',
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(data)
-    });
+    }).catch(() => { /* ignore */ });
   };
 }
 

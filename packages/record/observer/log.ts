@@ -20,7 +20,7 @@ const origin = LOG_LEVELS.reduce((origin, key) => {
 
 function logObserve(cb: LogCb) {
   const handlers = LOG_LEVELS.map(key => {
-    console[key] = function (...args: unknown[]) {
+    window.console[key] = function (...args: unknown[]) {
       
       setTimeout(() =>
         cb({ source: IncrementalSource.LOG, level: key, args: plain(args) })
@@ -29,7 +29,7 @@ function logObserve(cb: LogCb) {
     };
 
     return () => {
-      LOG_LEVELS.forEach(key => (console[key] = origin[key]));
+      LOG_LEVELS.forEach(key => (window.console[key] = origin[key]));
     };
   });
 
