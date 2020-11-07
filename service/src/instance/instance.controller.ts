@@ -2,8 +2,9 @@ import { Controller, Post, Body, UseGuards, Get, Delete } from '@nestjs/common';
 import { InstanceService } from './instance.service';
 import { InstanceCreateDTO } from './dto/create.dto';
 import { AuthGuard } from '@/auth/auth.guard';
-import { InstanceQueryDTO } from './dto/query.dto';
 import { InstanceDeleteDTO } from './dto/delete.dto';
+import { QueryConditions } from '@/_common/conditions';
+import { Instance } from './instance.schema';
 
 @Controller('instance')
 export class InstanceController {
@@ -17,7 +18,7 @@ export class InstanceController {
 
   @Get()
   @UseGuards(AuthGuard)
-  query(@Body() conditions: InstanceQueryDTO) {
+  query(@Body() conditions: QueryConditions<Instance>) {
     return this.instanceService.query(conditions);
   }
 

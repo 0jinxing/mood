@@ -1,11 +1,8 @@
 import request from '@/utils/request';
 import API from '@/constants/api';
+import { Pagination, PaginationResult } from '@/utils/pagination';
 
-type QueryInstanceListParams = {
-  domain?: string;
-  skip?: number;
-  limit?: number;
-};
+type QueryInstanceListParams = { domain?: string } & Pagination;
 
 export type Instance = {
   domain: string;
@@ -15,7 +12,7 @@ export type Instance = {
 };
 
 export const queryInstance = (param: QueryInstanceListParams) => {
-  return request<{ list: Instance[]; total: number }>(API.INSTANCE, {
+  return request<PaginationResult<Instance>>(API.INSTANCE, {
     headers: { 'Content-Type': 'application/json' },
     body: param
   });

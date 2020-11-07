@@ -2,9 +2,7 @@ import React, { useState, useEffect } from 'react';
 import dayjs from 'dayjs';
 import { queryInstance, Instance } from '@/services/instance';
 
-import CreateInstanceDialog, {
-  CreateValues
-} from './components/InstanceCreateDialog';
+import CreateInstanceDialog from './components/InstanceCreateDialog';
 
 import { Button, Table, Tag, Input, Form } from 'antd';
 import PageToolbar from '@/components/PageToolbar';
@@ -14,6 +12,7 @@ import styles from './InstanceList.scss';
 import { useForm } from 'antd/lib/form/Form';
 import { PaginationPage } from '@/common/types/pagination-page';
 import useAsyncEffect from '@/hooks/useAsyncEffect';
+import pagination from '@/utils/pagination';
 
 const { Column } = Table;
 
@@ -26,7 +25,7 @@ const InstanceList = () => {
 
   const [createVisible, setCreateVisible] = useState(false);
 
-  const createInstanceSubmit = (value: CreateValues) => {
+  const createInstanceSuccess = () => {
     queryList();
     setCreateVisible(false);
   };
@@ -51,10 +50,10 @@ const InstanceList = () => {
   const queryList = async () => {
     try {
       setListLoading(true);
-      const skip = (pageParams.page - 1) * pageParams.pageSize;
-      const limit = pageParams.pageSize;
-
-      const data = await queryInstance({ ...searchParams, skip, limit });
+      const data = await queryInstance({
+        ...searchParams,
+        ...pagination(pageParams)
+      });
       setList(data.list);
       setTotal(data.total);
 
@@ -148,7 +147,7 @@ const InstanceList = () => {
       <CreateInstanceDialog
         visible={createVisible}
         onCancel={createInstanceCancel}
-        onSubmit={createInstanceSubmit}
+        onSuccess={createInstanceSuccess}
       />
     </div>
   );

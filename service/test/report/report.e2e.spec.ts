@@ -4,6 +4,7 @@ import { expect } from 'chai';
 import * as request from 'supertest';
 import { cleanUp } from 'test/clean-up';
 import { createApp } from 'test/create-app';
+import { deflate } from 'pako';
 
 const eventData = require('./event-data.json');
 
@@ -41,7 +42,11 @@ describe('report e2e', async () => {
     const reportRes = await request(app.getHttpServer())
       .post('/event')
       .set('Authorization', `bearer ${token}`)
-      .send({ uid, events: eventData });
+      .send({
+        uid,
+        session: 'mock_session',
+        data: deflate(JSON.stringify(eventData), { to: 'string' })
+      });
     const { count } = reportRes.body;
     expect(count).eq(eventData.length);
   });

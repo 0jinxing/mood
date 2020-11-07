@@ -8,7 +8,8 @@ const API = {
 
   QUERY_CURRENT: URL_PREFIX + '/api/auth/current',
 
-  INSTANCE: URL_PREFIX + '/api/instance'
+  INSTANCE: URL_PREFIX + '/api/instance',
+  EVENT: URL_PREFIX + '/api/event'
 };
 
 export default API;

@@ -9,13 +9,13 @@ export type CreateValues = {
 
 type InstanceCreateDialogProps = {
   visible: boolean;
-  onSubmit: (values: CreateValues) => void;
+  onSuccess: (values: CreateValues) => void;
   onCancel: () => void;
 };
 
 const InstanceCreateDialog: FC<InstanceCreateDialogProps> = ({
   visible,
-  onSubmit,
+  onSuccess: onSubmit,
   onCancel
 }) => {
   const [form] = useForm();

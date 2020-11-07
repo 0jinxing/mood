@@ -23,7 +23,9 @@ export class InstanceService {
       session.startTransaction();
 
       const instance = await this.instanceModel.create({ uid, domain });
-      await current.updateOne({ $push: { instances: instance._id } });
+      await current.updateOne({
+        $push: { uids: instance.uid }
+      });
 
       await session.commitTransaction();
 
@@ -45,32 +47,31 @@ export class InstanceService {
 
     const instances = await this.instanceModel
       .find(query)
-      .where({ _id: { $in: current.instances } })
+      .where({ uid: { $in: current.uids } })
       .skip(skip)
       .limit(limit)
       .exec();
 
-    const total = current.instances.length;
+    const total = current.uids.length;
 
     return { list: instances, total };
   }
 
-  async delete(id: Types.ObjectId | Types.ObjectId[]) {
-    const ids = Array.isArray(id) ? id : [id];
+  async delete(uids: string | string[]) {
+    uids = Array.isArray(uids) ? uids : [uids];
+
     const current = await this.authService.getCurrent();
 
-    const isOwner = ids.every(id => {
-      return current.instances.includes(id);
-    });
+    const isOwner = uids.every(id => current.uids.includes(id));
 
     if (isOwner) {
       const session = await this.connection.startSession();
 
       try {
-        await current.updateOne({ $pullAll: { instances: ids } });
+        await current.updateOne({ $pullAll: { uids: uids } });
 
         const { deletedCount } = await this.instanceModel.deleteMany({
-          _id: { $in: ids }
+          uid: { $in: uids }
         });
 
         return { deletedCount };

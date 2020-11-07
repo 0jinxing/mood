@@ -56,28 +56,28 @@ describe('instance e2e', async () => {
     expect(list.length).eq(3);
   });
 
-  let instances: string[];
+  let uids: string[];
   it('query instance', async () => {
     const queryRes = await queryInstance(app, token);
     const { list } = queryRes.body;
-    instances = list.map(({ _id }) => _id);
-    expect(instances.length).eq(3);
+    uids = list.map(({ uid }) => uid);
+    expect(uids.length).eq(3);
 
     const limitRes = await queryInstance(app, token, 0, 2);
     const { list: limitList } = limitRes.body;
 
-    expect(limitList.map(({ _id }) => _id)).deep.eq(instances.slice(0, 2));
+    expect(limitList.map(({ uid }) => uid)).deep.eq(uids.slice(0, 2));
 
     const skipRes = await queryInstance(app, token, 1, 2);
     const { list: skipList } = skipRes.body;
-    expect(skipList.map(({ _id }) => _id)).deep.eq(instances.slice(1, 3));
+    expect(skipList.map(({ uid }) => uid)).deep.eq(uids.slice(1, 3));
   });
 
   it('delete instance', async () => {
     const { body } = await request(app.getHttpServer())
       .delete('/instance')
       .set('Authorization', `bearer ${token}`)
-      .send(instances.slice(0, 1))
+      .send(uids.slice(0, 1))
       .expect(200);
 
     expect(body.deletedCount).eq(1);
@@ -85,9 +85,9 @@ describe('instance e2e', async () => {
     const res = await queryInstance(app, token);
     const { list } = res.body;
 
-    expect(instances.length - list.length).eq(1);
+    expect(uids.length - list.length).eq(1);
 
-    instances = list.map((i: { _id: string }) => i._id);
+    uids = list.map(({ uid }) => uid);
   });
 
   it('batch delete instance', async () => {
@@ -96,9 +96,9 @@ describe('instance e2e', async () => {
     } = await request(app.getHttpServer())
       .delete('/instance')
       .set('Authorization', `bearer ${token}`)
-      .send(instances)
+      .send(uids)
       .expect(200);
 
-    expect(deletedCount).eq(instances.length);
+    expect(deletedCount).eq(uids.length);
   });
 });

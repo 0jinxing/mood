@@ -16,7 +16,7 @@ export class User extends Document {
   passwordSalt: string;
 
   @Prop({ required: true })
-  instances: Array<Types.ObjectId>;
+  uids: string[];
 }
 
 export const UserSchema = SchemaFactory.createForClass(User);

@@ -2,11 +2,12 @@ import { Injectable } from '@nestjs/common';
 import { Model } from 'mongoose';
 import { InjectModel } from '@nestjs/mongoose';
 import { TEvent } from '@mood/record';
-import { EventType } from '@mood/record/constant';
+import { EventType, IncrementalSource } from '@mood/record/constant';
 import { Report } from './report.schema';
 import { genQueryConditions } from '@/_common/conditions';
 import { AuthService } from '@/auth/auth.service';
 import { InstanceService } from '@/instance/instance.service';
+import { ReportQueryDTO } from './dto/query.dto';
 
 @Injectable()
 export class ReportService {
@@ -16,40 +17,41 @@ export class ReportService {
     private instanceService: InstanceService
   ) {}
 
-  async report(uid: string, events: TEvent[]) {
-    const reports = events.map(e => ({ uid, data: e }));
+  async report(uid: string, session: string, events: TEvent[]) {
+    const reports = events.map(e => ({ uid, session, data: e }));
     return this.reportModel.insertMany(reports);
   }
 
-  async query(
-    domain?: string,
-    uid?: string,
-    type?: EventType,
-    skip: number = 0,
-    limit: number = Number.MAX_SAFE_INTEGER
-  ) {
+  async query({
+    domain,
+    uid,
+    session,
+    type,
+    source,
+    skip,
+    limit
+  }: ReportQueryDTO) {
     const current = await this.authService.getCurrent();
 
     const conditions = genQueryConditions({
       domain,
       uid,
-      'data.type': type
+      session,
+      'data.type': type,
+      'data.source': source
     });
 
-    const total = await this.reportModel
-      .find({
-        instance: { $in: current.instances },
+    console.log(skip, limit);
+    const query = () => {
+      return this.reportModel.find({
+        uid: { $in: current.uids },
         ...conditions
-      })
-      .countDocuments();
+      });
+    };
 
-    const list = await this.reportModel
-      .find({
-        instance: { $in: current.instances },
-        ...conditions
-      })
-      .skip(skip)
-      .limit(limit);
+    const total = await query().countDocuments();
+
+    const list = await query().skip(skip).limit(limit);
 
     return { total, list };
   }
