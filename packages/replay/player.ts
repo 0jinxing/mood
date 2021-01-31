@@ -1,7 +1,7 @@
 import * as mittProxy from 'mitt';
 import type { MittStatic, Handler } from 'mitt';
 
-import rebuild, { buildNodeWithSN } from '@mood/snapshot/rebuild';
+import { rebuild, buildNodeWithSN } from '@mood/snapshot/rebuild';
 import { mirror } from '@mood/snapshot';
 import { TEventWithTime, FullSnapshotEvent } from '@mood/record';
 import { EventType, IncrementalSource } from '@mood/record/constant';
@@ -9,13 +9,11 @@ import { EventType, IncrementalSource } from '@mood/record/constant';
 import { AddedNodeMutation } from '@mood/record/observer/mutation';
 import { ViewportResizeData } from '@mood/record/observer/viewport-resize';
 
-import Timer from './timer';
-import createReplayerService from './fsm';
+import { Timer } from './timer';
+import { createReplayerService } from './fsm';
 import getInjectStyle from './styles/inject-style';
 
 import { ActionWithDelay } from './types';
-
-import './styles/index.css';
 
 const mitt: MittStatic = (mittProxy as any).default || mittProxy;
 
@@ -29,10 +27,6 @@ const {
   TOUCH_MOVE,
   MEDIA_INTERACTION,
   STYLE_SHEETRULE
-  // LOG,
-  // REQUEST_XHR,
-  // REQUEST_FETCH,
-  // GLOBAL_ERROR
 } = IncrementalSource;
 
 export type PlayerConfig = {
@@ -65,7 +59,7 @@ const defaultConfig: PlayerConfig = {
   insertStyleRules: []
 };
 
-class Player {
+export class Player {
   private $iframe: HTMLIFrameElement;
 
   private $wrapper: HTMLElement;
@@ -283,7 +277,7 @@ class Player {
         } else {
           event.positions.forEach(mutation => {
             const action = {
-              doAction: () => {
+              execAction: () => {
                 this.moveAndHover(mutation.x, mutation.y, mutation.id);
               },
               delay: mutation.timeOffset + timestamp - this.baselineTime
@@ -506,7 +500,7 @@ class Player {
       if (isSync) castFn();
       else {
         actions.push({
-          doAction: () => {
+          execAction: () => {
             castFn();
             this.emit('event_cast', event);
           },
@@ -534,7 +528,7 @@ class Player {
       }
       const castFn = this.getCastFn(event);
       actions.push({
-        doAction: castFn,
+        execAction: castFn,
         delay: this.getDelay(event)
       });
     }
@@ -544,5 +538,3 @@ class Player {
     this.emit('resume');
   }
 }
-
-export default Player;

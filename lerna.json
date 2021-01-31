@@ -1,5 +1,5 @@
 {
-  "packages": ["packages/*", "tracing", "service", "client", "repl"],
+  "packages": ["packages/*", "examples"],
   "npmClient": "yarn",
   "version": "0.0.0"
 }

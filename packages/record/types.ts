@@ -1,10 +1,7 @@
 import { AddedNode } from '@mood/snapshot';
 import { EventType } from './constant';
 
-import { ErrorData } from './observer/global-error';
-import { FetchData } from './observer/request-fetch';
 import { InputData } from './observer/input';
-import { LogData } from './observer/log';
 import { MediaInteractionData } from './observer/media-interaction';
 import { MouseInteractionData } from './observer/mouse-interaction';
 import { MouseMoveData } from './observer/mouse-move';
@@ -12,7 +9,6 @@ import { MutationData } from './observer/mutation';
 import { ScrollData } from './observer/scroll';
 import { StyleSheetData } from './observer/style-sheet';
 import { ViewportResizeData } from './observer/viewport-resize';
-import { XhrData } from './observer/request-xhr';
 
 export type IncrementalData =
   | MutationData
@@ -22,11 +18,7 @@ export type IncrementalData =
   | ViewportResizeData
   | InputData
   | MediaInteractionData
-  | StyleSheetData
-  | XhrData
-  | FetchData
-  | LogData
-  | ErrorData;
+  | StyleSheetData;
 
 export type DomContentLoadedEvent = {
   type: EventType.DOM_CONTENT_LOADED;

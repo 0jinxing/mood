@@ -50,7 +50,7 @@ export type MutationCb = (param: MutationData) => void;
 
 const genKey = (id: number, parentId: number) => `${id}@${parentId}`;
 
-function mutationObserve(cb: MutationCb) {
+export function mutationObserve(cb: MutationCb) {
   const observer = new MutationObserver(mutations => {
     const attrs: AttrCursor[] = [];
     const texts: Array<{ value: string; $el: Node }> = [];
@@ -208,7 +208,7 @@ function mutationObserve(cb: MutationCb) {
         id: mirror.getId(attr.$el as TNode),
         attributes: attr.attributes
       })),
-      
+
       removes,
       adds
     };
@@ -236,5 +236,3 @@ function mutationObserve(cb: MutationCb) {
     observer.disconnect();
   };
 }
-
-export default mutationObserve;

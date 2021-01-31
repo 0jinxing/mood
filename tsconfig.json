@@ -1,17 +1,18 @@
 {
   "include": ["packages", "tracing"],
   "compilerOptions": {
-    "module": "commonjs",
-    "rootDir": ".",
-    "baseUrl": ".",
-    "target": "es5",
-    "lib": ["es2018", "dom"],
+    "module": "ESNext",
+    "target": "ES5",
+    "lib": ["ES2018", "DOM"],
+    "moduleResolution": "Node",
     "noImplicitAny": true,
     "strictNullChecks": true,
     "downlevelIteration": true,
     "removeComments": true,
     "preserveConstEnums": true,
-    "sourceMap": true
+    "sourceMap": true,
+    "rootDir": ".",
+    "baseUrl": "."
   },
-  "compileOnSave": true
+  "compileOnSave": false
 }

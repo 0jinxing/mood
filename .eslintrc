@@ -4,43 +4,23 @@
     "browser": true,
     "mocha": true
   },
-
-  "extends": [
-    "plugin:react/recommended",
-    "standard",
-    "prettier",
-    "prettier/react"
-  ],
-
+  "extends": ["standard", "prettier"],
   "parserOptions": {
-    "ecmaFeatures": {
-      "jsx": true
-    },
     "lib": ["dom", "es2018"],
     "ecmaVersion": 11
   },
   "parser": "@typescript-eslint/parser",
-  "plugins": ["react", "@typescript-eslint"],
+  "plugins": ["@typescript-eslint"],
   "rules": {
-    "no-undef": "error",
-    "standard/no-callback-literal": "off",
     "no-useless-constructor": "off",
-
-    "no-unused-vars": "warn",
-    "@typescript-eslint/no-unused-vars": "warn",
-
-    "no-use-before-define": "off",
-    "@typescript-eslint/no-use-before-define": "off",
+    
+    "no-unused-vars": "off",
+    "@typescript-eslint/no-unused-vars": "off",
+    
+    "node/no-callback-literal": "off",
 
     "semi": ["error", "always"],
     "comma-dangle": ["error", "never"],
-    "quotes": ["error", "single"],
-
-    "react/prop-types": "off"
-  },
-  "settings": {
-    "react": {
-      "version": "^16.0.0"
-    }
+    "quotes": ["error", "single"]
   }
 }

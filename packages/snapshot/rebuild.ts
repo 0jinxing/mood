@@ -132,7 +132,7 @@ export function buildNodeWithSN(
   return $el as TNode;
 }
 
-function rebuild(adds: AddedNode[], $doc: HTMLDocument) {
+export function rebuild(adds: AddedNode[], $doc: HTMLDocument) {
   adds.forEach(({ node, parentId, nextId }) => {
     const $el = buildNodeWithSN(node, $doc)!;
 
@@ -155,5 +155,3 @@ function rebuild(adds: AddedNode[], $doc: HTMLDocument) {
     }
   });
 }
-
-export default rebuild;

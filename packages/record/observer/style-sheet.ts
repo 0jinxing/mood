@@ -19,7 +19,7 @@ export type StyleSheetData = {
 
 export type StyleSheetCb = (param: StyleSheetData) => void;
 
-function styleSheetObserve(cb: StyleSheetCb) {
+export function styleSheetObserve(cb: StyleSheetCb) {
   const insertRule = CSSStyleSheet.prototype.insertRule;
   CSSStyleSheet.prototype.insertRule = function (rule: string, index?: number) {
     const id = mirror.getId(this.ownerNode as Node | TNode);
@@ -49,5 +49,3 @@ function styleSheetObserve(cb: StyleSheetCb) {
     CSSStyleSheet.prototype.deleteRule = deleteRule;
   };
 }
-
-export default styleSheetObserve;

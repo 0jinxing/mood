@@ -1,4 +1,4 @@
 export type ActionWithDelay = {
-  doAction: () => void;
+  execAction: () => void;
   delay: number;
 };

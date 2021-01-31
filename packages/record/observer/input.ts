@@ -14,7 +14,7 @@ export type InputCb = (param: InputData) => void;
 
 const lastInputValueMap: WeakMap<EventTarget, InputValue> = new WeakMap();
 
-function inputObserve(cb: InputCb) {
+export function inputObserve(cb: InputCb) {
   const cbWithDedup = (
     $target: HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement,
     value: InputValue
@@ -79,5 +79,3 @@ function inputObserve(cb: InputCb) {
     handlers.forEach(h => h());
   };
 }
-
-export default inputObserve;

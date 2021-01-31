@@ -1,13 +1,13 @@
 import { ActionWithDelay } from './types';
 
-export default class Timer {
+export class Timer {
   public timeOffset: number = 0;
   private raf: number;
 
   constructor(
     private speed: number = 1,
     private actions: ActionWithDelay[] = []
-  ) {}
+  ) { }
 
   public setSpeed(speed = 1) {
     this.speed = speed;
@@ -36,7 +36,7 @@ export default class Timer {
         const action = actions[0];
         if (this.timeOffset >= action.delay) {
           actions.shift();
-          action.doAction();
+          action.execAction();
         } else {
           break;
         }

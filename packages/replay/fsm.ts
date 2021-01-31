@@ -34,7 +34,7 @@ export type MachineStates = Record<
   }
 >;
 
-function createReplayerService(context: MachineContext) {
+export function createReplayerService(context: MachineContext) {
   const states: MachineStates = {
     inited: { on: { play: 'playing' } },
     playing: {
@@ -54,5 +54,3 @@ function createReplayerService(context: MachineContext) {
   const service = interpret(machine);
   return service;
 }
-
-export default createReplayerService;

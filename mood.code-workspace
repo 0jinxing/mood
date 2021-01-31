@@ -1,28 +1,16 @@
 {
   "folders": [
     {
-      "name": "/",
-      "path": "."
-    },
-    {
-      "name": "client",
-      "path": "client"
-    },
-    {
-      "name": "service",
-      "path": "service"
-    },
-    {
       "name": "packages",
       "path": "packages"
     },
     {
-      "name": "repl",
-      "path": "repl"
+      "name": "examples",
+      "path": "examples"
     },
     {
-      "name": "tracing",
-      "path": "tracing"
+      "name": "/",
+      "path": "."
     }
   ]
 }

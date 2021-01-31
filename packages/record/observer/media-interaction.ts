@@ -12,7 +12,7 @@ export type MediaInteractionData = {
 
 export type MediaInteractionCb = (param: MediaInteractionData) => void;
 
-function mediaInteractionObserve(cb: MediaInteractionCb) {
+export function mediaInteractionObserve(cb: MediaInteractionCb) {
   const handler = (act: MediaInteractions) => (event: Event) => {
     const { target } = event;
     if (target) {
@@ -28,5 +28,3 @@ function mediaInteractionObserve(cb: MediaInteractionCb) {
     handlers.forEach(h => h());
   };
 }
-
-export default mediaInteractionObserve;

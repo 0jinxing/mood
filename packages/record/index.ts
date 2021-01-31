@@ -1,6 +1,6 @@
 import { snapshot } from '@mood/snapshot';
 
-import observe from './combine';
+import { observe } from './combine';
 import { on, queryWindowHeight, queryWindowWidth } from './utils';
 
 import { TEvent, TEventWithTime, EmitHandle } from './types';
@@ -19,7 +19,7 @@ function withTimestamp(e: TEvent): TEventWithTime {
 let wrappedEmit!: (e: TEventWithTime, isCheckout?: true) => void;
 let wrappedEmitWithTime!: (e: TEvent, isCheckout?: true) => void;
 
-function record(options: RecordOptions) {
+export function record(options: RecordOptions) {
   const { emit, checkoutEveryNms, checkoutEveryNth } = options;
 
   let lastFullSnapshotEvent: TEventWithTime;
@@ -80,16 +80,16 @@ function record(options: RecordOptions) {
           window.pageXOffset !== undefined
             ? window.pageXOffset
             : document?.documentElement.scrollLeft ||
-              document?.body?.parentElement?.scrollLeft ||
-              document?.body.scrollLeft ||
-              0,
+            document?.body?.parentElement?.scrollLeft ||
+            document?.body.scrollLeft ||
+            0,
         top:
           window.pageYOffset !== undefined
             ? window.pageYOffset
             : document?.documentElement.scrollTop ||
-              document?.body?.parentElement?.scrollTop ||
-              document?.body.scrollTop ||
-              0
+            document?.body?.parentElement?.scrollTop ||
+            document?.body.scrollTop ||
+            0
       }
     });
   };
@@ -137,5 +137,3 @@ export function addCustomEvent<T>(tag: string, payload: T) {
 }
 
 export * from './types';
-
-export default record;
