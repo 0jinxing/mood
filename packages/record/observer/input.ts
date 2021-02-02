@@ -27,7 +27,7 @@ export function inputObserve(cb: InputCb) {
     }
   };
 
-  const eventHandler = (event: Event) => {
+  const eventHandler = (event: Pick<Event, 'target'>) => {
     const { target: $target } = event;
 
     if (
@@ -69,7 +69,7 @@ export function inputObserve(cb: InputCb) {
   const hookHandlers = hookProperties.map(([prototype, key]) =>
     hookSetter<HTMLElement>(prototype, key, {
       set() {
-        eventHandler({ target: this } as Event);
+        eventHandler({ target: this });
       }
     })
   );
