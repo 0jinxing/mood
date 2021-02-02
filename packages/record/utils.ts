@@ -1,4 +1,4 @@
-import { TNode, mirror } from '@mood/snapshot';
+import { ExtNode, mirror } from '@mood/snapshot';
 
 export function on(
   type: string,
@@ -38,35 +38,6 @@ export function throttle<T>(
       }, remaining);
     }
   };
-}
-
-export function plain(val: any): unknown {
-  switch (typeof val) {
-    case 'number':
-    case 'boolean':
-    case 'string':
-    case 'undefined': {
-      return val;
-    }
-    case 'object': {
-      if (val && Symbol.iterator in val) {
-        const reslut = [];
-        for (const i of val) {
-          reslut.push(plain(i));
-        }
-        return reslut;
-      } else if (val instanceof RegExp) {
-        return `RegExp: ${val.source}/${val.flags ?? '[none]'}`;
-      } else if (val) {
-        return Object.getOwnPropertyNames(val).reduce(
-          (obj: any, key) => Object.assign({}, obj, { [key]: plain(val[key]) }),
-          {}
-        );
-      }
-    }
-  }
-
-  return Object.prototype.toString.call(val);
 }
 
 export function hookSetter<T>(
@@ -118,7 +89,7 @@ export function queryWindowWidth(): number {
  * collection
  */
 
-export function isAncestorRemoved($target: TNode): boolean {
+export function isAncestorRemoved($target: ExtNode): boolean {
   const id = mirror.getId($target);
   if (!mirror.has(id)) return true;
 
@@ -127,7 +98,7 @@ export function isAncestorRemoved($target: TNode): boolean {
   if ($target.parentNode.nodeType === $target.DOCUMENT_NODE) {
     return false;
   }
-  return isAncestorRemoved(($target.parentNode as Node) as TNode);
+  return isAncestorRemoved(($target.parentNode as Node) as ExtNode);
 }
 
 export function deepDelete(addsSet: Set<Node>, $node: Node) {
@@ -141,7 +112,7 @@ export function isParentRemoved(
 ): boolean {
   const { parentNode } = $node;
   if (!parentNode) return false;
-  const parentId = mirror.getId((parentNode as Node) as TNode);
+  const parentId = mirror.getId((parentNode as Node) as ExtNode);
   if (removes.some(r => r.id === parentId)) return true;
   return isParentRemoved(removes, parentNode);
 }

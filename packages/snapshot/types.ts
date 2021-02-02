@@ -61,8 +61,8 @@ export class AddedNode {
   node: SerializedNodeWithId;
 }
 
-export interface TNode extends Node {
+export interface ExtNode extends Node {
   __sn: SerializedNodeWithId;
 }
 
-export type IdNodeMap = { [key: number]: TNode };
+export type IdNodeMap = { [key: number]: ExtNode };

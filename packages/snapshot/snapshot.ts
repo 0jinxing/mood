@@ -3,7 +3,7 @@ import {
   SerializedNode,
   NodeType,
   Attributes,
-  TNode,
+  ExtNode,
   SerializedNodeWithId,
   AddedNode
 } from './types';
@@ -130,7 +130,6 @@ function serialize($node: Node, $doc: HTMLDocument): SerializedNode | null {
     };
   }
 
-  // eslint-disable-next-line no-undef
   if ($node instanceof CDATASection) {
     return { type: NodeType.CDATA_SECTION_NODE, textContent: '' };
   }
@@ -146,7 +145,7 @@ function serialize($node: Node, $doc: HTMLDocument): SerializedNode | null {
 }
 
 export function serializeWithId(
-  $node: Node | TNode,
+  $node: Node | ExtNode,
   $doc: HTMLDocument
 ): SerializedNodeWithId | null {
   const serializedNode = serialize($node, $doc);
@@ -156,8 +155,8 @@ export function serializeWithId(
   }
   const id = '__sn' in $node ? $node.__sn.id : genId();
   const nodeWithId = Object.assign(serializedNode, { id });
-  ($node as TNode).__sn = nodeWithId;
-  mirror.idNodeMap[id] = $node as TNode;
+  ($node as ExtNode).__sn = nodeWithId;
+  mirror.idNodeMap[id] = $node as ExtNode;
 
   return nodeWithId;
 }
@@ -166,7 +165,7 @@ export function snapshot($doc: HTMLDocument): AddedNode[] {
   const adds: AddedNode[] = [];
   const queue: Node[] = [$doc];
 
-  const serializeAdds = ($node: Node | TNode) => {
+  const serializeAdds = ($node: Node | ExtNode) => {
     const parentId = $node.parentElement
       ? mirror.getId($node.parentElement)
       : undefined;

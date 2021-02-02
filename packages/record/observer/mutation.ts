@@ -1,7 +1,7 @@
 import {
   serializeWithId,
   transformAttr,
-  TNode,
+  ExtNode,
   mirror,
   AddedNode,
   Attributes
@@ -62,7 +62,7 @@ export function mutationObserve(cb: MutationCb) {
     const movedSet = new Set<Node>();
     const movedMap = new Map<string, true>();
 
-    const genAdds = ($node: Node | TNode, $parent?: Node | TNode) => {
+    const genAdds = ($node: Node | ExtNode, $parent?: Node | ExtNode) => {
       if ('__sn' in $node) {
         movedSet.add($node);
         const parentId = $parent ? mirror.getId($parent) : undefined;
@@ -121,7 +121,7 @@ export function mutationObserve(cb: MutationCb) {
                * before callback fired, so we can ignore it because
                * newly added node will be serialized without child nodes.
                */
-            } else if (isAncestorRemoved(target as TNode)) {
+            } else if (isAncestorRemoved(target as ExtNode)) {
               /**
                * If parent id was not in the mirror map any more, it
                * means the parent node has already been removed. So
@@ -134,7 +134,7 @@ export function mutationObserve(cb: MutationCb) {
             } else {
               removes.push({ parentId, id });
             }
-            mirror.remove($node as TNode);
+            mirror.remove($node as ExtNode);
           });
         }
       }
@@ -181,7 +181,7 @@ export function mutationObserve(cb: MutationCb) {
     while (addQueue.length) {
       if (
         addQueue.every(
-          $node => !mirror.getId(($node.parentNode as Node) as TNode)
+          $node => !mirror.getId(($node.parentNode as Node) as ExtNode)
         )
       ) {
         /**
@@ -199,13 +199,13 @@ export function mutationObserve(cb: MutationCb) {
 
       texts: texts
         .map(text => ({
-          id: mirror.getId(text.$el as TNode),
+          id: mirror.getId(text.$el as ExtNode),
           value: text.value
         }))
         .filter(text => mirror.has(text.id)),
 
       attributes: attrs.map(attr => ({
-        id: mirror.getId(attr.$el as TNode),
+        id: mirror.getId(attr.$el as ExtNode),
         attributes: attr.attributes
       })),
 

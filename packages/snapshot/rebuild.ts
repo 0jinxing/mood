@@ -2,7 +2,7 @@ import {
   ElementNode,
   SerializedNodeWithId,
   NodeType,
-  TNode,
+  ExtNode,
   AddedNode
 } from './types';
 import { mirror } from './utils';
@@ -45,15 +45,15 @@ export function buildNode(
       : $doc.createElement(tagName);
 
     const SPECIAL_KEY = ['dataURL', 'mediaState', 'cssText'];
-    
+
     for (const [key, attrValue] of Object.entries(attributes)) {
       if (typeof attrValue === 'boolean' && !attrValue) continue;
       let value = attrValue === true ? '' : attrValue;
 
       if (!SPECIAL_KEY.includes(key)) {
-        const isTextarea = /TEXTAREA/i.test(tagName) && key === 'value';
+        const isTextarea = /TEXTAREA/i.test(tagName);
 
-        if (isTextarea) {
+        if (isTextarea && key === 'value') {
           const $child = $doc.createTextNode(value);
           $el.appendChild($child);
           continue;
@@ -115,7 +115,7 @@ export function buildNode(
 export function buildNodeWithSN(
   node: SerializedNodeWithId,
   $doc: HTMLDocument
-): TNode | null {
+): ExtNode | null {
   let $el = buildNode(node, $doc);
 
   if (!$el) return null;
@@ -126,10 +126,10 @@ export function buildNodeWithSN(
     $doc.close();
     $doc.open();
   }
-  ($el as TNode).__sn = node;
-  mirror.idNodeMap[node.id] = $el as TNode;
+  ($el as ExtNode).__sn = node;
+  mirror.idNodeMap[node.id] = $el as ExtNode;
 
-  return $el as TNode;
+  return $el as ExtNode;
 }
 
 export function rebuild(adds: AddedNode[], $doc: HTMLDocument) {

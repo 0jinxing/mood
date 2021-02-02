@@ -1,4 +1,4 @@
-import { mirror, TNode } from '@mood/snapshot';
+import { mirror, ExtNode } from '@mood/snapshot';
 import { IncrementalSource } from '../constant';
 
 export type StyleSheetDeleteRule = {
@@ -22,7 +22,7 @@ export type StyleSheetCb = (param: StyleSheetData) => void;
 export function styleSheetObserve(cb: StyleSheetCb) {
   const insertRule = CSSStyleSheet.prototype.insertRule;
   CSSStyleSheet.prototype.insertRule = function (rule: string, index?: number) {
-    const id = mirror.getId(this.ownerNode as Node | TNode);
+    const id = mirror.getId(this.ownerNode as Node | ExtNode);
     id &&
       cb({
         source: IncrementalSource.STYLE_SHEETRULE,
@@ -34,7 +34,7 @@ export function styleSheetObserve(cb: StyleSheetCb) {
 
   const deleteRule = CSSStyleSheet.prototype.deleteRule;
   CSSStyleSheet.prototype.deleteRule = function (index: number) {
-    const id = mirror.getId(this.ownerNode as TNode);
+    const id = mirror.getId(this.ownerNode as ExtNode);
     id &&
       cb({
         source: IncrementalSource.STYLE_SHEETRULE,

@@ -1,5 +1,5 @@
 import { on, throttle } from '../utils';
-import { mirror, TNode } from '@mood/snapshot';
+import { mirror, ExtNode } from '@mood/snapshot';
 import { IncrementalSource } from '../constant';
 
 export type ScrollData = {
@@ -14,7 +14,7 @@ export type ScrollCb = (param: ScrollData) => void;
 export function scrollObserve(cb: ScrollCb) {
   const updatePosition = throttle<UIEvent>(event => {
     const { target } = event;
-    const id = mirror.getId(target as Node | TNode);
+    const id = mirror.getId(target as Node | ExtNode);
     let $scroll: HTMLElement = target as HTMLElement;
     if (target === document) $scroll = document.scrollingElement as HTMLElement;
 

@@ -1,5 +1,5 @@
 import { on } from '../utils';
-import { TNode, mirror } from '@mood/snapshot';
+import { ExtNode, mirror } from '@mood/snapshot';
 import { IncrementalSource } from '../constant';
 
 export type MediaInteractions = 'play' | 'pause';
@@ -18,7 +18,7 @@ export function mediaInteractionObserve(cb: MediaInteractionCb) {
     if (target) {
       cb({
         source: IncrementalSource.MEDIA_INTERACTION,
-        id: mirror.getId(target as TNode),
+        id: mirror.getId(target as ExtNode),
         act
       });
     }

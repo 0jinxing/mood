@@ -1,26 +1,30 @@
-import { IdNodeMap, TNode } from './types';
+import { IdNodeMap, ExtNode } from './types';
 
-export class Mirror {
+function isExtNode($node: Node): $node is ExtNode {
+  return '__sn' in $node;
+}
+
+class Mirror {
   readonly idNodeMap: IdNodeMap = {};
 
-  getId($node: Node | TNode) {
-    if ('__sn' in $node) {
+  getId($node: Node | ExtNode) {
+    if (isExtNode($node)) {
       return $node.__sn.id;
     }
     return 0;
   }
 
   getNode<T extends Node = Node>(id: number) {
-    return (this.idNodeMap[id] as unknown) as (T & TNode) | undefined;
+    return (this.idNodeMap[id] as unknown) as (T & ExtNode) | undefined;
   }
 
-  remove($node: TNode) {
+  remove($node: ExtNode) {
     const id = this.getId($node);
     delete this.idNodeMap[id];
 
     if ($node.childNodes) {
       $node.childNodes.forEach($childNode =>
-        this.remove(($childNode as Node) as TNode)
+        this.remove(($childNode as Node) as ExtNode)
       );
     }
   }
@@ -32,7 +36,7 @@ export class Mirror {
 
 export const mirror = new Mirror();
 
-const URL_MATCH = /url\(["']?(.*?)["']?\)/ig;
+const URL_MATCH = /url\(["']?(.*?)["']?\)/gi;
 
 let baseUrl = '';
 export function absoluteToDoc(attrValue: string): string {
@@ -56,8 +60,7 @@ export function absoluteToSrcsetAttr(attrValue: string) {
   const splitValueArr = attrValue.split(',');
   const resultingSrcsetString = splitValueArr
     .map(val => {
-      const _val = val.trim();
-      const [url, size = ''] = _val.split(/\s+/);
+      const [url, size = ''] = val.trim().split(/\s+/);
       return `${absoluteToDoc(url)} ${size}`.trim();
     })
     .join(',');
