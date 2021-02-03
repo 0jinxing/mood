@@ -1,8 +1,8 @@
-import { TEventWithTime } from '@mood/record';
+import { RecordEventWithTime } from '@mood/record';
 import { createMachine, interpret } from '@xstate/fsm';
 
 export type MachineContext = {
-  events: TEventWithTime[];
+  events: RecordEventWithTime[];
   timeOffset: number;
   speed: number;
 };

@@ -3,7 +3,7 @@ import type { MittStatic, Handler } from 'mitt';
 
 import { rebuild, buildNodeWithSN } from '@mood/snapshot/rebuild';
 import { mirror } from '@mood/snapshot';
-import { TEventWithTime, FullSnapshotEvent } from '@mood/record';
+import { RecordEventWithTime, FullSnapshotEvent } from '@mood/record';
 import { EventType, IncrementalSource } from '@mood/record/constant';
 
 import { AddedNodeMutation } from '@mood/record/observer/mutation';
@@ -69,13 +69,13 @@ export class Player {
   private timer = new Timer();
 
   private baselineTime = 0;
-  private lastPlayedEvent: TEventWithTime;
+  private lastPlayedEvent: RecordEventWithTime;
   private service!: ReturnType<typeof createReplayerService>;
 
   private config: PlayerConfig = defaultConfig;
 
   constructor(
-    private events: TEventWithTime[],
+    private events: RecordEventWithTime[],
     config: Partial<PlayerConfig> = {}
   ) {
     this.setConfig(config);
@@ -133,7 +133,7 @@ export class Player {
     return this.baselineTime - this.events[0].timestamp;
   }
 
-  private getDelay(event: TEventWithTime): number {
+  private getDelay(event: RecordEventWithTime): number {
     if (
       event.type === EventType.INCREMENTAL_SNAPSHOT &&
       (event.source === MOUSE_MOVE || event.source === TOUCH_MOVE)
@@ -172,11 +172,9 @@ export class Player {
   }
 
   private applyIncremental(
-    event: TEventWithTime & { type: EventType.INCREMENTAL_SNAPSHOT },
+    event: RecordEventWithTime & { type: EventType.INCREMENTAL_SNAPSHOT },
     isSync: boolean
   ) {
-    const { timestamp } = event;
-
     switch (event.source) {
       case MUTATION: {
         event.removes.forEach(rm => {
@@ -241,16 +239,16 @@ export class Player {
             return;
           }
 
-          const mutation = addedQueue.shift()!;
-          appendNode(mutation);
+          const item = addedQueue.shift()!;
+          appendNode(item);
         }
 
-        event.texts.forEach(mutation => {
-          const $target = mirror.getNode(mutation.id);
+        event.texts.forEach(text => {
+          const $target = mirror.getNode(text.id);
           if (!$target) {
             return;
           }
-          $target.textContent = mutation.value;
+          $target.textContent = text.value;
         });
 
         event.attributes.forEach(mutation => {
@@ -280,7 +278,7 @@ export class Player {
               execAction: () => {
                 this.moveAndHover(mutation.x, mutation.y, mutation.id);
               },
-              delay: mutation.timeOffset + timestamp - this.baselineTime
+              delay: mutation.timeOffset + event.timestamp - this.baselineTime
             };
             this.timer.addAction(action);
           });
@@ -339,7 +337,7 @@ export class Player {
             $target.scrollLeft = event.x;
           } catch (err) {
             /**
-             * Seldomly we may found scroll target was removed before
+             * seldomly we may found scroll target was removed before
              * its last scroll event.
              */
           }
@@ -412,7 +410,7 @@ export class Player {
     }
   }
 
-  private rebuildFullSnapshot(event: TEventWithTime & FullSnapshotEvent) {
+  private rebuildFullSnapshot(event: RecordEventWithTime & FullSnapshotEvent) {
     const contentDocument = this.$iframe.contentDocument!;
 
     rebuild(event.adds, contentDocument);
@@ -431,8 +429,8 @@ export class Player {
     this.emit('full_snapshot_rebuilded');
   }
 
-  private getCastFn(event: TEventWithTime, isSync = false) {
-    let castFn: Function;
+  private getCastFn(event: RecordEventWithTime, isSync = false) {
+    let castFn: Function | undefined;
     switch (event.type) {
       case EventType.DOM_CONTENT_LOADED:
       case EventType.LOADED: {
@@ -461,9 +459,7 @@ export class Player {
     }
 
     const wrappedCastFn = () => {
-      if (castFn) {
-        castFn();
-      }
+      castFn && castFn();
 
       this.lastPlayedEvent = event;
       if (event === this.events[this.events.length - 1]) {
@@ -475,9 +471,10 @@ export class Player {
   }
 
   public getMetaData(): PlayerMetaData {
-    const firstEvent = this.events[0];
-    const lastEvent = this.events[this.events.length - 1];
-    return { totalTime: lastEvent.timestamp - firstEvent.timestamp };
+    const len = this.events.length;
+    const { 0: first, [len - 1]: last } = this.events;
+    
+    return { totalTime: last.timestamp - first.timestamp };
   }
 
   public getCurrentTime(): number {

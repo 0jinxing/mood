@@ -1,8 +1,8 @@
-import { TEventWithTime } from '@mood/record';
+import { RecordEventWithTime } from '@mood/record';
 import { Player, PlayerConfig } from './player';
 
 export function replay(
-  events: TEventWithTime[],
+  events: RecordEventWithTime[],
   config: Partial<PlayerConfig> = {}
 ) {
   return new Player(events, config);

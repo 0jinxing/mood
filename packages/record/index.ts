@@ -3,29 +3,29 @@ import { snapshot } from '@mood/snapshot';
 import { observe } from './combine';
 import { on, queryWindowHeight, queryWindowWidth } from './utils';
 
-import { TEvent, TEventWithTime, EmitHandle } from './types';
+import { RecordEvent, RecordEventWithTime, EmitHandle } from './types';
 import { EventType } from './constant';
 
 export type RecordOptions = {
-  emit: (e: TEventWithTime, isCheckout?: true) => void;
+  emit: (e: RecordEventWithTime, isCheckout?: true) => void;
   checkoutEveryNth?: number;
   checkoutEveryNms?: number;
 };
 
-function withTimestamp(e: TEvent): TEventWithTime {
+function withTimestamp(e: RecordEvent): RecordEventWithTime {
   return { ...e, timestamp: Date.now() };
 }
 
-let wrappedEmit!: (e: TEventWithTime, isCheckout?: true) => void;
-let wrappedEmitWithTime!: (e: TEvent, isCheckout?: true) => void;
+let wrappedEmit!: (e: RecordEventWithTime, isCheckout?: true) => void;
+let wrappedEmitWithTime!: (e: RecordEvent, isCheckout?: true) => void;
 
 export function record(options: RecordOptions) {
   const { emit, checkoutEveryNms, checkoutEveryNth } = options;
 
-  let lastFullSnapshotEvent: TEventWithTime;
+  let lastFullSnapshotEvent: RecordEventWithTime;
   let incrementalSnapshotCount = 0;
 
-  wrappedEmit = (event: TEventWithTime, isCheckout?: true) => {
+  wrappedEmit = (event: RecordEventWithTime, isCheckout?: true) => {
     emit(event, isCheckout);
 
     if (event.type === EventType.FULL_SNAPSHOT) {
@@ -47,7 +47,7 @@ export function record(options: RecordOptions) {
     }
   };
 
-  wrappedEmitWithTime = (event: TEvent, isCheckout?: true) => {
+  wrappedEmitWithTime = (event: RecordEvent, isCheckout?: true) => {
     wrappedEmit(withTimestamp(event), isCheckout);
   };
 
