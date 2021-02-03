@@ -51,7 +51,7 @@ export type CustomEvent<T = unknown> = {
   payload: T;
 };
 
-export type TEvent =
+export type RecordEvent =
   | DomContentLoadedEvent
   | LoadedEvent
   | FullSnapshotEvent
@@ -59,6 +59,6 @@ export type TEvent =
   | MetaEvent
   | CustomEvent;
 
-export type TEventWithTime = TEvent & { timestamp: number };
+export type RecordEventWithTime = RecordEvent & { timestamp: number };
 
 export type EmitHandle = (data: IncrementalData) => void;
