@@ -14,44 +14,56 @@ export type InputCb = (param: InputData) => void;
 
 const lastInputValueMap: WeakMap<EventTarget, InputValue> = new WeakMap();
 
+function isInputElement(
+  $el: HTMLElement | EventTarget | Node
+): $el is HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement {
+  return (
+    $el instanceof HTMLTextAreaElement ||
+    $el instanceof HTMLSelectElement ||
+    $el instanceof HTMLInputElement
+  );
+}
+
 export function inputObserve(cb: InputCb) {
   const cbWithDedup = (
     $target: HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement,
     value: InputValue
   ) => {
     const lastInputValue = lastInputValueMap.get($target);
-    if (!lastInputValue || lastInputValue !== value) {
-      lastInputValueMap.set($target, value);
-      const id = mirror.getId($target);
-      cb({ source: IncrementalSource.INPUT, value, id });
-    }
+
+    if (lastInputValue && lastInputValue === value) return;
+
+    lastInputValueMap.set($target, value);
+    const id = mirror.getId($target);
+    cb({ source: IncrementalSource.INPUT, value, id });
   };
 
   const eventHandler = (event: Pick<Event, 'target'>) => {
     const { target: $target } = event;
 
-    if (
-      !($target instanceof HTMLTextAreaElement) &&
-      !($target instanceof HTMLSelectElement) &&
-      !($target instanceof HTMLInputElement)
-    ) {
-      return;
-    }
+    if (!$target || !isInputElement($target)) return;
 
     const value: InputValue =
       $target instanceof HTMLInputElement
         ? $target.value || $target.checked
         : $target.value;
+
     cbWithDedup($target, value);
+
     const inputType = $target.type;
     const name = $target.name;
     if (inputType === 'radio' && name && value) {
       const selector = `input[type=radio][name=${name}]`;
-      const $$radio = document.querySelectorAll(selector);
 
-      $$radio.forEach($el => {
-        $el !== $target && cbWithDedup($el as HTMLInputElement, !value);
-      });
+      const $$radio: NodeListOf<HTMLInputElement> = document.querySelectorAll(
+        selector
+      );
+
+      // toggle
+      for (const $el of Array.from($$radio)) {
+        if (!$el.checked || $el === $target) return;
+        cbWithDedup($el as HTMLInputElement, false);
+      }
     }
   };
 
