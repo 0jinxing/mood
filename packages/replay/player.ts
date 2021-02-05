@@ -70,7 +70,7 @@ export class Player {
 
   private baselineTime = 0;
   private lastPlayedEvent: RecordEventWithTime;
-  private service!: ReturnType<typeof createReplayerService>;
+  private service: ReturnType<typeof createReplayerService>;
 
   private config: PlayerConfig = defaultConfig;
 
