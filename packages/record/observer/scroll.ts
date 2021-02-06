@@ -11,7 +11,7 @@ export type ScrollData = {
 
 export type ScrollCb = (param: ScrollData) => void;
 
-export function scrollObserve(cb: ScrollCb) {
+export function scroll(cb: ScrollCb) {
   const updatePosition = throttle<UIEvent>(event => {
     const { target } = event;
     const id = mirror.getId(target as Node | ExtNode);

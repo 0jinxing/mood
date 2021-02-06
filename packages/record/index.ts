@@ -1,6 +1,6 @@
 import { snapshot } from '@mood/snapshot';
 
-import { observe } from './combine';
+import { combine } from './combine';
 import { on, queryWindowHeight, queryWindowWidth } from './utils';
 
 import { RecordEvent, RecordEventWithTime, EmitHandle } from './types';
@@ -103,7 +103,7 @@ export function record(options: RecordOptions) {
 
   const initial = () => {
     takeFullSnapshot();
-    handlers.push(observe(incEmitWithTime));
+    handlers.push(combine(incEmitWithTime));
   };
 
   if (

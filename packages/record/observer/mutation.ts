@@ -50,7 +50,7 @@ export type MutationCb = (param: MutationData) => void;
 
 const genKey = (id: number, parentId: number) => `${id}@${parentId}`;
 
-export function mutationObserve(cb: MutationCb) {
+export function mutation(cb: MutationCb) {
   const observer = new MutationObserver(mutations => {
     const attrs: AttrCursor[] = [];
     const texts: Array<{ value: string; $el: Node }> = [];

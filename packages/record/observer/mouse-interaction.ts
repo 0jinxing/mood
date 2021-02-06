@@ -36,7 +36,7 @@ export type MouseInteractionData = {
 
 export type MouseInteractionCb = (param: MouseInteractionData) => void;
 
-export function mouseInteractionObserve(cb: MouseInteractionCb) {
+export function mouseInteraction(cb: MouseInteractionCb) {
   const handlers: VoidFunction[] = [];
 
   const getHandler = (act: MouseInteraction) => {

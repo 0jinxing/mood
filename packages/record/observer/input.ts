@@ -24,7 +24,7 @@ function isInputElement(
   );
 }
 
-export function inputObserve(cb: InputCb) {
+export function input(cb: InputCb) {
   const cbWithDedup = (
     $target: HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement,
     value: InputValue

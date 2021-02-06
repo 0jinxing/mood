@@ -17,7 +17,7 @@ export type MouseMoveData = {
 
 export type MousemoveCb = (param: MouseMoveData) => void;
 
-export function mouseMoveObserve(cb: MousemoveCb) {
+export function mouseMove(cb: MousemoveCb) {
   let positions: MousePosition[] = [];
   let timeBaseline: number = 0;
   const throttleCb = throttle((isTouch: boolean) => {

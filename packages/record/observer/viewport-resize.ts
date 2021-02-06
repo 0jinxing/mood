@@ -9,7 +9,7 @@ export type ViewportResizeData = {
 
 export type ViewportResizeCb = (param: ViewportResizeData) => void;
 
-export function viewportResizeObserve(cb: ViewportResizeCb) {
+export function viewportResize(cb: ViewportResizeCb) {
   const updateDimension = throttle(() => {
     const height = queryWindowHeight();
     const width = queryWindowWidth();
