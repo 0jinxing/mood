@@ -19,9 +19,8 @@ export type MousemoveCb = (param: MouseMoveData) => void;
 
 export function mouseMove(cb: MousemoveCb) {
   let positions: MousePosition[] = [];
-  let timeBaseline: number = 0;
   const throttleCb = throttle((isTouch: boolean) => {
-    const totalOffset = Date.now() - timeBaseline!;
+    const totalOffset = Date.now();
     cb({
       positions: positions.map(({ timeOffset, ...rest }) => ({
         ...rest,
@@ -40,12 +39,11 @@ export function mouseMove(cb: MousemoveCb) {
       const { clientX, clientY } =
         event instanceof TouchEvent ? event.changedTouches[0] : event;
 
-      timeBaseline || (timeBaseline = Date.now());
       positions.push({
         x: clientX,
         y: clientY,
         id: mirror.getId(target as Node),
-        timeOffset: Date.now() - timeBaseline
+        timeOffset: Date.now()
       });
       throttleCb(event instanceof TouchEvent);
     },
