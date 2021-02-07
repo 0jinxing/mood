@@ -14,7 +14,6 @@ import { createReplayerService } from './fsm';
 import getInjectStyle from './styles/inject-style';
 
 import { ActionWithDelay } from './types';
-import { chunk } from './utils';
 
 const mitt: MittStatic = (mittProxy as any).default || mittProxy;
 
@@ -59,6 +58,16 @@ const defaultConfig: PlayerConfig = {
   root: document.body,
   insertStyleRules: []
 };
+
+function chunk(array: any[], count: number) {
+  if (count == null || count < 1) return [];
+  const result = [];
+  let i = 0;
+  while (i < array.length) {
+    result.push(array.slice(i, (i += count)));
+  }
+  return result;
+}
 
 export class Player {
   private $iframe: HTMLIFrameElement;
@@ -446,7 +455,7 @@ export class Player {
       case EventType.FULL_SNAPSHOT: {
         castFn = () => {
           this.rebuildFullSnapshot(event);
-          
+
           const [top, left] = event.offset;
           this.$iframe.contentWindow!.scrollTo({ top, left });
         };
