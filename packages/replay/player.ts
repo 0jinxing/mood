@@ -14,6 +14,7 @@ import { createReplayerService } from './fsm';
 import getInjectStyle from './styles/inject-style';
 
 import { ActionWithDelay } from './types';
+import { chunk } from './utils';
 
 const mitt: MittStatic = (mittProxy as any).default || mittProxy;
 
@@ -142,7 +143,7 @@ export class Player {
       return event.timestamp - this.baselineTime;
     }
 
-    const [{ timestamp }] = event.positions;
+    const [, , , timestamp] = event.positions;
     return timestamp - this.baselineTime;
   }
 
@@ -271,15 +272,13 @@ export class Player {
 
       case MOUSE_MOVE: {
         if (isSync) {
-          const lastPosition = event.positions[event.positions.length - 1];
-          this.moveAndHover(lastPosition.x, lastPosition.y, lastPosition.id);
+          const [id, x, y] = event.positions.slice(event.positions.length - 4);
+          this.moveAndHover(x, y, id);
         } else {
-          event.positions.forEach(mutation => {
+          chunk(event.positions, 4).forEach(([id, x, y, timestamp]) => {
             const action = {
-              execAction: () => {
-                this.moveAndHover(mutation.x, mutation.y, mutation.id);
-              },
-              delay: mutation.timestamp - this.baselineTime
+              execAction: () => this.moveAndHover(x, y, id),
+              delay: timestamp - this.baselineTime
             };
             this.timer.addAction(action);
           });

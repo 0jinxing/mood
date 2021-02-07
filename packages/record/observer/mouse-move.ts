@@ -3,22 +3,18 @@ import { on, throttle } from '../utils';
 
 import { IncrementalSource } from '../constant';
 
-export type MousePosition = {
-  id: number;
-  x: number;
-  y: number;
-  timestamp: number;
-};
+// repeat: id, x, y, timestamp
+export type MousePositions = number[];
 
 export type MouseMoveData = {
   source: IncrementalSource.MOUSE_MOVE | IncrementalSource.TOUCH_MOVE;
-  positions: MousePosition[];
+  positions: MousePositions;
 };
 
 export type MousemoveCb = (param: MouseMoveData) => void;
 
 export function mouseMove(cb: MousemoveCb) {
-  let positions: MousePosition[] = [];
+  let positions: MousePositions = [];
   const throttleCb = throttle((isTouch: boolean) => {
     cb({
       positions,
@@ -34,12 +30,15 @@ export function mouseMove(cb: MousemoveCb) {
     const { clientX, clientY } =
       event instanceof TouchEvent ? event.changedTouches[0] : event;
 
-    positions.push({
-      x: clientX,
-      y: clientY,
-      id: mirror.getId(target as Node),
-      timestamp: updatePosition.timestamp
-    });
+    positions.splice(
+      positions.length,
+      0,
+      mirror.getId(target as Node),
+      clientX,
+      clientY,
+      updatePosition.timestamp
+    );
+
     throttleCb(event instanceof TouchEvent);
   }, Math.floor(1000 / 30));
 
