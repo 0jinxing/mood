@@ -30,7 +30,7 @@ export function throttle<T>(
       }
       previous = now;
       func.apply(null, args);
-    } else if (!timeout && !trailing) {
+    } else if (!timeout && trailing !== false) {
       timeout = setTimeout(() => {
         previous = leading === false ? 0 : Date.now();
         timeout = undefined;
