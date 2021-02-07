@@ -6,38 +6,39 @@ export function on(
   $target: Document | Window = document
 ): VoidFunction {
   const options = { capture: true, passive: true };
-
   $target.addEventListener(type, fn, options);
   return () => $target.removeEventListener(type, fn, options);
 }
 
-export function throttle<T>(
-  func: (arg: T) => void,
-  wait: number,
-  options?: { leading?: boolean; trailing?: boolean }
-) {
+export type Throttled = {
+  (...args: any): void;
+  timestamp: number;
+};
+
+export function throttle<T>(func: (arg: T) => void, wait: number) {
   let timeout: ReturnType<typeof setTimeout> | undefined;
   let previous = 0;
-  return (...args: any[]) => {
-    const now = Date.now();
-    const { leading, trailing } = options || {};
-    !previous && leading === false && (previous = now);
-    const remaining = wait - (now - previous);
-    if (remaining <= 0 || remaining > wait) {
-      if (timeout) {
-        clearTimeout(timeout);
-        timeout = undefined;
-      }
-      previous = now;
-      func.apply(null, args);
-    } else if (!timeout && trailing !== false) {
-      timeout = setTimeout(() => {
-        previous = leading === false ? 0 : Date.now();
-        timeout = undefined;
-        func.apply(null, args);
-      }, remaining);
+  let lastArgs: any[];
+
+  const later = () => {
+    previous = Date.now();
+    timeout = undefined;
+    func.apply(null, lastArgs);
+  };
+
+  const throttled: Throttled = (...args: any[]) => {
+    throttled.timestamp = Date.now();
+    lastArgs = args;
+    previous = previous || throttled.timestamp;
+
+    const remaining = wait - (throttled.timestamp - previous);
+    if (!timeout) {
+      timeout = setTimeout(later, remaining);
     }
   };
+  throttled.timestamp = 0;
+
+  return throttled;
 }
 
 export function hookSetter<T>(

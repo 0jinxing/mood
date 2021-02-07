@@ -7,7 +7,7 @@ export type MousePosition = {
   id: number;
   x: number;
   y: number;
-  timeOffset: number;
+  timestamp: number;
 };
 
 export type MouseMoveData = {
@@ -20,12 +20,8 @@ export type MousemoveCb = (param: MouseMoveData) => void;
 export function mouseMove(cb: MousemoveCb) {
   let positions: MousePosition[] = [];
   const throttleCb = throttle((isTouch: boolean) => {
-    const totalOffset = Date.now();
     cb({
-      positions: positions.map(({ timeOffset, ...rest }) => ({
-        ...rest,
-        timeOffset: timeOffset - totalOffset
-      })),
+      positions,
       source: isTouch
         ? IncrementalSource.TOUCH_MOVE
         : IncrementalSource.MOUSE_MOVE
@@ -33,23 +29,20 @@ export function mouseMove(cb: MousemoveCb) {
 
     positions = [];
   }, 500);
-  const updatePosition = throttle<MouseEvent | TouchEvent>(
-    event => {
-      const { target } = event;
-      const { clientX, clientY } =
-        event instanceof TouchEvent ? event.changedTouches[0] : event;
+  const updatePosition = throttle<MouseEvent | TouchEvent>(event => {
+    const { target } = event;
+    const { clientX, clientY } =
+      event instanceof TouchEvent ? event.changedTouches[0] : event;
 
-      positions.push({
-        x: clientX,
-        y: clientY,
-        id: mirror.getId(target as Node),
-        timeOffset: Date.now()
-      });
-      throttleCb(event instanceof TouchEvent);
-    },
-    Math.floor(1000 / 30),
-    { trailing: false }
-  );
+    positions.push({
+      x: clientX,
+      y: clientY,
+      id: mirror.getId(target as Node),
+      timestamp: updatePosition.timestamp
+    });
+    throttleCb(event instanceof TouchEvent);
+  }, Math.floor(1000 / 30));
+
   const handlers = [
     on('mousemove', updatePosition),
     on('touchmove', updatePosition)

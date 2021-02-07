@@ -134,15 +134,16 @@ export class Player {
   }
 
   private getDelay(event: RecordEventWithTime): number {
-    if (
-      event.type === EventType.INCREMENTAL_SNAPSHOT &&
-      (event.source === MOUSE_MOVE || event.source === TOUCH_MOVE)
-    ) {
-      const firstOffset = event.positions[0].timeOffset;
-      const firstTimestamp = event.timestamp + firstOffset;
-      return firstTimestamp - this.baselineTime;
+    if (event.type !== EventType.INCREMENTAL_SNAPSHOT) {
+      return event.timestamp - this.baselineTime;
     }
-    return event.timestamp - this.baselineTime;
+
+    if (event.source !== MOUSE_MOVE && event.source !== TOUCH_MOVE) {
+      return event.timestamp - this.baselineTime;
+    }
+
+    const [{ timestamp }] = event.positions;
+    return timestamp - this.baselineTime;
   }
 
   private moveAndHover(x: number, y: number, id: number) {
@@ -278,7 +279,7 @@ export class Player {
               execAction: () => {
                 this.moveAndHover(mutation.x, mutation.y, mutation.id);
               },
-              delay: mutation.timeOffset + event.timestamp - this.baselineTime
+              delay: mutation.timestamp - this.baselineTime
             };
             this.timer.addAction(action);
           });
@@ -473,7 +474,7 @@ export class Player {
   public getMetaData(): PlayerMetaData {
     const len = this.events.length;
     const { 0: first, [len - 1]: last } = this.events;
-    
+
     return { totalTime: last.timestamp - first.timestamp };
   }
 
