@@ -3,7 +3,7 @@ import { on, throttle } from '../utils';
 
 import { IncrementalSource } from '../constant';
 
-// repeat: id, x, y, timestamp
+// repeat => id, x, y, timestamp
 export type MousePositions = number[];
 
 export type MouseMoveData = {

@@ -72,25 +72,13 @@ export function record(options: RecordOptions) {
       throw new Error('Failed to snapshot the document');
     }
 
+    const top = document.documentElement.scrollTop || 0;
+    const left = document.documentElement.scrollLeft || 0;
+
     wrappedEmitWithTime({
       type: EventType.FULL_SNAPSHOT,
       adds,
-      offset: {
-        left:
-          window.pageXOffset !== undefined
-            ? window.pageXOffset
-            : document?.documentElement.scrollLeft ||
-            document?.body?.parentElement?.scrollLeft ||
-            document?.body.scrollLeft ||
-            0,
-        top:
-          window.pageYOffset !== undefined
-            ? window.pageYOffset
-            : document?.documentElement.scrollTop ||
-            document?.body?.parentElement?.scrollTop ||
-            document?.body.scrollTop ||
-            0
-      }
+      offset: [top, left]
     });
   };
 

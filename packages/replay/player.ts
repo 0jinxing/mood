@@ -290,9 +290,9 @@ export class Player {
         const $target = mirror.getNode<HTMLElement>(event.id);
         if (!$target) break;
 
-        this.emit('mouse_interaction', { type: event.act, $target });
+        this.emit('mouse_interaction', { type: event.action, $target });
 
-        switch (event.act) {
+        switch (event.action) {
           case 'blur': {
             // TODO
             break;
@@ -314,7 +314,7 @@ export class Player {
             break;
           }
           default: {
-            const ev = new Event(event.act);
+            const ev = new Event(event.action);
             $target.dispatchEvent(ev);
           }
         }
@@ -354,13 +354,13 @@ export class Player {
         const $target = mirror.getNode<HTMLMediaElement>(event.id);
         if (!$target) break;
 
-        if (event.act === 'play') {
+        if (event.action === 'play') {
           if ($target.readyState >= HTMLMediaElement.HAVE_CURRENT_DATA) {
             $target.play();
           } else {
             $target.addEventListener('canplay', () => $target.play());
           }
-        } else if (event.act === 'pause') {
+        } else if (event.action === 'pause') {
           $target.pause();
         }
         break;
@@ -446,7 +446,9 @@ export class Player {
       case EventType.FULL_SNAPSHOT: {
         castFn = () => {
           this.rebuildFullSnapshot(event);
-          this.$iframe.contentWindow!.scrollTo(event.offset);
+          
+          const [top, left] = event.offset;
+          this.$iframe.contentWindow!.scrollTo({ top, left });
         };
         break;
       }

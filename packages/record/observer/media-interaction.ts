@@ -6,7 +6,7 @@ export type MediaInteraction = 'play' | 'pause';
 
 export type MediaInteractionData = {
   source: IncrementalSource.MEDIA_INTERACTION;
-  act: MediaInteraction;
+  action: MediaInteraction;
   id: number;
 };
 
@@ -19,7 +19,7 @@ export function mediaInteraction(cb: MediaInteractionCb) {
       cb({
         source: IncrementalSource.MEDIA_INTERACTION,
         id: mirror.getId(target as ExtNode),
-        act
+        action: act
       });
     }
   };

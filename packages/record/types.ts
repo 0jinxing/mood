@@ -31,7 +31,7 @@ export type LoadedEvent = {
 export type FullSnapshotEvent = {
   type: EventType.FULL_SNAPSHOT;
   adds: AddedNode[];
-  offset: { top: number; left: number };
+  offset: [top: number, left: number];
 };
 
 export type IncrementalSnapshotEvent = {

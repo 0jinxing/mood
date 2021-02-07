@@ -28,7 +28,7 @@ const ACTS: MouseInteraction[] = [
 
 export type MouseInteractionData = {
   source: IncrementalSource.MOUSE_INTERACTION;
-  act: MouseInteraction;
+  action: MouseInteraction;
   id: number;
   x: number;
   y: number;
@@ -48,7 +48,7 @@ export function mouseInteraction(cb: MouseInteractionCb) {
 
       cb({
         source: IncrementalSource.MOUSE_INTERACTION,
-        act,
+        action: act,
         id,
         x: clientX,
         y: clientY
