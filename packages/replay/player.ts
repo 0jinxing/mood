@@ -59,7 +59,7 @@ const defaultConfig: PlayerConfig = {
   insertStyleRules: []
 };
 
-function chunk(array: any[], count: number) {
+function chunk<T>(array: T[], count: number) {
   if (count == null || count < 1) return [];
   const result = [];
   let i = 0;
