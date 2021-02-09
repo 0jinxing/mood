@@ -1,4 +1,4 @@
-import { ExtNode, mirror } from '@mood/snapshot';
+import { ExtNode, Mirror, mirror } from '@mood/snapshot';
 
 export function on(
   type: string,
@@ -41,27 +41,41 @@ export function throttle<T>(func: (arg: T) => void, wait: number) {
   return throttled;
 }
 
-export function hookSetter<T>(
+export function hook<T>(
   target: T,
-  key: string | number | symbol,
-  descriptor: PropertyDescriptor,
-  isRevoked?: boolean
+  key: keyof T,
+  descriptor: PropertyDescriptor
 ) {
   const original = Object.getOwnPropertyDescriptor(target, key);
-  Object.defineProperty(
-    target,
-    key,
-    isRevoked
-      ? descriptor
-      : {
-          set(value) {
-            original && original.set && original.set.call(this, value);
-            // put hooked setter into event loop to avoid of set latency
-            setTimeout(() => descriptor.set!.call(this, value));
-          }
-        }
-  );
-  return () => hookSetter(target, key, original || {}, true);
+  Object.defineProperty(target, key, descriptor);
+
+  return () => Object.defineProperty(target, key, original || {});
+}
+
+export function hookSetter<T>(
+  target: T,
+  key: keyof T,
+  setter: (val: any) => void
+) {
+  const original = Object.getOwnPropertyDescriptor(target, key);
+  return hook(target, key, {
+    set(val) {
+      original?.set?.call(this, val);
+      setTimeout(() => setter.call(this, val));
+    }
+  });
+}
+
+export function hookFunc<T>(target: T, key: keyof T, func: Function) {
+  const original = Object.getOwnPropertyDescriptor(target, key);
+  return hook(target, key, {
+    value: function (...args: any[]) {
+      const originalValue: Function | undefined = original?.value;
+      const result = originalValue?.apply(this, args);
+      setTimeout(() => func.apply(this, [result, args]));
+      return result;
+    }
+  });
 }
 
 export function isNativeFun(fun: Function) {
@@ -124,3 +138,5 @@ export function isAncestorInSet(set: Set<Node>, $node: Node): boolean {
   if (set.has(parentNode)) return true;
   return isAncestorInSet(set, parentNode);
 }
+
+export const offscreenMirror = new Mirror();

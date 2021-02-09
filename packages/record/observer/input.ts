@@ -78,11 +78,10 @@ export function input(cb: InputCb) {
     [HTMLTextAreaElement.prototype, 'value']
   ];
 
-  const hookHandlers = hookProperties.map(([prototype, key]) =>
-    hookSetter<HTMLElement>(prototype, key, {
-      set() {
-        eventHandler({ target: this });
-      }
+  type Properties<T = any> = [prototype: T, key: keyof T];
+  const hookHandlers = hookProperties.map(([prototype, key]: Properties) =>
+    hookSetter(prototype, key, function () {
+      eventHandler({ target: this });
     })
   );
   handlers.push(...hookHandlers);

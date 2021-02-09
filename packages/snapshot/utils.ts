@@ -4,7 +4,7 @@ function isExtNode($node: Node): $node is ExtNode {
   return '__sn' in $node;
 }
 
-class Mirror {
+export class Mirror {
   readonly idNodeMap: IdNodeMap = {};
 
   getId($node: Node | ExtNode) {
