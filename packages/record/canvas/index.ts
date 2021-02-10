@@ -1,7 +1,12 @@
-import { isPlain } from '../../is';
-import { Plain } from '../../types';
 import { mirror } from '@mood/snapshot';
-import { hookFunc, hookSetter } from '../../utils';
+
+import { isPlain } from '../is';
+import { hookFunc, hookSetter } from '../utils';
+import { Plain } from '../types';
+import { extendImageData } from './image-data';
+import { extendPath2D } from './path2d';
+import { extendCanvasGradient } from './canvas-gradient';
+import { extendCanvasPattern } from './canvas-pattern';
 
 // https://developer.mozilla.org/docs/Web/API/CanvasRenderingContext2D
 type Ctx2DMethod =
@@ -135,6 +140,13 @@ export type CanvasCb = (param: CanvasData) => void;
 function canvas(cb: CanvasCb) {
   const prototype = CanvasRenderingContext2D.prototype;
 
+  const extendUnsubscribes = [
+    extendImageData(),
+    extendPath2D(),
+    extendCanvasGradient(),
+    extendCanvasPattern()
+  ];
+
   const methodUnsubscribes = methods.map(key =>
     hookFunc(prototype, key, function (_: unknown, ...args: any[]) {
       const self: CanvasRenderingContext2D = this;
@@ -187,10 +199,11 @@ function canvas(cb: CanvasCb) {
   );
 
   return () => {
-    methodUnsubscribes.forEach(u => u());
-
-    propsUnsubscribes.forEach(u => u());
-
-    createUnsubscribes.forEach(u => u());
+    [
+      ...extendUnsubscribes,
+      ...methodUnsubscribes,
+      ...propsUnsubscribes,
+      ...createUnsubscribes
+    ].forEach(u => u());
   };
 }

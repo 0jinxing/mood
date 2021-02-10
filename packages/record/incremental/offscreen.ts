@@ -1,9 +1,9 @@
 import {
   mirror,
   SerializedNodeWithId,
-  serializeWithId
-} from 'packages/snapshot';
-import { isExtNode } from 'packages/snapshot/is';
+  serializeWithId,
+  isExtNode
+} from '@mood/snapshot';
 import { IncrementalSource } from '../constant';
 import { hookFunc } from '../utils';
 

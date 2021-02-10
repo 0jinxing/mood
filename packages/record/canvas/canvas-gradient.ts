@@ -1,5 +1,5 @@
-import { Plain } from '../../types';
-import { hookFunc } from 'packages/record/utils';
+import { Plain } from '../types';
+import { hookFunc } from '../utils';
 
 export type CanvasGradientPlain = {
   impl: 'radialGradient' | 'linearGradient';

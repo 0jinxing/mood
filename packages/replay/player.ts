@@ -1,13 +1,15 @@
 import * as mittProxy from 'mitt';
 import type { MittStatic, Handler } from 'mitt';
 
-import { rebuild, buildNodeWithSN } from '@mood/snapshot/rebuild';
-import { mirror } from '@mood/snapshot';
-import { RecordEventWithTime, FullSnapshotEvent } from '@mood/record';
-import { EventType, IncrementalSource } from '@mood/record/constant';
-
-import { AddedNodeMutation } from '@mood/record/observer/mutation';
-import { ViewportResizeData } from '@mood/record/observer/viewport-resize';
+import { mirror, rebuild, buildNodeWithSN } from '@mood/snapshot';
+import {
+  RecordEventWithTime,
+  FullSnapshotEvent,
+  IncrementalSource,
+  EventType,
+  AddedNodeMutation,
+  ViewportResizeData
+} from '@mood/record';
 
 import { Timer } from './timer';
 import { createReplayerService } from './fsm';

@@ -1,5 +1,5 @@
-import { Plain } from '../../types';
-import { hookFunc } from '../../utils';
+import { Plain } from '../types';
+import { hookFunc } from '../utils';
 
 type Path2DMethod =
   | 'addPath'

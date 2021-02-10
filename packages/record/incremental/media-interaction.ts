@@ -1,5 +1,5 @@
-import { on } from '../utils';
 import { ExtNode, mirror } from '@mood/snapshot';
+import { on } from '../utils';
 import { IncrementalSource } from '../constant';
 
 export type MediaInteraction = 'play' | 'pause';

@@ -1,5 +1,5 @@
-import { on, throttle } from '../utils';
 import { mirror, ExtNode } from '@mood/snapshot';
+import { on, throttle } from '../utils';
 import { IncrementalSource } from '../constant';
 
 export type ScrollData = {

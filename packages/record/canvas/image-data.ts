@@ -1,4 +1,4 @@
-import { Plain } from '../../types';
+import { Plain } from '../types';
 
 export type ImageDataPlain = {
   impl: 'imageData';

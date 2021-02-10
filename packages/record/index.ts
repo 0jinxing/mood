@@ -1,8 +1,6 @@
 import { snapshot } from '@mood/snapshot';
-
-import { combine } from './combine';
+import { incremental } from './incremental';
 import { on, queryWindowHeight, queryWindowWidth } from './utils';
-
 import { RecordEvent, RecordEventWithTime, EmitHandle } from './types';
 import { EventType } from './constant';
 
@@ -82,8 +80,8 @@ export function record(options: RecordOptions) {
     });
   };
 
-  const handlers: Function[] = [];
-  handlers.push(
+  const unsubscribes: Function[] = [];
+  unsubscribes.push(
     on('DOMContentLoaded', () => {
       wrappedEmitWithTime({ type: EventType.DOM_CONTENT_LOADED });
     })
@@ -91,7 +89,8 @@ export function record(options: RecordOptions) {
 
   const initial = () => {
     takeFullSnapshot();
-    handlers.push(combine(incEmitWithTime));
+
+    unsubscribes.push(incremental(incEmitWithTime));
   };
 
   if (
@@ -100,7 +99,7 @@ export function record(options: RecordOptions) {
   ) {
     initial();
   } else {
-    handlers.push(
+    unsubscribes.push(
       on(
         'load',
         () => {
@@ -113,7 +112,7 @@ export function record(options: RecordOptions) {
   }
 
   return () => {
-    handlers.forEach(h => h());
+    unsubscribes.forEach(h => h());
   };
 }
 
@@ -125,3 +124,5 @@ export function addCustomEvent<T>(tag: string, payload: T) {
 }
 
 export * from './types';
+export * from './constant';
+export * from './incremental';

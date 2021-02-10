@@ -1,15 +1,16 @@
 import { AddedNode } from '@mood/snapshot';
+
 import { EventType } from './constant';
 
-import { InputData } from './observer/input';
-import { MediaInteractionData } from './observer/media-interaction';
-import { MouseInteractionData } from './observer/mouse-interaction';
-import { MouseMoveData } from './observer/mouse-move';
-import { MutationData } from './observer/mutation';
-import { OffscreenData } from './observer/offscreen';
-import { ScrollData } from './observer/scroll';
-import { StyleSheetData } from './observer/style-sheet';
-import { ViewportResizeData } from './observer/viewport-resize';
+import { InputData } from './incremental/input';
+import { MediaInteractionData } from './incremental/media-interaction';
+import { MouseInteractionData } from './incremental/mouse-interaction';
+import { MouseMoveData } from './incremental/mouse-move';
+import { MutationData } from './incremental/mutation';
+import { OffscreenData } from './incremental/offscreen';
+import { ScrollData } from './incremental/scroll';
+import { StyleSheetData } from './incremental/style-sheet';
+import { ViewportResizeData } from './incremental/viewport-resize';
 
 export type IncrementalData =
   | MutationData
