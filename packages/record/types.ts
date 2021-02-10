@@ -64,3 +64,7 @@ export type RecordEvent =
 export type RecordEventWithTime = RecordEvent & { timestamp: number };
 
 export type EmitHandle = (data: IncrementalData) => void;
+
+export interface Plain<T = any> {
+  $plain?: () => T;
+}

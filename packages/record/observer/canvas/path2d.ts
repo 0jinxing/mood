@@ -1,4 +1,5 @@
-import { hookFunc, hookSetter } from 'packages/record/utils';
+import { Plain } from '../../types';
+import { hookFunc } from '../../utils';
 
 type Path2DMethod =
   | 'addPath'
@@ -12,11 +13,13 @@ type Path2DMethod =
   | 'quadraticCurveTo'
   | 'rect';
 
-type Path2DPlain = Array<[key: Path2DMethod, args: any[]]>;
+type Path2DPlain = {
+  impl: 'path2d';
+  restore: Array<[key: Path2DMethod, args: unknown[]]>;
+};
 
 declare global {
-  interface Path2D {
-    $plain?: () => Path2DPlain;
+  interface Path2D extends Plain<Path2DPlain> {
     $plainData?: Path2DPlain;
   }
 }
@@ -37,11 +40,9 @@ const hookKeys: ReadonlyArray<Path2DMethod> = [
 export function extendPath2D() {
   const prototype = Path2D.prototype;
   Object.defineProperty(prototype, '$plain', {
-    get() {
-      return function () {
-        const self: Path2D = this;
-        return self.$plainData ?? [];
-      };
+    value: function () {
+      const self: Path2D = this;
+      return self.$plainData;
     },
     enumerable: false
   });
@@ -50,15 +51,14 @@ export function extendPath2D() {
     hookFunc(prototype, key, function (_: unknown, ...args: any[]) {
       const self: Path2D = this;
 
-      const data: Path2DPlain = [] || self.$plainData;
-      data.push([
+      if (!self.$plainData) self.$plainData = { impl: 'path2d', restore: [] };
+      self.$plainData.restore.push([
         key,
         args.map(arg => {
           if (arg instanceof Path2D) return arg.$plain && arg.$plain();
           return arg;
         })
       ]);
-      self.$plainData = data;
     })
   );
 
@@ -70,10 +70,11 @@ export function extendPath2D() {
 
 export function restorePath2D(plain: Path2DPlain) {
   const result = new Path2D();
-  for (const [key, args] of plain) {
+  for (const [key, args] of plain.restore) {
     const func: Function = result[key];
-    if (key === 'addPath' && args[0]) {
-      args[0] = restorePath2D(args[0]);
+    if (key === 'addPath') {
+      const [plain] = args;
+      args[0] = restorePath2D(plain as Path2DPlain);
     }
     func.apply(result, args);
   }
