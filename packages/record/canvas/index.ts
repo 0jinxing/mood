@@ -137,7 +137,7 @@ export type CanvasData = {
 
 export type CanvasCb = (param: CanvasData) => void;
 
-function canvas(cb: CanvasCb) {
+export function canvas(cb: CanvasCb) {
   const prototype = CanvasRenderingContext2D.prototype;
 
   const extendUnsubscribes = [
