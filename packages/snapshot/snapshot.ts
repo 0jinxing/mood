@@ -1,4 +1,5 @@
 import { mirror, transformAttr, absoluteToStylesheet } from './utils';
+import { isSVGElement } from './is';
 import {
   SerializedNode,
   NodeType,
@@ -29,10 +30,6 @@ function getCSSRuleText(rule: CSSRule): string {
   return rule instanceof CSSImportRule
     ? getCSSText(rule.styleSheet)
     : rule.cssText;
-}
-
-function isSVGElement($el: Element): boolean {
-  return /SVG/i.test($el.tagName) || $el instanceof SVGElement;
 }
 
 function serialize($node: Node, $doc: HTMLDocument): SerializedNode | null {

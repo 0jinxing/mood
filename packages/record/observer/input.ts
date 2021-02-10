@@ -67,7 +67,7 @@ export function input(cb: InputCb) {
     }
   };
 
-  const handlers = ['input', 'change'].map(eventName => {
+  const unsubscribes = ['input', 'change'].map(eventName => {
     return on(eventName, eventHandler);
   });
 
@@ -84,9 +84,9 @@ export function input(cb: InputCb) {
       eventHandler({ target: this });
     })
   );
-  handlers.push(...hookHandlers);
+  unsubscribes.push(...hookHandlers);
 
   return () => {
-    handlers.forEach(h => h());
+    unsubscribes.forEach(h => h());
   };
 }

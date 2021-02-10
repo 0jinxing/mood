@@ -26,7 +26,8 @@ const {
   INPUT,
   TOUCH_MOVE,
   MEDIA_INTERACTION,
-  STYLE_SHEETRULE
+  STYLE_SHEETRULE,
+  OFFSCREEN
 } = IncrementalSource;
 
 export type PlayerConfig = {
@@ -415,6 +416,11 @@ export class Player {
           event.removes.forEach(({ index }) => styleSheet.deleteRule(index));
         }
         break;
+      }
+
+      case OFFSCREEN: {
+        if (!mirror.getNode(event.sn.id)) return;
+        buildNodeWithSN(event.sn, this.$iframe.contentDocument!);
       }
     }
   }

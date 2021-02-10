@@ -16,5 +16,6 @@ export enum IncrementalSource {
   INPUT,
   TOUCH_MOVE,
   MEDIA_INTERACTION,
-  STYLE_SHEETRULE
+  STYLE_SHEETRULE,
+  OFFSCREEN
 }

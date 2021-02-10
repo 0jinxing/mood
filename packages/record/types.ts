@@ -6,6 +6,7 @@ import { MediaInteractionData } from './observer/media-interaction';
 import { MouseInteractionData } from './observer/mouse-interaction';
 import { MouseMoveData } from './observer/mouse-move';
 import { MutationData } from './observer/mutation';
+import { OffscreenData } from './observer/offscreen';
 import { ScrollData } from './observer/scroll';
 import { StyleSheetData } from './observer/style-sheet';
 import { ViewportResizeData } from './observer/viewport-resize';
@@ -18,7 +19,8 @@ export type IncrementalData =
   | ViewportResizeData
   | InputData
   | MediaInteractionData
-  | StyleSheetData;
+  | StyleSheetData
+  | OffscreenData;
 
 export type DomContentLoadedEvent = {
   type: EventType.DOM_CONTENT_LOADED;

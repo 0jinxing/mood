@@ -6,6 +6,7 @@ import { mouseMove } from './observer/mouse-move';
 import { mediaInteraction } from './observer/media-interaction';
 import { styleSheet } from './observer/style-sheet';
 import { mutation } from './observer/mutation';
+import { offscreen } from './observer/offscreen';
 
 import { EmitHandle } from './types';
 
@@ -18,7 +19,8 @@ export function combine(emit: EmitHandle) {
     viewportResize,
     input,
     mediaInteraction,
-    styleSheet
+    styleSheet,
+    offscreen
   ].map(o => o(emit));
 
   return () => {

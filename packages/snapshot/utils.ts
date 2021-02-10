@@ -1,8 +1,5 @@
+import { isExtNode } from './is';
 import { IdNodeMap, ExtNode } from './types';
-
-function isExtNode($node: Node): $node is ExtNode {
-  return '__sn' in $node;
-}
 
 export class Mirror {
   readonly idNodeMap: IdNodeMap = {};

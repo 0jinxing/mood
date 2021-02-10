@@ -78,10 +78,6 @@ export function hookFunc<T>(target: T, key: keyof T, func: Function) {
   });
 }
 
-export function isNativeFun(fun: Function) {
-  return /\[native\s+code\]/i.test(fun.toString());
-}
-
 // viewport
 
 export function queryWindowHeight(): number {
@@ -104,6 +100,11 @@ export function queryWindowWidth(): number {
  * collection
  */
 
+export function deepDelete(addsSet: Set<Node>, $node: Node) {
+  addsSet.delete($node);
+  $node.childNodes.forEach(childN => deepDelete(addsSet, childN));
+}
+
 export function isAncestorRemoved($target: ExtNode): boolean {
   const id = mirror.getId($target);
   if (!mirror.has(id)) return true;
@@ -114,11 +115,6 @@ export function isAncestorRemoved($target: ExtNode): boolean {
     return false;
   }
   return isAncestorRemoved(($target.parentNode as Node) as ExtNode);
-}
-
-export function deepDelete(addsSet: Set<Node>, $node: Node) {
-  addsSet.delete($node);
-  $node.childNodes.forEach(childN => deepDelete(addsSet, childN));
 }
 
 export function isParentRemoved(
@@ -138,5 +134,3 @@ export function isAncestorInSet(set: Set<Node>, $node: Node): boolean {
   if (set.has(parentNode)) return true;
   return isAncestorInSet(set, parentNode);
 }
-
-export const offscreenMirror = new Mirror();
