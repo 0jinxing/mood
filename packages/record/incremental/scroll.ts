@@ -2,16 +2,16 @@ import { mirror, ExtNode } from '@mood/snapshot';
 import { on, throttle } from '../utils';
 import { IncrementalSource } from '../constant';
 
-export type ScrollData = {
+export type ScrollParam = {
   source: IncrementalSource.SCROLL;
   id: number;
   x: number;
   y: number;
 };
 
-export type ScrollCb = (param: ScrollData) => void;
+export type ScrollCallback = (param: ScrollParam) => void;
 
-export function scroll(cb: ScrollCb) {
+export function scroll(cb: ScrollCallback) {
   const updatePosition = throttle<UIEvent>(event => {
     const { target } = event;
     const id = mirror.getId(target as Node | ExtNode);

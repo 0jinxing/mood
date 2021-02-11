@@ -72,16 +72,16 @@ const PROPS = <const>[
 type Context2DMethod = typeof METHOD_KEYS[number];
 type Context2DProp = typeof PROPS[number];
 
-export type CanvasData = {
+export type CanvasParam = {
   canvasId: number;
   key: Context2DMethod | Context2DProp;
   args?: unknown[];
   value?: unknown | Plain<unknown>;
 };
 
-export type CanvasCb = (param: CanvasData) => void;
+export type CanvasCallback = (param: CanvasParam) => void;
 
-export function canvas(cb: CanvasCb) {
+export function canvas(cb: CanvasCallback) {
   const prototype = CanvasRenderingContext2D.prototype;
 
   const extendUnsubscribes = [

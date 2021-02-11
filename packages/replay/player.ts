@@ -8,7 +8,7 @@ import {
   IncrementalSource,
   EventType,
   AddedNodeMutation,
-  ViewportResizeData
+  ViewportResizeParam
 } from '@mood/record';
 
 import { Timer } from './timer';
@@ -137,7 +137,7 @@ export class Player {
     this.timer.setSpeed(this.config.speed);
   }
 
-  private handleResize(dimension: ViewportResizeData) {
+  private handleResize(dimension: ViewportResizeParam) {
     this.$iframe.width = `${dimension.width}px`;
     this.$iframe.height = `${dimension.height}px`;
   }

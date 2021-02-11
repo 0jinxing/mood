@@ -4,13 +4,13 @@ import { hookSetter, on } from '../utils';
 
 export type InputValue = string | boolean;
 
-export type InputData = {
+export type InputParam = {
   source: IncrementalSource.INPUT;
   id: number;
   value: InputValue;
 };
 
-export type InputCb = (param: InputData) => void;
+export type InputCallback = (param: InputParam) => void;
 
 const lastInputValueMap: WeakMap<EventTarget, InputValue> = new WeakMap();
 
@@ -24,7 +24,7 @@ function isInputElement(
   );
 }
 
-export function input(cb: InputCb) {
+export function input(cb: InputCallback) {
   const cbWithDedup = (
     $target: HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement,
     value: InputValue

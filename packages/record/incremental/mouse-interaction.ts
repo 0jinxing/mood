@@ -16,7 +16,7 @@ const ACTIONS = <const>[
 
 export type MouseInteraction = typeof ACTIONS[number];
 
-export type MouseInteractionData = {
+export type MouseInteractionParam = {
   source: IncrementalSource.MOUSE_INTERACTION;
   action: MouseInteraction;
   id: number;
@@ -24,9 +24,9 @@ export type MouseInteractionData = {
   y: number;
 };
 
-export type MouseInteractionCb = (param: MouseInteractionData) => void;
+export type MouseInteractionCallback = (param: MouseInteractionParam) => void;
 
-export function mouseInteraction(cb: MouseInteractionCb) {
+export function mouseInteraction(cb: MouseInteractionCallback) {
   const handlers: VoidFunction[] = [];
 
   const getHandler = (action: MouseInteraction) => {

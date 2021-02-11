@@ -7,14 +7,14 @@ import {
 import { IncrementalSource } from '../constant';
 import { hookFunc } from '../utils';
 
-export type OffscreenData = {
+export type OffscreenParam = {
   source: IncrementalSource.OFFSCREEN;
   sn: SerializedNodeWithId;
 };
 
-export type OffscreenCb = (param: OffscreenData) => void;
+export type OffscreenCallback = (param: OffscreenParam) => void;
 
-export function offscreen(cb: OffscreenCb) {
+export function offscreen(cb: OffscreenCallback) {
   const unsubscribe = hookFunc(
     Document.prototype,
     'createElement',

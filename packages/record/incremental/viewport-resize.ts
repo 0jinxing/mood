@@ -1,15 +1,15 @@
 import { queryWindowHeight, queryWindowWidth, on, throttle } from '../utils';
 import { IncrementalSource } from '../constant';
 
-export type ViewportResizeData = {
+export type ViewportResizeParam = {
   source: IncrementalSource.VIEWPORT_RESIZE;
   width: number;
   height: number;
 };
 
-export type ViewportResizeCb = (param: ViewportResizeData) => void;
+export type ViewportResizeCallback = (param: ViewportResizeParam) => void;
 
-export function viewportResize(cb: ViewportResizeCb) {
+export function viewportResize(cb: ViewportResizeCallback) {
   const updateDimension = throttle(() => {
     const height = queryWindowHeight();
     const width = queryWindowWidth();

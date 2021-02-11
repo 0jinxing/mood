@@ -6,14 +6,14 @@ import { IncrementalSource } from '../constant';
 // repeat => id, x, y, timestamp
 export type MousePositions = number[];
 
-export type MouseMoveData = {
+export type MouseMoveParam = {
   source: IncrementalSource.MOUSE_MOVE | IncrementalSource.TOUCH_MOVE;
   positions: MousePositions;
 };
 
-export type MousemoveCb = (param: MouseMoveData) => void;
+export type MousemoveCallback = (param: MouseMoveParam) => void;
 
-export function mouseMove(cb: MousemoveCb) {
+export function mouseMove(cb: MousemoveCallback) {
   let positions: MousePositions = [];
   const throttleCb = throttle((isTouch: boolean) => {
     cb({

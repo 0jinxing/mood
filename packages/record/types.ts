@@ -2,26 +2,26 @@ import { AddedNode } from '@mood/snapshot';
 
 import { EventType } from './constant';
 
-import { InputData } from './incremental/input';
-import { MediaInteractionData } from './incremental/media-interaction';
-import { MouseInteractionData } from './incremental/mouse-interaction';
-import { MouseMoveData } from './incremental/mouse-move';
-import { MutationData } from './incremental/mutation';
-import { OffscreenData } from './incremental/offscreen';
-import { ScrollData } from './incremental/scroll';
-import { StyleSheetData } from './incremental/style-sheet';
-import { ViewportResizeData } from './incremental/viewport-resize';
+import { InputParam } from './incremental/input';
+import { MediaInteractionParam } from './incremental/media-interaction';
+import { MouseInteractionParam } from './incremental/mouse-interaction';
+import { MouseMoveParam } from './incremental/mouse-move';
+import { MutationParam } from './incremental/mutation';
+import { OffscreenParam } from './incremental/offscreen';
+import { ScrollParam } from './incremental/scroll';
+import { StyleSheetParam } from './incremental/style-sheet';
+import { ViewportResizeParam } from './incremental/viewport-resize';
 
 export type IncrementalData =
-  | MutationData
-  | MouseMoveData
-  | MouseInteractionData
-  | ScrollData
-  | ViewportResizeData
-  | InputData
-  | MediaInteractionData
-  | StyleSheetData
-  | OffscreenData;
+  | MutationParam
+  | MouseMoveParam
+  | MouseInteractionParam
+  | ScrollParam
+  | ViewportResizeParam
+  | InputParam
+  | MediaInteractionParam
+  | StyleSheetParam
+  | OffscreenParam;
 
 export type DomContentLoadedEvent = {
   type: EventType.DOM_CONTENT_LOADED;

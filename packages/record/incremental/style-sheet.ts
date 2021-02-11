@@ -10,16 +10,16 @@ export type StyleSheetAddRule = {
   index?: number;
 };
 
-export type StyleSheetData = {
+export type StyleSheetParam = {
   source: IncrementalSource.STYLE_SHEETRULE;
   id: number;
   removes?: StyleSheetDeleteRule[];
   adds?: StyleSheetAddRule[];
 };
 
-export type StyleSheetCb = (param: StyleSheetData) => void;
+export type StyleSheetCallback = (param: StyleSheetParam) => void;
 
-export function styleSheet(cb: StyleSheetCb) {
+export function styleSheet(cb: StyleSheetCallback) {
   const insertRule = CSSStyleSheet.prototype.insertRule;
   CSSStyleSheet.prototype.insertRule = function (rule: string, index?: number) {
     const id = mirror.getId(this.ownerNode as Node | ExtNode);
