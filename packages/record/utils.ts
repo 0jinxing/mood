@@ -61,7 +61,7 @@ export function hookSetter<T>(
   return hook(target, key, {
     set(val) {
       original?.set?.call(this, val);
-      setTimeout(() => setter.call(this, val));
+      setter.call(this, val);
     }
   });
 }
@@ -72,7 +72,7 @@ export function hookFunc<T>(target: T, key: keyof T, func: Function) {
     value: function (...args: any[]) {
       const originalValue: Function | undefined = original?.value;
       const result = originalValue?.apply(this, args);
-      setTimeout(() => func.apply(this, [result, args]));
+      func.apply(this, [result, args]);
       return result;
     }
   });

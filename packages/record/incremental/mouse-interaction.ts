@@ -2,18 +2,7 @@ import { mirror } from '@mood/snapshot';
 import { on } from '../utils';
 import { IncrementalSource } from '../constant';
 
-export type MouseInteraction =
-  | 'mouseup'
-  | 'mousedown'
-  | 'click'
-  | 'contexemenu'
-  | 'dbclick'
-  | 'focus'
-  | 'blur'
-  | 'touchstart'
-  | 'touchend';
-
-const ACTS: MouseInteraction[] = [
+const ACTIONS = <const>[
   'mouseup',
   'mousedown',
   'click',
@@ -24,6 +13,8 @@ const ACTS: MouseInteraction[] = [
   'touchstart',
   'touchend'
 ];
+
+export type MouseInteraction = typeof ACTIONS[number];
 
 export type MouseInteractionData = {
   source: IncrementalSource.MOUSE_INTERACTION;
@@ -38,7 +29,7 @@ export type MouseInteractionCb = (param: MouseInteractionData) => void;
 export function mouseInteraction(cb: MouseInteractionCb) {
   const handlers: VoidFunction[] = [];
 
-  const getHandler = (act: MouseInteraction) => {
+  const getHandler = (action: MouseInteraction) => {
     return (event: MouseEvent | TouchEvent) => {
       const id = mirror.getId(event.target as Node);
 
@@ -47,7 +38,7 @@ export function mouseInteraction(cb: MouseInteractionCb) {
 
       cb({
         source: IncrementalSource.MOUSE_INTERACTION,
-        action: act,
+        action,
         id,
         x: clientX,
         y: clientY
@@ -55,9 +46,9 @@ export function mouseInteraction(cb: MouseInteractionCb) {
     };
   };
 
-  ACTS.forEach((act: MouseInteraction) => {
-    const handler = getHandler(act);
-    handlers.push(on(act, handler));
+  ACTIONS.forEach((action: MouseInteraction) => {
+    const handler = getHandler(action);
+    handlers.push(on(action, handler));
   });
   return () => {
     handlers.forEach(h => h());

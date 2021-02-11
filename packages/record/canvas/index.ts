@@ -8,61 +8,7 @@ import { extendPath2D } from './path2d';
 import { extendCanvasGradient } from './canvas-gradient';
 import { extendCanvasPattern } from './canvas-pattern';
 
-// https://developer.mozilla.org/docs/Web/API/CanvasRenderingContext2D
-type Ctx2DMethod =
-  | 'arc'
-  | 'arcTo'
-  | 'beginPath'
-  | 'bezierCurveTo'
-  | 'clearRect'
-  | 'clip' // pick Path2D
-  | 'closePath'
-  | 'drawImage' // pick HTMLImageElement
-  | 'ellipse'
-  | 'fill' // pick Path2D
-  | 'fillRect'
-  | 'fillText'
-  | 'lineTo'
-  | 'moveTo'
-  | 'putImageData' // pick ImageData
-  | 'quadraticCurveTo'
-  | 'rect'
-  | 'resetTransform'
-  | 'restore'
-  | 'rotate'
-  | 'save'
-  | 'scale'
-  | 'setLineDash'
-  | 'setTransform'
-  | 'stroke' // pick Path2D
-  | 'strokeRect'
-  | 'strokeText'
-  | 'transform'
-  | 'translate';
-
-type Ctx2DProp =
-  | 'direction'
-  | 'fillStyle' // pick CanvasGradient CanvasPattern
-  | 'filter'
-  | 'font'
-  | 'globalAlpha'
-  | 'globalCompositeOperation'
-  | 'imageSmoothingEnabled'
-  | 'imageSmoothingQuality'
-  | 'lineCap'
-  | 'lineDashOffset'
-  | 'lineJoin'
-  | 'lineWidth'
-  | 'miterLimit'
-  | 'shadowBlur'
-  | 'shadowColor'
-  | 'shadowOffsetX'
-  | 'shadowOffsetY'
-  | 'strokeStyle'
-  | 'textAlign'
-  | 'textBaseline';
-
-const methods: Ctx2DMethod[] = [
+const METHOD_KEYS = <const>[
   'arc',
   'arcTo',
   'beginPath',
@@ -94,18 +40,13 @@ const methods: Ctx2DMethod[] = [
   'translate'
 ];
 
-type CtxCreateMethod =
-  | 'createLinearGradient'
-  | 'createRadialGradient'
-  | 'createPattern';
-
-const createMethods: CtxCreateMethod[] = [
+const CREATE_KEYS = <const>[
   'createPattern',
   'createLinearGradient',
   'createRadialGradient'
 ];
 
-const props: Ctx2DProp[] = [
+const PROPS = <const>[
   'direction',
   'fillStyle', // pick CanvasGradient CanvasPattern
   'filter',
@@ -128,9 +69,12 @@ const props: Ctx2DProp[] = [
   'textBaseline'
 ];
 
+type Context2DMethod = typeof METHOD_KEYS[number];
+type Context2DProp = typeof PROPS[number];
+
 export type CanvasData = {
   canvasId: number;
-  key: Ctx2DMethod | Ctx2DProp;
+  key: Context2DMethod | Context2DProp;
   args?: unknown[];
   value?: unknown | Plain<unknown>;
 };
@@ -147,7 +91,7 @@ export function canvas(cb: CanvasCb) {
     extendCanvasPattern()
   ];
 
-  const methodUnsubscribes = methods.map(key =>
+  const methodUnsubscribes = METHOD_KEYS.map(key =>
     hookFunc(prototype, key, function (_: unknown, ...args: any[]) {
       const self: CanvasRenderingContext2D = this;
       const canvasId = mirror.getId(self.canvas);
@@ -159,7 +103,7 @@ export function canvas(cb: CanvasCb) {
     })
   );
 
-  const propsUnsubscribes = props.map(key =>
+  const propsUnsubscribes = PROPS.map(key =>
     hookSetter(prototype, key, function (value) {
       const self: CanvasRenderingContext2D = this;
       const canvasId = mirror.getId(self.canvas);
@@ -168,7 +112,7 @@ export function canvas(cb: CanvasCb) {
     })
   );
 
-  const createUnsubscribes = createMethods.map(key =>
+  const createUnsubscribes = CREATE_KEYS.map(key =>
     hookFunc(
       prototype,
       key,

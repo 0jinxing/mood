@@ -1,30 +1,7 @@
 import { Plain } from '../types';
 import { hookFunc } from '../utils';
 
-type Path2DMethod =
-  | 'addPath'
-  | 'arc'
-  | 'arcTo'
-  | 'bezierCurveTo'
-  | 'closePath'
-  | 'ellipse'
-  | 'lineTo'
-  | 'moveTo'
-  | 'quadraticCurveTo'
-  | 'rect';
-
-type Path2DPlain = {
-  impl: 'path2d';
-  restore: Array<[key: Path2DMethod, args: unknown[]]>;
-};
-
-declare global {
-  interface Path2D extends Plain<Path2DPlain> {
-    $plainData?: Path2DPlain;
-  }
-}
-
-const hookKeys: ReadonlyArray<Path2DMethod> = [
+const METHOD_KEYS = <const>[
   'addPath',
   'arc',
   'arcTo',
@@ -37,6 +14,19 @@ const hookKeys: ReadonlyArray<Path2DMethod> = [
   'rect'
 ];
 
+type Path2DMethod = typeof METHOD_KEYS[number];
+
+type Path2DPlain = {
+  impl: 'path2d';
+  restore: Array<[key: Path2DMethod, args: unknown[]]>;
+};
+
+declare global {
+  interface Path2D extends Plain<Path2DPlain> {
+    $plainData?: Path2DPlain;
+  }
+}
+
 export function extendPath2D() {
   const prototype = Path2D.prototype;
   Object.defineProperty(prototype, '$plain', {
@@ -47,7 +37,7 @@ export function extendPath2D() {
     enumerable: false
   });
 
-  const handlers = hookKeys.map(key =>
+  const handlers = METHOD_KEYS.map(key =>
     hookFunc(prototype, key, function (_: unknown, ...args: any[]) {
       const self: Path2D = this;
 
