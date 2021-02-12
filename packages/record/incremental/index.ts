@@ -8,9 +8,9 @@ import { styleSheet } from './style-sheet';
 import { mutation } from './mutation';
 import { offscreen } from './offscreen';
 
-import { EmitHandle } from '../types';
+import { IncEmitHandler } from '../types';
 
-export function incremental(emit: EmitHandle) {
+export function incremental(emit: IncEmitHandler) {
   const unsubscribes = [
     mutation,
     mouseMove,

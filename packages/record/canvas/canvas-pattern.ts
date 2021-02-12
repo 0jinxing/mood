@@ -1,29 +1,7 @@
-import { Plain } from '../types';
-
 export type CanvasPatternPlain = {
-  impl: 'pattern';
-  restore: {
+  kind: 'pattern';
+  extra: {
     canvasId: number;
-    create: number[];
+    create: [sourceId: number, repetition: string | null];
   };
 };
-
-declare global {
-  interface CanvasPattern extends Plain<CanvasPatternPlain> {
-    $plainData: CanvasPatternPlain;
-  }
-}
-
-export function extendCanvasPattern() {
-  Object.defineProperty(CanvasPattern.prototype, '$plain', {
-    value: function () {
-      const self: CanvasPattern = this;
-      return self.$plainData;
-    },
-    enumerable: false
-  });
-
-  return () => {
-    delete CanvasPattern.prototype.$plain;
-  };
-}

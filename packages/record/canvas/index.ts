@@ -1,12 +1,10 @@
 import { mirror } from '@mood/snapshot';
 
-import { isPlain } from '../is';
 import { hookFunc, hookSetter } from '../utils';
-import { Plain } from '../types';
-import { extendImageData } from './image-data';
 import { extendPath2D } from './path2d';
 import { extendCanvasGradient } from './canvas-gradient';
-import { extendCanvasPattern } from './canvas-pattern';
+import { setExtraData } from 'packages/snapshot/utils/extra';
+import { restoreExtra } from '../utils/canvas';
 
 const METHOD_KEYS = <const>[
   'arc',
@@ -76,7 +74,7 @@ export type CanvasParam = {
   canvasId: number;
   key: Context2DMethod | Context2DProp;
   args?: unknown[];
-  value?: unknown | Plain<unknown>;
+  value?: unknown;
 };
 
 export type CanvasCallback = (param: CanvasParam) => void;
@@ -84,12 +82,7 @@ export type CanvasCallback = (param: CanvasParam) => void;
 export function canvas(cb: CanvasCallback) {
   const prototype = CanvasRenderingContext2D.prototype;
 
-  const extendUnsubscribes = [
-    extendImageData(),
-    extendPath2D(),
-    extendCanvasGradient(),
-    extendCanvasPattern()
-  ];
+  const extendUnsubscribes = [extendPath2D(), extendCanvasGradient()];
 
   const methodUnsubscribes = METHOD_KEYS.map(key =>
     hookFunc(prototype, key, function (_: unknown, ...args: any[]) {
@@ -98,7 +91,7 @@ export function canvas(cb: CanvasCallback) {
       cb({
         canvasId,
         key,
-        args: args.map(item => (isPlain(item) ? item.$plain!() : item))
+        args: args.map(item => restoreExtra(item) ?? item)
       });
     })
   );
@@ -108,7 +101,7 @@ export function canvas(cb: CanvasCallback) {
       const self: CanvasRenderingContext2D = this;
       const canvasId = mirror.getId(self.canvas);
 
-      cb({ canvasId, key, value: isPlain(value) ? value.$plain!() : value });
+      cb({ canvasId, key, value: restoreExtra(value) ?? value });
     })
   );
 
@@ -121,22 +114,18 @@ export function canvas(cb: CanvasCallback) {
         const canvasId = mirror.getId(self.canvas);
 
         if (result instanceof CanvasPattern) {
-          result.$plainData = {
+          setExtraData(result, {
             impl: 'pattern',
             restore: { canvasId, create: args }
-          };
+          });
         } else if (result instanceof CanvasGradient) {
-          result.$plainData = {
+          setExtraData(result, {
             impl:
               key === 'createLinearGradient'
                 ? 'linearGradient'
                 : 'radialGradient',
-            restore: {
-              canvasId,
-              create: args,
-              stop: []
-            }
-          };
+            restore: { canvasId, create: args, stop: [] }
+          });
         }
       }
     )

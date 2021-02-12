@@ -6,7 +6,7 @@ export enum NodeType {
   COMMENT_NODE,
   DOCUMENT_NODE,
   DOCUMENT_TYPE_NODE,
-  DOCUMENT_FRAGMENT_NODE,
+  DOCUMENT_FRAGMENT_NODE
 }
 
 export type Attributes = { [key: string]: boolean | string };
@@ -59,10 +59,8 @@ export type AddedNode = {
   parentId?: number;
   nextId?: number;
   node: SerializedNodeWithId;
-}
+};
 
-export interface ExtNode extends Node {
-  __sn: SerializedNodeWithId;
-}
-
-export type IdNodeMap = { [key: number]: ExtNode };
+export type IdNodeMap<T extends EventTarget = EventTarget> = {
+  [key: number]: T;
+};

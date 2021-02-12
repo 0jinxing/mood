@@ -1,4 +1,4 @@
-import { Plain } from '../types';
+import { getExtraData, setExtraData } from 'packages/snapshot/utils/extra';
 import { hookFunc } from '../utils';
 
 const METHOD_KEYS = <const>[
@@ -16,51 +16,43 @@ const METHOD_KEYS = <const>[
 
 type Path2DMethod = typeof METHOD_KEYS[number];
 
-type Path2DPlain = {
-  impl: 'path2d';
-  restore: Array<[key: Path2DMethod, args: unknown[]]>;
+export type Path2DPlain = {
+  kind: 'path2d';
+  extra: Array<[key: Path2DMethod, args: unknown[]]>;
 };
-
-declare global {
-  interface Path2D extends Plain<Path2DPlain> {
-    $plainData?: Path2DPlain;
-  }
-}
 
 export function extendPath2D() {
   const prototype = Path2D.prototype;
-  Object.defineProperty(prototype, '$plain', {
-    value: function () {
-      const self: Path2D = this;
-      return self.$plainData;
-    },
-    enumerable: false
-  });
 
   const handlers = METHOD_KEYS.map(key =>
     hookFunc(prototype, key, function (_: unknown, ...args: any[]) {
       const self: Path2D = this;
 
-      if (!self.$plainData) self.$plainData = { impl: 'path2d', restore: [] };
-      self.$plainData.restore.push([
+      const extraData = getExtraData<Path2DPlain>(self) || {
+        kind: 'path2d',
+        extra: []
+      };
+
+      extraData.extra.push([
         key,
         args.map(arg => {
-          if (arg instanceof Path2D) return arg.$plain && arg.$plain();
+          if (arg instanceof Path2D) return getExtraData<Path2DPlain>(arg);
           return arg;
         })
       ]);
+
+      setExtraData(self, extraData);
     })
   );
 
   return () => {
-    delete Path2D.prototype.$plain;
     handlers.forEach(h => h());
   };
 }
 
 export function restorePath2D(plain: Path2DPlain) {
   const result = new Path2D();
-  for (const [key, args] of plain.restore) {
+  for (const [key, args] of plain.extra) {
     const func: Function = result[key];
     if (key === 'addPath') {
       const [plain] = args;

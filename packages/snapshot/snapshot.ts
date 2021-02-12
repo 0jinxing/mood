@@ -1,13 +1,12 @@
 import { mirror, transformAttr, absoluteToStylesheet } from './utils';
-import { isSVGElement } from './is';
 import {
   SerializedNode,
   NodeType,
   Attributes,
-  ExtNode,
   SerializedNodeWithId,
   AddedNode
 } from './types';
+import { getExtraData, setExtraData } from './utils/extra';
 
 let id = 0;
 function genId(): number {
@@ -30,6 +29,10 @@ function getCSSRuleText(rule: CSSRule): string {
   return rule instanceof CSSImportRule
     ? getCSSText(rule.styleSheet)
     : rule.cssText;
+}
+
+function isSVGElement($el: Element): $el is SVGElement {
+  return /SVG/i.test($el.tagName) || $el instanceof SVGElement;
 }
 
 function serialize($node: Node, $doc: HTMLDocument): SerializedNode | null {
@@ -142,7 +145,7 @@ function serialize($node: Node, $doc: HTMLDocument): SerializedNode | null {
 }
 
 export function serializeWithId(
-  $node: Node | ExtNode,
+  $node: Node,
   $doc: HTMLDocument
 ): SerializedNodeWithId | null {
   const serializedNode = serialize($node, $doc);
@@ -150,10 +153,11 @@ export function serializeWithId(
     // @WARN not serialized
     return null;
   }
-  const id = '__sn' in $node ? $node.__sn.id : genId();
+  const sn = getExtraData<SerializedNodeWithId>($node);
+  const id = sn ? sn.id : genId();
   const nodeWithId = Object.assign(serializedNode, { id });
-  ($node as ExtNode).__sn = nodeWithId;
-  mirror.idNodeMap[id] = $node as ExtNode;
+  setExtraData($node, nodeWithId);
+  mirror.idNodeMap[id] = $node;
 
   return nodeWithId;
 }
@@ -162,7 +166,7 @@ export function snapshot($doc: HTMLDocument): AddedNode[] {
   const adds: AddedNode[] = [];
   const queue: Node[] = [$doc];
 
-  const serializeAdds = ($node: Node | ExtNode) => {
+  const serializeAdds = ($node: Node) => {
     const parentId = $node.parentElement
       ? mirror.getId($node.parentElement)
       : undefined;

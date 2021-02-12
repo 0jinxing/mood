@@ -1,4 +1,4 @@
-import { ExtNode, mirror } from '@mood/snapshot';
+import { mirror } from '@mood/snapshot';
 import { on } from '../utils';
 import { IncrementalSource } from '../constant';
 
@@ -18,7 +18,7 @@ export function mediaInteraction(cb: MediaInteractionCallback) {
     if (target) {
       cb({
         source: IncrementalSource.MEDIA_INTERACTION,
-        id: mirror.getId(target as ExtNode),
+        id: mirror.getId(target),
         action: act
       });
     }

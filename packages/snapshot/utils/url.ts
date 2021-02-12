@@ -1,37 +1,3 @@
-import { isExtNode } from './is';
-import { IdNodeMap, ExtNode } from './types';
-
-export class Mirror {
-  readonly idNodeMap: IdNodeMap = {};
-
-  getId($node: Node | ExtNode) {
-    if (isExtNode($node)) {
-      return $node.__sn.id;
-    }
-    return 0;
-  }
-
-  getNode<T extends Node = Node>(id: number) {
-    return (this.idNodeMap[id] as unknown) as (T & ExtNode) | undefined;
-  }
-
-  remove($node: ExtNode) {
-    const id = this.getId($node);
-    delete this.idNodeMap[id];
-
-    if ($node.childNodes) {
-      $node.childNodes.forEach($childNode =>
-        this.remove(($childNode as Node) as ExtNode)
-      );
-    }
-  }
-
-  has(id: number) {
-    return !!this.idNodeMap[id];
-  }
-}
-
-export const mirror = new Mirror();
 
 const URL_MATCH = /url\(["']?(.*?)["']?\)/gi;
 

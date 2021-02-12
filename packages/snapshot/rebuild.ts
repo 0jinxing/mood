@@ -2,10 +2,10 @@ import {
   ElementNode,
   SerializedNodeWithId,
   NodeType,
-  ExtNode,
   AddedNode
 } from './types';
 import { mirror } from './utils';
+import { setExtraData } from './utils/extra';
 
 function getTagName(node: ElementNode) {
   let tagName = node.tagName;
@@ -115,7 +115,7 @@ export function buildNode(
 export function buildNodeWithSN(
   node: SerializedNodeWithId,
   $doc: HTMLDocument
-): ExtNode | null {
+): Node | null {
   let $el = buildNode(node, $doc);
 
   if (!$el) return null;
@@ -126,10 +126,10 @@ export function buildNodeWithSN(
     $doc.close();
     $doc.open();
   }
-  ($el as ExtNode).__sn = node;
-  mirror.idNodeMap[node.id] = $el as ExtNode;
+  setExtraData($el, node);
+  mirror.idNodeMap[node.id] = $el;
 
-  return $el as ExtNode;
+  return $el;
 }
 
 export function rebuild(adds: AddedNode[], $doc: HTMLDocument) {

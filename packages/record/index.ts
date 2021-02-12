@@ -1,8 +1,9 @@
 import { snapshot } from '@mood/snapshot';
 import { incremental } from './incremental';
 import { on, queryWindowHeight, queryWindowWidth } from './utils';
-import { RecordEvent, RecordEventWithTime, EmitHandle } from './types';
+import { RecordEvent, RecordEventWithTime, IncEmitHandler } from './types';
 import { EventType } from './constant';
+import { canvas } from './canvas';
 
 export type RecordOptions = {
   emit: (e: RecordEventWithTime, isCheckout?: true) => void;
@@ -49,7 +50,7 @@ export function record(options: RecordOptions) {
     wrappedEmit(withTimestamp(event), isCheckout);
   };
 
-  const incEmitWithTime: EmitHandle = data => {
+  const incEmitWithTime: IncEmitHandler = data => {
     wrappedEmitWithTime({ type: EventType.INCREMENTAL_SNAPSHOT, ...data });
   };
 
@@ -89,7 +90,7 @@ export function record(options: RecordOptions) {
 
   const initial = () => {
     takeFullSnapshot();
-
+    canvas(() => {});
     unsubscribes.push(incremental(incEmitWithTime));
   };
 

@@ -1,9 +1,5 @@
-import {
-  mirror,
-  SerializedNodeWithId,
-  serializeWithId,
-  isExtNode
-} from '@mood/snapshot';
+import { mirror, SerializedNodeWithId, serializeWithId } from '@mood/snapshot';
+import { getExtraData } from 'packages/snapshot/utils/extra';
 import { IncrementalSource } from '../constant';
 import { hookFunc } from '../utils';
 
@@ -19,11 +15,11 @@ export function offscreen(cb: OffscreenCallback) {
     Document.prototype,
     'createElement',
     function (result: HTMLElement, ...args: unknown[]) {
-      if (isExtNode(result)) return;
+      if (getExtraData(result)) return;
 
       const node = serializeWithId(result, document);
 
-      if (node && isExtNode(result)) {
+      if (node && getExtraData(result)) {
         mirror.idNodeMap[node.id] = result;
         cb({ source: IncrementalSource.OFFSCREEN, sn: node });
       }

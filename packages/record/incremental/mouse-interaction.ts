@@ -27,7 +27,7 @@ export type MouseInteractionParam = {
 export type MouseInteractionCallback = (param: MouseInteractionParam) => void;
 
 export function mouseInteraction(cb: MouseInteractionCallback) {
-  const handlers: VoidFunction[] = [];
+  const handlers: Function[] = [];
 
   const getHandler = (action: MouseInteraction) => {
     return (event: MouseEvent | TouchEvent) => {

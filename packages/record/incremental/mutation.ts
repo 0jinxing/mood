@@ -1,10 +1,10 @@
 import {
   serializeWithId,
   transformAttr,
-  ExtNode,
   mirror,
   AddedNode,
-  Attributes
+  Attributes,
+  SerializedNodeWithId
 } from '@mood/snapshot';
 
 import {
@@ -15,6 +15,7 @@ import {
 } from '../utils';
 
 import { IncrementalSource } from '../constant';
+import { getExtraData } from 'packages/snapshot/utils/extra';
 
 export type AttrCursor = {
   $el: Node;
@@ -62,12 +63,13 @@ export function mutation(cb: MutationCallback) {
     const movedSet = new Set<Node>();
     const movedMap = new Map<string, true>();
 
-    const genAdds = ($node: Node | ExtNode, $parent?: Node | ExtNode) => {
-      if ('__sn' in $node) {
+    const genAdds = ($node: Node, $parent?: Node) => {
+      const sn = getExtraData<SerializedNodeWithId>($node);
+      if (sn) {
         movedSet.add($node);
         const parentId = $parent ? mirror.getId($parent) : undefined;
         if (parentId) {
-          movedMap.set(genKey($node.__sn.id, parentId), true);
+          movedMap.set(genKey(sn.id, parentId), true);
         }
       } else {
         addedSet.add($node);
@@ -121,7 +123,7 @@ export function mutation(cb: MutationCallback) {
                * before callback fired, so we can ignore it because
                * newly added node will be serialized without child nodes.
                */
-            } else if (isAncestorRemoved(target as ExtNode)) {
+            } else if (isAncestorRemoved(target)) {
               /**
                * If parent id was not in the mirror map any more, it
                * means the parent node has already been removed. So
@@ -134,7 +136,7 @@ export function mutation(cb: MutationCallback) {
             } else {
               removes.push({ parentId, id });
             }
-            mirror.remove($node as ExtNode);
+            mirror.remove($node);
           });
         }
       }
@@ -181,7 +183,7 @@ export function mutation(cb: MutationCallback) {
     while (addQueue.length) {
       if (
         addQueue.every(
-          $node => !mirror.getId(($node.parentNode as Node) as ExtNode)
+          ({ parentNode }) => parentNode && !mirror.getId(parentNode)
         )
       ) {
         /**
@@ -199,13 +201,13 @@ export function mutation(cb: MutationCallback) {
 
       texts: texts
         .map(text => ({
-          id: mirror.getId(text.$el as ExtNode),
+          id: mirror.getId(text.$el),
           value: text.value
         }))
         .filter(text => mirror.has(text.id)),
 
       attributes: attrs.map(attr => ({
-        id: mirror.getId(attr.$el as ExtNode),
+        id: mirror.getId(attr.$el),
         attributes: attr.attributes
       })),
 
