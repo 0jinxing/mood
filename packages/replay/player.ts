@@ -16,6 +16,7 @@ import { createReplayerService } from './fsm';
 import getInjectStyle from './styles/inject-style';
 
 import { ActionWithDelay } from './types';
+import { restore } from 'packages/record/utils/canvas';
 
 const mitt: MittStatic = (mittProxy as any).default || mittProxy;
 
@@ -122,7 +123,7 @@ export class Player {
     this.$cursor.classList.add('__cursor');
 
     this.$iframe = document.createElement('iframe');
-    this.$iframe.setAttribute('sandbox', 'allow-same-origin');
+    this.$iframe.setAttribute('sandbox', 'allow-same-origin allow-scripts');
     this.$iframe.setAttribute('scrolling', 'no');
     this.$iframe.setAttribute('style', 'pointer-events: none');
 
@@ -427,6 +428,23 @@ export class Player {
     }
   }
 
+  private applyCanvas(event: RecordEventWithTime & { type: EventType.CANVAS }) {
+    const { canvasId, key, args, value } = event;
+    const canvas$ = mirror.getNode<HTMLCanvasElement>(canvasId);
+
+    const ctx = canvas$?.getContext('2d');
+    if (!ctx) return;
+
+    const prop = ctx[key];
+    if (Object.prototype.toString.call(prop) === '[object Function]') {
+      // Reflect.apply(prop as Function, ctx, args?.map(restore) || []);
+      // @ts-ignore
+      ctx[key].apply(ctx, (args || []).map(restore));
+    } else {
+      Reflect.set(ctx, key, restore(value));
+    }
+  }
+
   private rebuildFullSnapshot(event: RecordEventWithTime & FullSnapshotEvent) {
     const contentDocument = this.$iframe.contentDocument!;
 
@@ -472,6 +490,12 @@ export class Player {
       case EventType.INCREMENTAL_SNAPSHOT: {
         castFn = () => {
           this.applyIncremental(event, isSync);
+        };
+        break;
+      }
+      case EventType.CANVAS: {
+        castFn = () => {
+          this.applyCanvas(event);
         };
         break;
       }

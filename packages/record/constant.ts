@@ -4,6 +4,7 @@ export enum EventType {
   DOM_CONTENT_LOADED,
   FULL_SNAPSHOT,
   INCREMENTAL_SNAPSHOT,
+  CANVAS,
   CUSTOM
 }
 

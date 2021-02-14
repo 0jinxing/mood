@@ -6,3 +6,7 @@ export type ImageDataPlain = {
     width: number;
   };
 };
+
+export function extendImageData() {
+  return () => {};
+}

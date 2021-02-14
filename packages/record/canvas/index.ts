@@ -3,10 +3,10 @@ import { mirror } from '@mood/snapshot';
 import { hookFunc, hookSetter } from '../utils';
 import { extendPath2D } from './path2d';
 import { extendCanvasGradient } from './canvas-gradient';
-import { setExtraData } from 'packages/snapshot/utils/extra';
-import { restoreExtra } from '../utils/canvas';
+import { getExtraData, setExtraData } from 'packages/snapshot/utils/extra';
+import { restore, RestoreType } from '../utils/canvas';
 
-const METHOD_KEYS = <const>[
+export const METHOD_KEYS = <const>[
   'arc',
   'arcTo',
   'beginPath',
@@ -38,13 +38,13 @@ const METHOD_KEYS = <const>[
   'translate'
 ];
 
-const CREATE_KEYS = <const>[
+export const CREATE_KEYS = <const>[
   'createPattern',
   'createLinearGradient',
   'createRadialGradient'
 ];
 
-const PROPS = <const>[
+export const PROPS = <const>[
   'direction',
   'fillStyle', // pick CanvasGradient CanvasPattern
   'filter',
@@ -73,8 +73,10 @@ type Context2DProp = typeof PROPS[number];
 export type CanvasParam = {
   canvasId: number;
   key: Context2DMethod | Context2DProp;
-  args?: unknown[];
-  value?: unknown;
+
+  args?: RestoreType[];
+
+  value?: RestoreType;
 };
 
 export type CanvasCallback = (param: CanvasParam) => void;
@@ -85,13 +87,19 @@ export function canvas(cb: CanvasCallback) {
   const extendUnsubscribes = [extendPath2D(), extendCanvasGradient()];
 
   const methodUnsubscribes = METHOD_KEYS.map(key =>
-    hookFunc(prototype, key, function (_: unknown, ...args: any[]) {
+    hookFunc(prototype, key, function (_: unknown, args: any[]) {
       const self: CanvasRenderingContext2D = this;
       const canvasId = mirror.getId(self.canvas);
       cb({
         canvasId,
         key,
-        args: args.map(item => restoreExtra(item) ?? item)
+        args: args.map(item => {
+          if (typeof item !== 'object' || !item) return item;
+          if (item instanceof HTMLElement) {
+            return { sn: mirror.getId(item) };
+          }
+          return getExtraData(item) ?? item;
+        })
       });
     })
   );
@@ -101,7 +109,7 @@ export function canvas(cb: CanvasCallback) {
       const self: CanvasRenderingContext2D = this;
       const canvasId = mirror.getId(self.canvas);
 
-      cb({ canvasId, key, value: restoreExtra(value) ?? value });
+      cb({ canvasId, key, value: restore(value) ?? value });
     })
   );
 
@@ -109,7 +117,7 @@ export function canvas(cb: CanvasCallback) {
     hookFunc(
       prototype,
       key,
-      function (result: CanvasGradient | CanvasPattern, ...args: number[]) {
+      function (result: CanvasGradient | CanvasPattern, args: number[]) {
         const self: CanvasRenderingContext2D = this;
         const canvasId = mirror.getId(self.canvas);
 

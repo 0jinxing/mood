@@ -1,4 +1,5 @@
 import { AddedNode } from '@mood/snapshot';
+import { CanvasParam } from './canvas';
 
 import { EventType } from './constant';
 
@@ -12,7 +13,7 @@ import { ScrollParam } from './incremental/scroll';
 import { StyleSheetParam } from './incremental/style-sheet';
 import { ViewportResizeParam } from './incremental/viewport-resize';
 
-export type IncrementalData =
+export type IncrementalParam =
   | MutationParam
   | MouseMoveParam
   | MouseInteractionParam
@@ -39,7 +40,7 @@ export type FullSnapshotEvent = {
 
 export type IncrementalSnapshotEvent = {
   type: EventType.INCREMENTAL_SNAPSHOT;
-} & IncrementalData;
+} & IncrementalParam;
 
 export type MetaEvent = {
   type: EventType.META;
@@ -47,6 +48,10 @@ export type MetaEvent = {
   width: number;
   height: number;
 };
+
+export type CanvasEvent = {
+  type: EventType.CANVAS;
+} & CanvasParam;
 
 export type CustomEvent<T = unknown> = {
   type: EventType.CUSTOM;
@@ -60,8 +65,9 @@ export type RecordEvent =
   | FullSnapshotEvent
   | IncrementalSnapshotEvent
   | MetaEvent
+  | CanvasEvent
   | CustomEvent;
 
 export type RecordEventWithTime = RecordEvent & { timestamp: number };
 
-export type IncEmitHandler = (data: IncrementalData) => void;
+export type IncEmitHandler = (data: IncrementalParam) => void;

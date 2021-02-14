@@ -14,7 +14,7 @@ export function offscreen(cb: OffscreenCallback) {
   const unsubscribe = hookFunc(
     Document.prototype,
     'createElement',
-    function (result: HTMLElement, ...args: unknown[]) {
+    function (result: HTMLElement) {
       if (getExtraData(result)) return;
 
       const node = serializeWithId(result, document);
