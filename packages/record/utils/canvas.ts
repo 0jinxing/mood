@@ -1,8 +1,11 @@
 import { mirror } from 'packages/snapshot';
-import { CanvasGradientPlain } from '../canvas/canvas-gradient';
+import {
+  CanvasGradientExtra,
+  CanvasGradientStop
+} from '../canvas/canvas-gradient';
 import { CanvasPatternPlain } from '../canvas/canvas-pattern';
-import { ImageDataPlain } from '../canvas/image-data';
-import { Path2DPlain } from '../canvas/path2d';
+import { ImageDataExtra } from '../canvas/image-data';
+import { Path2DExtra } from '../canvas/path2d';
 
 export type Primitive =
   | bigint
@@ -16,10 +19,10 @@ export type Primitive =
 type ElementSN = { sn: number };
 
 export type RestoreType =
-  | ImageDataPlain
-  | Path2DPlain
+  | ImageDataExtra
+  | Path2DExtra
   | CanvasPatternPlain
-  | CanvasGradientPlain
+  | CanvasGradientExtra
   | ElementSN
   | Primitive
   | Array<ResponseType>;
@@ -28,7 +31,7 @@ export function restore(value: RestoreType): any {
   if (value instanceof Array) {
     return value.map(restore);
   }
-  
+
   if (typeof value !== 'object' || value === null) {
     return value;
   }
@@ -37,7 +40,7 @@ export function restore(value: RestoreType): any {
     return restoreElement(value);
   }
 
-  switch (value.kind) {
+  switch (value.k) {
     case 'imageData': {
       return restoreImageDataExtra(value);
     }
@@ -58,19 +61,16 @@ export function restoreElement({ sn }: ElementSN) {
   return mirror.getNode(sn);
 }
 
-function restoreImageDataExtra(value: ImageDataPlain) {
-  const { width, height, data } = value.extra;
+function restoreImageDataExtra({ e }: ImageDataExtra) {
+  const [width, height, ...data] = e;
   const result = new ImageData(width, height);
   result.data.set(data);
 
   return result;
 }
 
-function restorePath2DExtra(value: Path2DPlain) {
-  const {
-    create: [path],
-    patch
-  } = value.extra;
+function restorePath2DExtra({ e }: Path2DExtra) {
+  const [path, patch] = e;
   const arg = <string | Path2D | undefined>restore(path);
   const result = new Path2D(arg);
   for (const [prop, args] of patch) {
@@ -79,11 +79,8 @@ function restorePath2DExtra(value: Path2DPlain) {
   return result;
 }
 
-function restorePatternExtra(value: CanvasPatternPlain) {
-  const {
-    canvasId,
-    create: [sourceId, repetition]
-  } = value.extra;
+function restorePatternExtra({ e }: CanvasPatternPlain) {
+  const [canvasId, sourceId, repetition] = e;
   const canvas = mirror.getNode<HTMLCanvasElement>(canvasId);
 
   type SourceElement = HTMLVideoElement | HTMLCanvasElement | HTMLImageElement;
@@ -96,8 +93,8 @@ function restorePatternExtra(value: CanvasPatternPlain) {
   return ctx.createPattern(source, repetition);
 }
 
-function restoreGradientExtra(value: CanvasGradientPlain) {
-  const { canvasId, create, stop } = value.extra;
+function restoreGradientExtra(value: CanvasGradientExtra) {
+  const [canvasId] = value.e;
   const canvas = mirror.getNode<HTMLCanvasElement>(canvasId);
 
   const ctx = canvas?.getContext('2d');
@@ -105,11 +102,13 @@ function restoreGradientExtra(value: CanvasGradientPlain) {
 
   let result: CanvasGradient;
 
-  if (value.kind === 'linear') {
-    const [x0, y0, x1, y1] = create;
+  const stop = value.e[value.e.length - 1] as CanvasGradientStop[];
+
+  if (value.k === 'linear') {
+    const [, x0, y0, x1, y1] = value.e;
     result = ctx.createLinearGradient(x0, y0, x1, y1);
   } else {
-    const [x0, y0, r0, x1, y1, r1] = create;
+    const [, x0, y0, r0, x1, y1, r1] = value.e;
     result = ctx.createRadialGradient(x0, y0, r0, x1, y1, r1);
   }
   for (const [offset, color] of stop) {

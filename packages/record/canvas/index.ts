@@ -5,6 +5,7 @@ import { extendPath2D } from './path2d';
 import { extendCanvasGradient } from './canvas-gradient';
 import { getExtraData, setExtraData } from 'packages/snapshot/utils/extra';
 import { restore, RestoreType } from '../utils/canvas';
+import { CanvasPatternPlain as CanvasPatternExtra } from './canvas-pattern';
 
 export const METHOD_KEYS = <const>[
   'arc',
@@ -122,6 +123,10 @@ export function canvas(cb: CanvasCallback) {
         const canvasId = mirror.getId(self.canvas);
 
         if (result instanceof CanvasPattern) {
+          const extraData: CanvasPatternExtra = {
+            k: 'pattern',
+            e: [canvasId, 0, null]
+          };
           setExtraData(result, {
             impl: 'pattern',
             restore: { canvasId, create: args }

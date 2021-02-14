@@ -1,12 +1,4 @@
-export type ImageDataPlain = {
-  kind: 'imageData';
-  extra: {
-    data: number[];
-    height: number;
-    width: number;
-  };
+export type ImageDataExtra = {
+  k: 'imageData';
+  e: [width: number, height: number, ...data: number[]];
 };
-
-export function extendImageData() {
-  return () => {};
-}

@@ -54,8 +54,13 @@ export function record(options: RecordOptions) {
     wrappedEmitWithTime({ type: EventType.INCREMENTAL_SNAPSHOT, ...data });
   };
 
+  let timeOfCanvas = 0;
   const canvasEmitWithTime = (data: CanvasParam) => {
-    wrappedEmitWithTime({ type: EventType.CANVAS, ...data });
+    const timestamp = Date.now();
+    if (timestamp - timeOfCanvas > 15) {
+      timeOfCanvas = timestamp;
+    }
+    emit({ timestamp: timeOfCanvas, type: EventType.CANVAS, ...data });
   };
 
   const takeFullSnapshot = (isCheckout?: true) => {

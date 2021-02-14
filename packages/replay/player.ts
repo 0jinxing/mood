@@ -73,6 +73,10 @@ function chunk<T>(array: T[], count: number) {
   return result;
 }
 
+function isFunction(target: unknown): target is Function {
+  return Object.prototype.toString.call(target) === '[object Function]';
+}
+
 export class Player {
   private $iframe: HTMLIFrameElement;
 
@@ -436,10 +440,8 @@ export class Player {
     if (!ctx) return;
 
     const prop = ctx[key];
-    if (Object.prototype.toString.call(prop) === '[object Function]') {
-      // Reflect.apply(prop as Function, ctx, args?.map(restore) || []);
-      // @ts-ignore
-      ctx[key].apply(ctx, (args || []).map(restore));
+    if (isFunction(prop)) {
+      Reflect.apply(prop, ctx, args?.map(restore) || []);
     } else {
       Reflect.set(ctx, key, restore(value));
     }
