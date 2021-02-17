@@ -1,4 +1,6 @@
-export function hook<T>(
+import { MethodKeys, PropKeys } from '../types';
+
+export function hook<T extends object>(
   target: T,
   key: keyof T,
   descriptor: PropertyDescriptor
@@ -9,9 +11,9 @@ export function hook<T>(
   return () => Object.defineProperty(target, key, original || {});
 }
 
-export function hookSetter<T>(
+export function hookProp<T extends object>(
   target: T,
-  key: keyof T,
+  key: PropKeys<T>,
   setter: (val: any) => void
 ) {
   const original = Object.getOwnPropertyDescriptor(target, key);
@@ -23,13 +25,19 @@ export function hookSetter<T>(
   });
 }
 
-export function hookFunc<T>(target: T, key: keyof T, func: Function) {
+export function hookMethod<T extends object>(
+  target: T,
+  key: MethodKeys<T>,
+  hooker: typeof target[typeof key]
+) {
   const original = Object.getOwnPropertyDescriptor(target, key);
   return hook(target, key, {
     value: function (...args: any[]) {
-      const originalValue: Function | undefined = original?.value;
+      const originalValue = original?.value;
+
       const result = originalValue?.apply(this, args);
-      func.apply(this, [result, args]);
+      hooker.apply(this, args);
+
       return result;
     }
   });

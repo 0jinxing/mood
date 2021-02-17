@@ -1,5 +1,5 @@
-import { getExtraData, setExtraData } from 'packages/snapshot/utils/extra';
-import { hookFunc } from '../utils';
+import { Addition, getAddition, setAddition } from '@mood/snapshot';
+import { hookMethod } from '../utils';
 
 const PATCH_KEYS = <const>[
   'addPath',
@@ -14,31 +14,31 @@ const PATCH_KEYS = <const>[
   'rect'
 ];
 
-export type Path2DExtra = {
-  k: 'path2d';
-  e: [
-    create: string | Path2DExtra | undefined,
+export type Path2DAddition = Addition<
+  'path2d',
+  [
+    create: string | Path2DAddition | undefined,
     patch: Array<[key: typeof PATCH_KEYS[number], args: unknown[]]>
-  ];
-};
+  ]
+>;
 
 export function extendPath2D() {
   const prototype = Path2D.prototype;
 
   const handlers = PATCH_KEYS.map(key =>
-    hookFunc(prototype, key, function (_: unknown, args: any[]) {
+    hookMethod(prototype, key, function (_: unknown, args: any[]) {
       const self: Path2D = this;
 
-      const extraData = getExtraData<Path2DExtra>(self);
+      const extra = getAddition<Path2DAddition>(self);
 
-      if (!extraData) return;
+      if (!extra) return;
 
-      const patch = extraData.e[1];
+      const patch = extra.base[1];
 
       patch.push([
         key,
         args.map(arg => {
-          if (arg instanceof Path2D) return getExtraData<Path2DExtra>(arg);
+          if (arg instanceof Path2D) return getAddition<Path2DAddition>(arg);
           return arg;
         })
       ]);
@@ -52,11 +52,11 @@ export function extendPath2D() {
       const result = Reflect.construct(target, [path], newTarget);
 
       const create =
-        path instanceof Path2D ? getExtraData<Path2DExtra>(path) : path;
+        path instanceof Path2D ? getAddition<Path2DAddition>(path) : path;
 
-      const extraData: Path2DExtra = { k: 'path2d', e: [create, []] };
+      const extra: Path2DAddition = { kind: 'path2d', base: [create, []] };
 
-      setExtraData(result, extraData);
+      setAddition(result, extra);
 
       return result;
     }
@@ -69,22 +69,4 @@ export function extendPath2D() {
 
     handlers.forEach(h => h());
   };
-}
-
-export function restorePath2D({ e }: Path2DExtra) {
-  const [create, patch] = e;
-
-  const result: Path2D = new Path2D(
-    !create || typeof create === 'string' ? create : restorePath2D(create)
-  );
-
-  for (const [key, args] of patch) {
-    const func: Function = result[key];
-    if (key === 'addPath') {
-      const [path] = args;
-      args[0] = restorePath2D(path as Path2DExtra);
-    }
-    func.apply(result, args);
-  }
-  return result;
 }

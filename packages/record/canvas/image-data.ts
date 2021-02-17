@@ -1,4 +1,6 @@
-export type ImageDataExtra = {
-  k: 'imageData';
-  e: [width: number, height: number, ...data: number[]];
-};
+import { Addition } from '@mood/snapshot';
+
+export type ImageDataAddition = Addition<
+  'imageData',
+  [width: number, height: number, ...data: number[]]
+>;

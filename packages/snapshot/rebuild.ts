@@ -2,10 +2,10 @@ import {
   ElementNode,
   SerializedNodeWithId,
   NodeType,
-  AddedNode
+  AddedNode,
+  ElementAddition
 } from './types';
-import { mirror } from './utils';
-import { setExtraData } from './utils/extra';
+import { mirror, setAddition } from './utils';
 
 function getTagName(node: ElementNode) {
   let tagName = node.tagName;
@@ -126,7 +126,7 @@ export function buildNodeWithSN(
     $doc.close();
     $doc.open();
   }
-  setExtraData($el, node);
+  setAddition<ElementAddition>($el, { kind: 'element', base: node.id });
   mirror.idNodeMap[node.id] = $el;
 
   return $el;

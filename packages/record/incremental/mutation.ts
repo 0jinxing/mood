@@ -4,7 +4,8 @@ import {
   mirror,
   AddedNode,
   Attributes,
-  SerializedNodeWithId
+  SerializedNodeWithId,
+  ElementAddition
 } from '@mood/snapshot';
 
 import {
@@ -15,7 +16,7 @@ import {
 } from '../utils';
 
 import { IncrementalSource } from '../constant';
-import { getExtraData } from 'packages/snapshot/utils/extra';
+import { getAddition } from '@mood/snapshot/utils/addition';
 
 export type AttrCursor = {
   $el: Node;
@@ -64,12 +65,12 @@ export function mutation(cb: MutationCallback) {
     const movedMap = new Map<string, true>();
 
     const genAdds = ($node: Node, $parent?: Node) => {
-      const sn = getExtraData<SerializedNodeWithId>($node);
-      if (sn) {
+      const addition = getAddition<ElementAddition>($node);
+      if (addition) {
         movedSet.add($node);
         const parentId = $parent ? mirror.getId($parent) : undefined;
         if (parentId) {
-          movedMap.set(genKey(sn.id, parentId), true);
+          movedMap.set(genKey(addition.base, parentId), true);
         }
       } else {
         addedSet.add($node);

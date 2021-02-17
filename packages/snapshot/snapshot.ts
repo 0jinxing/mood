@@ -1,12 +1,18 @@
-import { mirror, transformAttr, absoluteToStylesheet } from './utils';
+import {
+  mirror,
+  transformAttr,
+  absoluteToStylesheet,
+  getAddition,
+  setAddition
+} from './utils';
 import {
   SerializedNode,
   NodeType,
   Attributes,
   SerializedNodeWithId,
-  AddedNode
+  AddedNode,
+  ElementAddition
 } from './types';
-import { getExtraData, setExtraData } from './utils/extra';
 
 let id = 0;
 function genId(): number {
@@ -153,13 +159,13 @@ export function serializeWithId(
     // @WARN not serialized
     return null;
   }
-  const sn = getExtraData<SerializedNodeWithId>($node);
-  const id = sn ? sn.id : genId();
-  const nodeWithId = Object.assign(serializedNode, { id });
-  setExtraData($node, nodeWithId);
+  const addition = getAddition<ElementAddition>($node);
+  const id = addition ? addition.base : genId();
+
+  setAddition<ElementAddition>($node, { kind: 'element', base: id });
   mirror.idNodeMap[id] = $node;
 
-  return nodeWithId;
+  return Object.assign(serializedNode, { id });
 }
 
 export function snapshot($doc: HTMLDocument): AddedNode[] {

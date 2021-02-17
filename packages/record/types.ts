@@ -71,3 +71,15 @@ export type RecordEvent =
 export type RecordEventWithTime = RecordEvent & { timestamp: number };
 
 export type IncEmitHandler = (data: IncrementalParam) => void;
+
+type StringKeys<T extends object> = T[keyof T] extends string
+  ? T[keyof T]
+  : never;
+
+export type MethodKeys<T extends object> = StringKeys<
+  { [K in keyof T]: T[K] extends Function ? K : never }
+>;
+
+export type PropKeys<T extends object> = StringKeys<
+  { [K in keyof T]: T[K] extends Function ? never : K }
+>;

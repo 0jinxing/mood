@@ -64,3 +64,10 @@ export type AddedNode = {
 export type IdNodeMap<T extends EventTarget = EventTarget> = {
   [key: number]: T;
 };
+
+export type Addition<K = string, B = any> = {
+  kind: K;
+  base: B;
+};
+
+export type ElementAddition = Addition<'element', number>;

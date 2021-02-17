@@ -1,12 +1,12 @@
-import { IdNodeMap, SerializedNodeWithId } from '../types';
-import { getExtraData } from './extra';
+import { ElementAddition, IdNodeMap } from '../types';
+import { getAddition } from './addition';
 
 export class Mirror {
   readonly idNodeMap: IdNodeMap = {};
 
   getId<T extends EventTarget = Node>($node: T) {
-    const sn = getExtraData<SerializedNodeWithId>($node);
-    if (sn) return sn.id;
+    const addition = getAddition<ElementAddition>($node);
+    if (addition) return addition.base;
     return 0;
   }
 

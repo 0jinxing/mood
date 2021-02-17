@@ -1,11 +1,11 @@
-import { getExtraData } from 'packages/snapshot/utils/extra';
-import { hookFunc } from '../utils';
+import { getAddition, Addition } from '@mood/snapshot';
+import { hookMethod } from '../utils';
 
 export type CanvasGradientStop = [offset: number, color: string];
 
-export type CanvasRadialGradientExtra = {
-  k: 'radial';
-  e: [
+export type CanvasRadialGradientAddition = Addition<
+  'radial',
+  [
     canvasId: number,
     x0: number,
     y0: number,
@@ -14,35 +14,36 @@ export type CanvasRadialGradientExtra = {
     y1: number,
     r1: number,
     stop: CanvasGradientStop[]
-  ];
-};
+  ]
+>;
 
-export type CanvasLinearGradientExtra = {
-  k: 'linear';
-  e: [
+export type CanvasLinearGradientAddition = Addition<
+  'linear',
+  [
     canvasId: number,
     x0: number,
     y0: number,
     x1: number,
     y1: number,
     stop: CanvasGradientStop[]
-  ];
-};
+  ]
+>;
 
-export type CanvasGradientExtra =
-  | CanvasRadialGradientExtra
-  | CanvasLinearGradientExtra;
+export type CanvasGradientAddition =
+  | CanvasRadialGradientAddition
+  | CanvasLinearGradientAddition;
 
 export function extendCanvasGradient() {
-  const unsubscribe = hookFunc(
+  const unsubscribe = hookMethod(
     CanvasGradient.prototype,
     'addColorStop',
-    function (_: unknown, offset: number, color: string) {
+    function (offset, color) {
       const self: CanvasGradient = this;
-      const data = getExtraData<CanvasGradientExtra>(self);
-      if (!data) return;
 
-      const stop = data.k === 'linear' ? data.e[5] : data.e[7];
+      const extra = getAddition<CanvasGradientAddition>(self)!;
+      if (!extra) return;
+
+      const stop = extra.kind === 'linear' ? extra.base[5] : extra.base[7];
       stop.push([offset, color]);
     }
   );

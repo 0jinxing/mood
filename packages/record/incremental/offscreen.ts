@@ -1,7 +1,7 @@
 import { mirror, SerializedNodeWithId, serializeWithId } from '@mood/snapshot';
-import { getExtraData } from 'packages/snapshot/utils/extra';
+import { getAddition } from '@mood/snapshot/utils/addition';
 import { IncrementalSource } from '../constant';
-import { hookFunc } from '../utils';
+import { hookMethod } from '../utils';
 
 export type OffscreenParam = {
   source: IncrementalSource.OFFSCREEN;
@@ -11,15 +11,15 @@ export type OffscreenParam = {
 export type OffscreenCallback = (param: OffscreenParam) => void;
 
 export function offscreen(cb: OffscreenCallback) {
-  const unsubscribe = hookFunc(
+  const unsubscribe = hookMethod(
     Document.prototype,
     'createElement',
     function (result: HTMLElement) {
-      if (getExtraData(result)) return;
+      if (getAddition(result)) return;
 
       const node = serializeWithId(result, document);
 
-      if (node && getExtraData(result)) {
+      if (node && getAddition(result)) {
         mirror.idNodeMap[node.id] = result;
         cb({ source: IncrementalSource.OFFSCREEN, sn: node });
       }

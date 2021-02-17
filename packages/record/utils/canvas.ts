@@ -1,11 +1,11 @@
-import { mirror } from 'packages/snapshot';
+import { ElementAddition, mirror } from 'packages/snapshot';
 import {
-  CanvasGradientExtra,
+  CanvasGradientAddition,
   CanvasGradientStop
 } from '../canvas/canvas-gradient';
-import { CanvasPatternPlain } from '../canvas/canvas-pattern';
-import { ImageDataExtra } from '../canvas/image-data';
-import { Path2DExtra } from '../canvas/path2d';
+import { CanvasPatternAddition } from '../canvas/canvas-pattern';
+import { ImageDataAddition } from '../canvas/image-data';
+import { Path2DAddition } from '../canvas/path2d';
 
 export type Primitive =
   | bigint
@@ -16,16 +16,14 @@ export type Primitive =
   | symbol
   | undefined;
 
-type ElementSN = { sn: number };
-
 export type RestoreType =
-  | ImageDataExtra
-  | Path2DExtra
-  | CanvasPatternPlain
-  | CanvasGradientExtra
-  | ElementSN
+  | ImageDataAddition
+  | Path2DAddition
+  | CanvasPatternAddition
+  | CanvasGradientAddition
+  | ElementAddition
   | Primitive
-  | Array<ResponseType>;
+  | Array<RestoreType>;
 
 export function restore(value: RestoreType): any {
   if (value instanceof Array) {
@@ -40,37 +38,37 @@ export function restore(value: RestoreType): any {
     return restoreElement(value);
   }
 
-  switch (value.k) {
+  switch (value.kind) {
     case 'imageData': {
-      return restoreImageDataExtra(value);
+      return restoreImageData(value);
     }
     case 'path2d': {
-      return restorePath2DExtra(value);
+      return restorePath2D(value);
     }
     case 'pattern': {
-      return restorePatternExtra(value);
+      return restorePattern(value);
     }
     case 'linear':
     case 'radial': {
-      return restoreGradientExtra(value);
+      return restoreGradient(value);
     }
   }
 }
 
-export function restoreElement({ sn }: ElementSN) {
-  return mirror.getNode(sn);
+export function restoreElement(addition: ElementAddition) {
+  return mirror.getNode(addition.base);
 }
 
-function restoreImageDataExtra({ e }: ImageDataExtra) {
-  const [width, height, ...data] = e;
+function restoreImageData(addition: ImageDataAddition) {
+  const [width, height, ...data] = addition.base;
   const result = new ImageData(width, height);
   result.data.set(data);
 
   return result;
 }
 
-function restorePath2DExtra({ e }: Path2DExtra) {
-  const [path, patch] = e;
+function restorePath2D(addition: Path2DAddition) {
+  const [path, patch] = addition.base;
   const arg = <string | Path2D | undefined>restore(path);
   const result = new Path2D(arg);
   for (const [prop, args] of patch) {
@@ -79,8 +77,8 @@ function restorePath2DExtra({ e }: Path2DExtra) {
   return result;
 }
 
-function restorePatternExtra({ e }: CanvasPatternPlain) {
-  const [canvasId, sourceId, repetition] = e;
+function restorePattern(addition: CanvasPatternAddition) {
+  const [canvasId, sourceId, repetition] = addition.base;
   const canvas = mirror.getNode<HTMLCanvasElement>(canvasId);
 
   type SourceElement = HTMLVideoElement | HTMLCanvasElement | HTMLImageElement;
@@ -93,8 +91,8 @@ function restorePatternExtra({ e }: CanvasPatternPlain) {
   return ctx.createPattern(source, repetition);
 }
 
-function restoreGradientExtra(value: CanvasGradientExtra) {
-  const [canvasId] = value.e;
+function restoreGradient(addition: CanvasGradientAddition) {
+  const [canvasId] = addition.base;
   const canvas = mirror.getNode<HTMLCanvasElement>(canvasId);
 
   const ctx = canvas?.getContext('2d');
@@ -102,13 +100,13 @@ function restoreGradientExtra(value: CanvasGradientExtra) {
 
   let result: CanvasGradient;
 
-  const stop = value.e[value.e.length - 1] as CanvasGradientStop[];
+  const stop = addition.base[addition.base.length - 1] as CanvasGradientStop[];
 
-  if (value.k === 'linear') {
-    const [, x0, y0, x1, y1] = value.e;
+  if (addition.kind === 'linear') {
+    const [, x0, y0, x1, y1] = addition.base;
     result = ctx.createLinearGradient(x0, y0, x1, y1);
   } else {
-    const [, x0, y0, r0, x1, y1, r1] = value.e;
+    const [, x0, y0, r0, x1, y1, r1] = addition.base;
     result = ctx.createRadialGradient(x0, y0, r0, x1, y1, r1);
   }
   for (const [offset, color] of stop) {

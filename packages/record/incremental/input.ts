@@ -1,6 +1,6 @@
 import { mirror } from '@mood/snapshot';
 import { IncrementalSource } from '../constant';
-import { hookSetter, on } from '../utils';
+import { hookProp, on } from '../utils';
 
 export type InputValue = string | boolean;
 
@@ -80,7 +80,7 @@ export function input(cb: InputCallback) {
 
   type Properties<T = any> = [prototype: T, key: keyof T];
   const hookHandlers = hookProperties.map(([prototype, key]: Properties) =>
-    hookSetter(prototype, key, function () {
+    hookProp(prototype, key, function () {
       eventHandler({ target: this });
     })
   );
