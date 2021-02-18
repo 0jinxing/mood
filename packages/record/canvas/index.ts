@@ -90,7 +90,7 @@ export function canvas(cb: CanvasCallback) {
   const extendUnsubscribes = [extendPath2D(), extendCanvasGradient()];
 
   const methodUnsubscribes = METHOD_KEYS.map(key =>
-    hookMethod(prototype, key, function (...args: any[]) {
+    hookMethod(prototype, key, function (_, args) {
       const self: CanvasRenderingContext2D = this;
       const canvasId = mirror.getId(self.canvas);
       cb({
@@ -122,11 +122,7 @@ export function canvas(cb: CanvasCallback) {
     hookMethod(
       prototype,
       'createPattern',
-      function (
-        result: CanvasPattern,
-        source: CanvasImageSource,
-        repetition: string | null
-      ) {
+      function (result, [source, repetition]) {
         const self: CanvasRenderingContext2D = this;
         if (source instanceof HTMLElement) {
           setAddition<CanvasPatternAddition>(result, {

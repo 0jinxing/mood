@@ -72,11 +72,11 @@ export type RecordEventWithTime = RecordEvent & { timestamp: number };
 
 export type IncEmitHandler = (data: IncrementalParam) => void;
 
-type IsAny<T> = any extends T ? true : false;
+export type IsAny<T> = any extends T ? true : false;
 
-type ValueOf<T extends object> = T[keyof T];
+export type ValueOf<T extends object> = T[keyof T];
 
-type FN = (...args: any[]) => any;
+export type FN = (...args: any[]) => any;
 
 export type MethodKeys<T extends object> = ValueOf<
   {

@@ -1,7 +1,8 @@
 import { Addition, getAddition, setAddition } from '@mood/snapshot';
+import { MethodKeys, ValueOf } from '../types';
 import { hookMethod } from '../utils';
 
-const PATCH_KEYS = <const>[
+const PATCH_KEYS: ReadonlyArray<MethodKeys<Path2D>> = [
   'addPath',
   'arc',
   'arcTo',
@@ -14,34 +15,36 @@ const PATCH_KEYS = <const>[
   'rect'
 ];
 
+type Patch<T extends object> = ValueOf<
+  { [K in MethodKeys<T>]: { key: K; args: Parameters<T[K]> } }
+>;
+
 export type Path2DAddition = Addition<
   'path2d',
-  [
-    create: string | Path2DAddition | undefined,
-    patch: Array<[key: typeof PATCH_KEYS[number], args: unknown[]]>
-  ]
+  {
+    create: string | Path2DAddition | undefined;
+    patch: Patch<Path2D>[];
+  }
 >;
 
 export function extendPath2D() {
   const prototype = Path2D.prototype;
 
   const handlers = PATCH_KEYS.map(key =>
-    hookMethod(prototype, key, function (_: unknown, args: any[]) {
+    hookMethod(prototype, key, function (_, args) {
       const self: Path2D = this;
 
       const extra = getAddition<Path2DAddition>(self);
 
       if (!extra) return;
 
-      const patch = extra.base[1];
+      const patch = extra.base.patch;
 
-      patch.push([
-        key,
-        args.map(arg => {
-          if (arg instanceof Path2D) return getAddition<Path2DAddition>(arg);
-          return arg;
-        })
-      ]);
+      if (key === 'addPath') {
+        args.map();
+      }
+
+      patch.push({ key, args });
     })
   );
 
@@ -61,6 +64,7 @@ export function extendPath2D() {
       return result;
     }
   });
+
   window.Path2D = revocable.proxy;
 
   return () => {

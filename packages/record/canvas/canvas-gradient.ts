@@ -1,20 +1,20 @@
 import { getAddition, Addition } from '@mood/snapshot';
 import { hookMethod } from '../utils';
 
-export type CanvasGradientStop = [offset: number, color: string];
+export type CanvasGradientStop = { offset: number; color: string };
 
 export type CanvasRadialGradientAddition = Addition<
   'radial',
-  [
-    canvasId: number,
-    x0: number,
-    y0: number,
-    r0: number,
-    x1: number,
-    y1: number,
-    r1: number,
-    stop: CanvasGradientStop[]
-  ]
+  {
+    canvasId: number;
+    x0: number;
+    y0: number;
+    r0: number;
+    x1: number;
+    y1: number;
+    r1: number;
+    stop: CanvasGradientStop[];
+  }
 >;
 
 export type CanvasLinearGradientAddition = Addition<
