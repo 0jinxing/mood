@@ -37,7 +37,7 @@ export function extendCanvasGradient() {
   const unsubscribe = hookMethod(
     CanvasGradient.prototype,
     'addColorStop',
-    function (offset, color) {
+    function (_: unknown, offset: number, color: string) {
       const self: CanvasGradient = this;
 
       const extra = getAddition<CanvasGradientAddition>(self)!;

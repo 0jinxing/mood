@@ -1,5 +1,6 @@
 import { mirror } from '@mood/snapshot';
 import { IncrementalSource } from '../constant';
+import { PropKeys } from '../types';
 import { hookProp, on } from '../utils';
 
 export type InputValue = string | boolean;
@@ -78,7 +79,7 @@ export function input(cb: InputCallback) {
     [HTMLTextAreaElement.prototype, 'value']
   ];
 
-  type Properties<T = any> = [prototype: T, key: keyof T];
+  type Properties<T extends object = any> = [prototype: T, key: PropKeys<T>];
   const hookHandlers = hookProperties.map(([prototype, key]: Properties) =>
     hookProp(prototype, key, function () {
       eventHandler({ target: this });

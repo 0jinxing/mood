@@ -7,8 +7,8 @@ import {
   extendCanvasGradient
 } from './canvas-gradient';
 import { getAddition, setAddition } from '@mood/snapshot/utils/addition';
-import { restore, RestoreType } from '../utils/canvas';
-import { CanvasPatternAddition as CanvasPatternExtra } from './canvas-pattern';
+import { RestoreType } from '../utils/canvas';
+import { CanvasPatternAddition } from './canvas-pattern';
 import { MethodKeys, PropKeys } from '../types';
 
 type C2DMethod = MethodKeys<CanvasRenderingContext2D>;
@@ -78,9 +78,7 @@ export const PROPS: ReadonlyArray<C2DProp> = [
 export type CanvasParam = {
   canvasId: number;
   key: C2DMethod | C2DProp;
-
   args?: RestoreType[];
-
   value?: RestoreType;
 };
 
@@ -114,47 +112,70 @@ export function canvas(cb: CanvasCallback) {
       const self: CanvasRenderingContext2D = this;
       const canvasId = mirror.getId(self.canvas);
 
-      cb({ canvasId, key, value: restore(value) ?? value });
+      cb({ canvasId, key, value: getAddition(value) ?? value });
     })
   );
 
-  const createUnsubscribes = CREATE_KEYS.map(key =>
+  const createUnsubscribes: Function[] = [];
+
+  createUnsubscribes.push(
     hookMethod(
       prototype,
-      key,
+      'createPattern',
       function (
-        result: CanvasGradient | CanvasPattern,
-        args: [HTMLElement, string | null]
+        result: CanvasPattern,
+        source: CanvasImageSource,
+        repetition: string | null
       ) {
         const self: CanvasRenderingContext2D = this;
-        const canvasId = mirror.getId(self.canvas);
-
-        if (result instanceof CanvasPattern) {
-          const [source, repetition] = args;
-          setAddition<CanvasPatternExtra>(result, {
+        if (source instanceof HTMLElement) {
+          setAddition<CanvasPatternAddition>(result, {
             kind: 'pattern',
-            base: [
-              canvasId,
-              source instanceof HTMLElement ? mirror.getId(source) : 0,
-              repetition
-            ]
-          });
-        } else if (result instanceof CanvasGradient) {
-          const kind = key === 'createLinearGradient' ? 'linear' : 'radial';
-          if (kind === 'linear') {
-            const [x0, y0, x1, y1] = args;
-            setAddition<CanvasGradientAddition>(result, {
-              kind,
-              base: [canvasId, x0, y0, x1, y1]
-            });
-          }
-
-          const [] = args;
-          setAddition<CanvasGradientAddition>(result, {
-            kind,
-            base: [canvasId]
+            base: [mirror.getId(self.canvas), mirror.getId(source), repetition]
           });
         }
+      }
+    )
+  );
+
+  createUnsubscribes.push(
+    hookMethod(
+      prototype,
+      'createLinearGradient',
+      function (
+        result: CanvasGradient,
+        x0: number,
+        y0: number,
+        x1: number,
+        y1: number
+      ) {
+        const self: CanvasRenderingContext2D = this;
+        setAddition<CanvasGradientAddition>(result, {
+          kind: 'linear',
+          base: [mirror.getId(self.canvas), x0, y0, x1, y1, []]
+        });
+      }
+    )
+  );
+
+  createUnsubscribes.push(
+    hookMethod(
+      prototype,
+      'createRadialGradient',
+      function (
+        result: CanvasGradient,
+        x0: number,
+        y0: number,
+        r0: number,
+        x1: number,
+        y1: number,
+        r1: number
+      ) {
+        const self: CanvasRenderingContext2D = this;
+        setAddition<CanvasGradientAddition>(result, {
+          kind: 'radial',
+          base: [mirror.getId(self.canvas), x0, y0, r0, x1, y1, r1, []]
+        });
       }
     )
   );

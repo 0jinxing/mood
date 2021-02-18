@@ -74,20 +74,22 @@ export type IncEmitHandler = (data: IncrementalParam) => void;
 
 type IsAny<T> = any extends T ? true : false;
 
-type StringKeys<T extends object> = T[keyof T] extends string
-  ? T[keyof T]
-  : never;
+type ValueOf<T extends object> = T[keyof T];
 
-export type MethodKeys<T extends object> = StringKeys<
+type FN = (...args: any[]) => any;
+
+export type MethodKeys<T extends object> = ValueOf<
   {
-    [K in keyof T]: T[K] extends Function
-      ? IsAny<T[K]> extends true
-        ? never
-        : K
+    [K in keyof T]: K extends string
+      ? T[K] extends FN
+        ? IsAny<T[K]> extends true
+          ? never
+          : K
+        : never
       : never;
   }
 >;
 
-export type PropKeys<T extends object> = StringKeys<
-  { [K in keyof T]: T[K] extends Function ? never : K }
+export type PropKeys<T extends object> = ValueOf<
+  { [K in keyof T]: T[K] extends FN ? never : K }
 >;

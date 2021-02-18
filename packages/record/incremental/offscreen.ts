@@ -1,6 +1,7 @@
 import { mirror, SerializedNodeWithId, serializeWithId } from '@mood/snapshot';
 import { getAddition } from '@mood/snapshot/utils/addition';
 import { IncrementalSource } from '../constant';
+import { MethodKeys } from '../types';
 import { hookMethod } from '../utils';
 
 export type OffscreenParam = {
@@ -28,3 +29,5 @@ export function offscreen(cb: OffscreenCallback) {
 
   return unsubscribe;
 }
+
+type a = MethodKeys<Document>;
