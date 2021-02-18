@@ -28,7 +28,7 @@ export function hookProp<T extends object>(
 export function hookMethod<T extends object>(
   target: T,
   key: MethodKeys<T>,
-  hooker: typeof target[typeof key]
+  hooker: Function
 ) {
   const original = Object.getOwnPropertyDescriptor(target, key);
   return hook(target, key, {
@@ -36,7 +36,7 @@ export function hookMethod<T extends object>(
       const originalValue = original?.value;
 
       const result = originalValue?.apply(this, args);
-      hooker.apply(this, args);
+      hooker.apply(this, [result, ...args]);
 
       return result;
     }
