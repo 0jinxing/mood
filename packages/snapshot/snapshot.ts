@@ -2,22 +2,20 @@ import {
   mirror,
   transformAttr,
   absoluteToStylesheet,
-  getAddition,
-  setAddition
-} from './utils';
-import {
-  SerializedNode,
-  NodeType,
-  Attributes,
-  SerializedNodeWithId,
-  AddedNode,
   ElementAddition
-} from './types';
+} from './utils';
+import { SN, NT, Attributes, SNWithId, AddedNode } from './types';
 
 let id = 0;
 function genId(): number {
   return ++id;
 }
+
+function getTagName($el: Element) {
+  const [, tagName] = $el.innerHTML.match(/<(\S+)/)!;
+  return tagName;
+}
+
 
 function getCSSText(styleSheet: CSSStyleSheet): string {
   try {
@@ -38,17 +36,17 @@ function getCSSRuleText(rule: CSSRule): string {
 }
 
 function isSVGElement($el: Element): $el is SVGElement {
-  return /SVG/i.test($el.tagName) || $el instanceof SVGElement;
+  return /SVG/i.test(getTagName($el)) || $el instanceof SVGElement;
 }
 
-function serialize($node: Node, $doc: HTMLDocument): SerializedNode | null {
+function serialize($node: Node, $doc: HTMLDocument): SN | null {
   if ($node instanceof Document) {
-    return { type: NodeType.DOCUMENT_NODE };
+    return { type: NT.DOCUMENT_NODE };
   }
 
   if ($node instanceof DocumentType) {
     return {
-      type: NodeType.DOCUMENT_TYPE_NODE,
+      type: NT.DOCUMENT_TYPE_NODE,
       name: $node.name,
       publicId: $node.publicId,
       systemId: $node.systemId
@@ -60,12 +58,12 @@ function serialize($node: Node, $doc: HTMLDocument): SerializedNode | null {
     for (const { name, value } of Array.from($node.attributes)) {
       attributes[name] = transformAttr(name, value);
     }
-    // styleSheets link => inline style & absolute url
     if ($node instanceof HTMLLinkElement) {
       const styleSheet = Array.from($doc.styleSheets).find(
         sheet => sheet.href === $node.href
       ) as CSSStyleSheet;
       const cssText = styleSheet ? getCSSText(styleSheet) : '';
+
       if (cssText) {
         delete attributes.rel;
         delete attributes.href;
@@ -73,7 +71,6 @@ function serialize($node: Node, $doc: HTMLDocument): SerializedNode | null {
       }
     }
 
-    // handle form fields
     if ($node instanceof HTMLInputElement) {
       const type = attributes.type;
       const value = $node.value;
@@ -94,27 +91,9 @@ function serialize($node: Node, $doc: HTMLDocument): SerializedNode | null {
       attributes.selected = $node.selected;
     }
 
-    // handle canvas
-    if ($node instanceof HTMLCanvasElement) {
-      let dataURL = '';
-      try {
-        dataURL = $node.toDataURL();
-      } catch {
-        // @WARN cross
-      }
-      attributes.dataURL = dataURL;
-    }
-
-    // handle audio and video
-    if (
-      $node instanceof HTMLAudioElement ||
-      $node instanceof HTMLVideoElement
-    ) {
-      attributes.mediaState = $node.paused;
-    }
     return {
-      type: NodeType.ELEMENT_NODE,
-      tagName: $node.tagName,
+      type: NT.ELEMENT_NODE,
+      tagName: getTagName($node),
       attributes,
       isSVG: isSVGElement($node)
     };
@@ -130,19 +109,19 @@ function serialize($node: Node, $doc: HTMLDocument): SerializedNode | null {
       textContent = 'SCRIPT_PLACEHOLDER';
     }
     return {
-      type: NodeType.TEXT_NODE,
+      type: NT.TEXT_NODE,
       textContent: textContent || '',
       isStyle
     };
   }
 
   if ($node instanceof CDATASection) {
-    return { type: NodeType.CDATA_SECTION_NODE, textContent: '' };
+    return { type: NT.CDATA_SECTION_NODE, textContent: '' };
   }
 
   if ($node instanceof Comment) {
     return {
-      type: NodeType.COMMENT_NODE,
+      type: NT.COMMENT_NODE,
       textContent: $node.textContent || ''
     };
   }
@@ -153,16 +132,16 @@ function serialize($node: Node, $doc: HTMLDocument): SerializedNode | null {
 export function serializeWithId(
   $node: Node,
   $doc: HTMLDocument
-): SerializedNodeWithId | null {
+): SNWithId | null {
   const serializedNode = serialize($node, $doc);
   if (!serializedNode) {
     // @WARN not serialized
     return null;
   }
-  const addition = getAddition<ElementAddition>($node);
+  const addition = mirror.getData<ElementAddition>($node);
   const id = addition ? addition.base : genId();
 
-  setAddition<ElementAddition>($node, { kind: 'element', base: id });
+  mirror.setData($node, { kind: 'element', base: id });
   mirror.idNodeMap[id] = $node;
 
   return Object.assign(serializedNode, { id });

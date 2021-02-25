@@ -1,4 +1,4 @@
-import { mirror, SerializedNodeWithId, serializeWithId } from '@mood/snapshot';
+import { mirror, SNWithId, serializeWithId } from '@mood/snapshot';
 import { getAddition } from '@mood/snapshot/utils/addition';
 import { IncrementalSource } from '../constant';
 import { MethodKeys } from '../types';
@@ -6,7 +6,7 @@ import { hookMethod } from '../utils';
 
 export type OffscreenParam = {
   source: IncrementalSource.OFFSCREEN;
-  sn: SerializedNodeWithId;
+  sn: SNWithId;
 };
 
 export type OffscreenCallback = (param: OffscreenParam) => void;

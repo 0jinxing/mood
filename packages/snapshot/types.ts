@@ -1,4 +1,4 @@
-export enum NodeType {
+export enum NT {
   ELEMENT_NODE,
   TEXT_NODE,
   CDATA_SECTION_NODE,
@@ -12,40 +12,40 @@ export enum NodeType {
 export type Attributes = { [key: string]: boolean | string };
 
 export type DocumentNode = {
-  type: NodeType.DOCUMENT_NODE;
+  type: NT.DOCUMENT_NODE;
 };
 
 export type DocumentTypeNode = {
-  type: NodeType.DOCUMENT_TYPE_NODE;
+  type: NT.DOCUMENT_TYPE_NODE;
   name: string;
   publicId: string;
   systemId: string;
 };
 
 export type ElementNode = {
-  type: NodeType.ELEMENT_NODE;
+  type: NT.ELEMENT_NODE;
   tagName: string;
   attributes: Attributes;
   isSVG?: boolean;
 };
 
 export type TextNode = {
-  type: NodeType.TEXT_NODE;
+  type: NT.TEXT_NODE;
   textContent: string;
   isStyle?: boolean;
 };
 
 export type CDataNode = {
-  type: NodeType.CDATA_SECTION_NODE;
+  type: NT.CDATA_SECTION_NODE;
   textContent: '';
 };
 
 export type CommentNode = {
-  type: NodeType.COMMENT_NODE;
+  type: NT.COMMENT_NODE;
   textContent: string;
 };
 
-export type SerializedNode =
+export type SN =
   | DocumentNode
   | DocumentTypeNode
   | ElementNode
@@ -53,21 +53,10 @@ export type SerializedNode =
   | CDataNode
   | CommentNode;
 
-export type SerializedNodeWithId = SerializedNode & { id: number };
+export type SNWithId = SN & { id: number };
 
 export type AddedNode = {
   parentId?: number;
   nextId?: number;
-  node: SerializedNodeWithId;
+  node: SNWithId;
 };
-
-export type IdNodeMap<T extends EventTarget = EventTarget> = {
-  [key: number]: T;
-};
-
-export type Addition<K = string, B = any> = {
-  kind: K;
-  base: B;
-};
-
-export type ElementAddition = Addition<'element', number>;

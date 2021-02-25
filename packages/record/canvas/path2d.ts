@@ -1,5 +1,5 @@
 import { Addition, getAddition, setAddition } from '@mood/snapshot';
-import { MethodKeys, ValueOf } from '../types';
+import { FN, MethodKeys, ValueOf } from '../types';
 import { hookMethod } from '../utils';
 
 const PATCH_KEYS: ReadonlyArray<MethodKeys<Path2D>> = [
@@ -18,14 +18,22 @@ const PATCH_KEYS: ReadonlyArray<MethodKeys<Path2D>> = [
 type Patch<T extends object> = ValueOf<
   { [K in MethodKeys<T>]: { key: K; args: Parameters<T[K]> } }
 >;
-
+const fn = Path2D
 export type Path2DAddition = Addition<
   'path2d',
   {
-    create: string | Path2DAddition | undefined;
+    create: Parameters<fn>;
     patch: Patch<Path2D>[];
   }
 >;
+
+
+type Fn<U> = U extends any ? (k: U) => void : never;
+type UnionToIntersection<U> = Fn<U> extends (k: infer I) => void ? I : never;
+
+type A = Fn<{ a: 1 } | { b: 12; a: 1 }>;
+
+type Result = UnionToIntersection<{ a: 1 } | { b: 12; a: 1 }>; // T1 & T2
 
 export function extendPath2D() {
   const prototype = Path2D.prototype;

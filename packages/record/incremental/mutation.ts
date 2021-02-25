@@ -4,7 +4,7 @@ import {
   mirror,
   AddedNode,
   Attributes,
-  SerializedNodeWithId,
+  SNWithId,
   ElementAddition
 } from '@mood/snapshot';
 
