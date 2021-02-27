@@ -1,14 +1,10 @@
 import { AddedNode } from '@mood/snapshot';
-import { CanvasParam } from './canvas';
-
 import { EventType } from './constant';
-
 import { InputParam } from './incremental/input';
 import { MediaInteractionParam } from './incremental/media-interaction';
 import { MouseInteractionParam } from './incremental/mouse-interaction';
 import { MouseMoveParam } from './incremental/mouse-move';
 import { MutationParam } from './incremental/mutation';
-import { OffscreenParam } from './incremental/offscreen';
 import { ScrollParam } from './incremental/scroll';
 import { StyleSheetParam } from './incremental/style-sheet';
 import { ViewportResizeParam } from './incremental/viewport-resize';
@@ -21,8 +17,7 @@ export type IncrementalParam =
   | ViewportResizeParam
   | InputParam
   | MediaInteractionParam
-  | StyleSheetParam
-  | OffscreenParam;
+  | StyleSheetParam;
 
 export type DomContentLoadedEvent = {
   type: EventType.DOM_CONTENT_LOADED;
@@ -49,10 +44,6 @@ export type MetaEvent = {
   height: number;
 };
 
-export type CanvasEvent = {
-  type: EventType.CANVAS;
-} & CanvasParam;
-
 export type CustomEvent<T = unknown> = {
   type: EventType.CUSTOM;
   tag: string;
@@ -65,7 +56,6 @@ export type RecordEvent =
   | FullSnapshotEvent
   | IncrementalSnapshotEvent
   | MetaEvent
-  | CanvasEvent
   | CustomEvent;
 
 export type RecordEventWithTime = RecordEvent & { timestamp: number };

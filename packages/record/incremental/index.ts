@@ -6,7 +6,6 @@ import { mouseMove } from './mouse-move';
 import { mediaInteraction } from './media-interaction';
 import { styleSheet } from './style-sheet';
 import { mutation } from './mutation';
-import { offscreen } from './offscreen';
 
 import { IncEmitHandler } from '../types';
 
@@ -19,8 +18,7 @@ export function incremental(emit: IncEmitHandler) {
     viewportResize,
     input,
     mediaInteraction,
-    styleSheet,
-    offscreen
+    styleSheet
   ].map(o => o(emit));
 
   return () => {
@@ -33,7 +31,6 @@ export * from './media-interaction';
 export * from './mouse-interaction';
 export * from './mouse-move';
 export * from './mutation';
-export * from './offscreen';
 export * from './scroll';
 export * from './style-sheet';
 export * from './viewport-resize';

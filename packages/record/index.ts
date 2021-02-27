@@ -3,7 +3,6 @@ import { incremental } from './incremental';
 import { on, queryWindowHeight, queryWindowWidth } from './utils';
 import { RecordEvent, RecordEventWithTime, IncEmitHandler } from './types';
 import { EventType } from './constant';
-import { canvas, CanvasParam } from './canvas';
 
 export type RecordOptions = {
   emit: (e: RecordEventWithTime, isCheckout?: true) => void;
@@ -54,15 +53,6 @@ export function record(options: RecordOptions) {
     wrappedEmitWithTime({ type: EventType.INCREMENTAL_SNAPSHOT, ...data });
   };
 
-  let timeOfCanvas = 0;
-  const canvasEmitWithTime = (data: CanvasParam) => {
-    const timestamp = Date.now();
-    if (timestamp - timeOfCanvas > 15) {
-      timeOfCanvas = timestamp;
-    }
-    emit({ timestamp: timeOfCanvas, type: EventType.CANVAS, ...data });
-  };
-
   const takeFullSnapshot = (isCheckout?: true) => {
     wrappedEmitWithTime(
       {
@@ -99,7 +89,6 @@ export function record(options: RecordOptions) {
 
   const initial = () => {
     takeFullSnapshot();
-    unsubscribes.push(canvas(canvasEmitWithTime));
     unsubscribes.push(incremental(incEmitWithTime));
   };
 

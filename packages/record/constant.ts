@@ -4,7 +4,6 @@ export enum EventType {
   DOM_CONTENT_LOADED,
   FULL_SNAPSHOT,
   INCREMENTAL_SNAPSHOT,
-  CANVAS,
   CUSTOM
 }
 
@@ -17,6 +16,5 @@ export enum IncrementalSource {
   INPUT,
   TOUCH_MOVE,
   MEDIA_INTERACTION,
-  STYLE_SHEETRULE,
-  OFFSCREEN
+  STYLE_SHEETRULE
 }

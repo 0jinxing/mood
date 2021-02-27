@@ -16,7 +16,6 @@ import { createReplayerService } from './fsm';
 import getInjectStyle from './styles/inject-style';
 
 import { ActionWithDelay } from './types';
-import { restore } from 'packages/record/utils/canvas';
 
 const mitt: MittStatic = (mittProxy as any).default || mittProxy;
 
@@ -29,8 +28,7 @@ const {
   INPUT,
   TOUCH_MOVE,
   MEDIA_INTERACTION,
-  STYLE_SHEETRULE,
-  OFFSCREEN
+  STYLE_SHEETRULE
 } = IncrementalSource;
 
 export type PlayerConfig = {
@@ -424,26 +422,6 @@ export class Player {
         }
         break;
       }
-
-      case OFFSCREEN: {
-        if (!mirror.getNode(event.sn.id)) return;
-        buildNodeWithSN(event.sn, this.$iframe.contentDocument!);
-      }
-    }
-  }
-
-  private applyCanvas(event: RecordEventWithTime & { type: EventType.CANVAS }) {
-    const { canvasId, key, args, value } = event;
-    const canvas$ = mirror.getNode<HTMLCanvasElement>(canvasId);
-
-    const ctx = canvas$?.getContext('2d');
-    if (!ctx) return;
-
-    const prop = ctx[key];
-    if (isFunction(prop)) {
-      Reflect.apply(prop, ctx, args?.map(restore) || []);
-    } else {
-      Reflect.set(ctx, key, restore(value));
     }
   }
 
@@ -492,12 +470,6 @@ export class Player {
       case EventType.INCREMENTAL_SNAPSHOT: {
         castFn = () => {
           this.applyIncremental(event, isSync);
-        };
-        break;
-      }
-      case EventType.CANVAS: {
-        castFn = () => {
-          this.applyCanvas(event);
         };
         break;
       }

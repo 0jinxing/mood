@@ -4,7 +4,6 @@ import {
   mirror,
   AddedNode,
   Attributes,
-  SNWithId,
   ElementAddition
 } from '@mood/snapshot';
 
@@ -16,7 +15,6 @@ import {
 } from '../utils';
 
 import { IncrementalSource } from '../constant';
-import { getAddition } from '@mood/snapshot/utils/addition';
 
 export type AttrCursor = {
   $el: Node;
@@ -65,7 +63,7 @@ export function mutation(cb: MutationCallback) {
     const movedMap = new Map<string, true>();
 
     const genAdds = ($node: Node, $parent?: Node) => {
-      const addition = getAddition<ElementAddition>($node);
+      const addition = mirror.getData<ElementAddition>($node);
       if (addition) {
         movedSet.add($node);
         const parentId = $parent ? mirror.getId($parent) : undefined;
