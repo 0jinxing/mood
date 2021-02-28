@@ -1,50 +1,46 @@
-export type Addition<K = string, B = any> = {
-  kind: K;
-  base: B;
-};
+class Mirror {
+  private readonly idPool = new WeakMap<EventTarget, number>();
+  private readonly nodePool = new Map<number, Node>();
 
-export type ElementAddition = Addition<'element', number>;
-
-export type IdNodeMap = {
-  [key: number]: EventTarget;
-};
-
-export class Mirror {
-  private readonly dataPool: WeakMap<EventTarget, Addition> = new WeakMap();
-
-  readonly idNodeMap: IdNodeMap = {};
-
-  getData<T extends Addition>($node: EventTarget) {
-    return this.dataPool.get($node) as T | undefined;
+  set(id: number, $node: Node) {
+    this.idPool.set($node, id);
+    this.nodePool.set(id, $node);
   }
 
-  setData($node: Node, data: Addition) {
-    this.dataPool.set($node, data);
-  }
-
-  getId<T extends EventTarget = Node>($node: T) {
-    const addition = mirror.getData<ElementAddition>($node);
-    if (addition) return addition.base;
-    return 0;
+  getId<T extends EventTarget>($target: T) {
+    return this.idPool.get($target) || 0;
   }
 
   getNode<T extends Node>(id: number) {
-    return this.idNodeMap[id] as T | undefined;
+    return this.nodePool.get(id) as T | undefined;
   }
 
-  remove($node: Node) {
-    const id = this.getId($node);
-    delete this.idNodeMap[id];
+  remove(nodeOrId: Node | number) {
+    let id: number;
+    let node: Node | undefined;
 
-    const { childNodes } = $node;
+    if (typeof nodeOrId === 'number') {
+      id = nodeOrId;
+      node = this.nodePool.get(nodeOrId);
+    } else {
+      id = this.getId(nodeOrId);
+      node = nodeOrId;
+    }
 
+    if (!node) return;
+
+    this.idPool.delete(node);
+    this.nodePool.delete(id);
+
+    const { childNodes } = node;
     if (childNodes) {
       childNodes.forEach($childNode => this.remove($childNode));
     }
   }
 
-  has(id: number) {
-    return !!this.idNodeMap[id];
+  has(nodeOrId: number | Node) {
+    if (typeof nodeOrId === 'number') return !!this.nodePool.has(nodeOrId);
+    return this.idPool.has(nodeOrId);
   }
 }
 

@@ -14,7 +14,7 @@ export type ScrollCallback = (param: ScrollParam) => void;
 export function scroll(cb: ScrollCallback) {
   const updatePosition = throttle<UIEvent>(({ target }) => {
     if (!target) return;
-    
+
     const id = mirror.getId(target);
     let $scroll: HTMLElement = target as HTMLElement;
     if (target === document) $scroll = document.scrollingElement as HTMLElement;

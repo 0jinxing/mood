@@ -7,9 +7,9 @@ import { mediaInteraction } from './media-interaction';
 import { styleSheet } from './style-sheet';
 import { mutation } from './mutation';
 
-import { IncEmitHandler } from '../types';
+import { EmitHandler } from '../types';
 
-export function incremental(emit: IncEmitHandler) {
+export function subscribe(emit: EmitHandler) {
   const unsubscribes = [
     mutation,
     mouseMove,

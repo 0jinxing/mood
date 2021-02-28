@@ -1,7 +1,7 @@
 import { snapshot } from '@mood/snapshot';
-import { incremental } from './incremental';
+import { subscribe } from './subscribe';
 import { on, queryWindowHeight, queryWindowWidth } from './utils';
-import { RecordEvent, RecordEventWithTime, IncEmitHandler } from './types';
+import { RecordEvent, RecordEventWithTime, EmitHandler } from './types';
 import { EventType } from './constant';
 
 export type RecordOptions = {
@@ -49,7 +49,7 @@ export function record(options: RecordOptions) {
     wrappedEmit(withTimestamp(event), isCheckout);
   };
 
-  const incEmitWithTime: IncEmitHandler = data => {
+  const incEmitWithTime: EmitHandler = data => {
     wrappedEmitWithTime({ type: EventType.INCREMENTAL_SNAPSHOT, ...data });
   };
 
@@ -89,7 +89,7 @@ export function record(options: RecordOptions) {
 
   const initial = () => {
     takeFullSnapshot();
-    unsubscribes.push(incremental(incEmitWithTime));
+    unsubscribes.push(subscribe(incEmitWithTime));
   };
 
   if (
@@ -124,4 +124,4 @@ export function addCustomEvent<T>(tag: string, payload: T) {
 
 export * from './types';
 export * from './constant';
-export * from './incremental';
+export * from './subscribe';

@@ -1,10 +1,9 @@
 import {
   serializeWithId,
-  transformAttr,
+  abs,
   mirror,
   AddedNode,
-  Attributes,
-  ElementAddition
+  Attributes
 } from '@mood/snapshot';
 
 import {
@@ -63,12 +62,12 @@ export function mutation(cb: MutationCallback) {
     const movedMap = new Map<string, true>();
 
     const genAdds = ($node: Node, $parent?: Node) => {
-      const addition = mirror.getData<ElementAddition>($node);
-      if (addition) {
+      const id = mirror.getId($node);
+      if (id) {
         movedSet.add($node);
         const parentId = $parent ? mirror.getId($parent) : undefined;
         if (parentId) {
-          movedMap.set(genKey(addition.base, parentId), true);
+          movedMap.set(genKey(id, parentId), true);
         }
       } else {
         addedSet.add($node);
@@ -98,10 +97,7 @@ export function mutation(cb: MutationCallback) {
             current = { $el: target, attributes: {} };
             attrs.push(current);
           }
-          current.attributes[attributeName!] = transformAttr(
-            attributeName!,
-            value!
-          );
+          current.attributes[attributeName!] = abs(attributeName!, value!);
         }
         // childList
         else if (type === 'childList') {

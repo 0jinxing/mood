@@ -1,10 +1,5 @@
-import {
-  mirror,
-  transformAttr,
-  absoluteToStylesheet,
-  ElementAddition
-} from './utils';
-import { SN, NT, Attributes, SNWithId, AddedNode } from './types';
+import { mirror, abs, absToStyle } from './utils';
+import { NT, Attributes, SNWithId, AddedNode } from './types';
 
 let id = 0;
 function genId(): number {
@@ -12,10 +7,9 @@ function genId(): number {
 }
 
 function getTagName($el: Element) {
-  const [, tagName] = $el.innerHTML.match(/<(\S+)/)!;
-  return tagName;
+  if ($el instanceof HTMLFormElement) return 'FORM';
+  return $el.tagName;
 }
-
 
 function getCSSText(styleSheet: CSSStyleSheet): string {
   try {
@@ -39,13 +33,20 @@ function isSVGElement($el: Element): $el is SVGElement {
   return /SVG/i.test(getTagName($el)) || $el instanceof SVGElement;
 }
 
-function serialize($node: Node, $doc: HTMLDocument): SN | null {
+export function serializeWithId(
+  $node: Node,
+  $doc: HTMLDocument
+): SNWithId | null {
+  const id = mirror.getId($node) || genId();
+  mirror.set(id, $node);
+
   if ($node instanceof Document) {
-    return { type: NT.DOCUMENT_NODE };
+    return { id, type: NT.DOCUMENT_NODE };
   }
 
   if ($node instanceof DocumentType) {
     return {
+      id,
       type: NT.DOCUMENT_TYPE_NODE,
       name: $node.name,
       publicId: $node.publicId,
@@ -56,18 +57,18 @@ function serialize($node: Node, $doc: HTMLDocument): SN | null {
   if ($node instanceof Element) {
     const attributes: Attributes = {};
     for (const { name, value } of Array.from($node.attributes)) {
-      attributes[name] = transformAttr(name, value);
+      attributes[name] = abs(name, value);
     }
     if ($node instanceof HTMLLinkElement) {
       const styleSheet = Array.from($doc.styleSheets).find(
         sheet => sheet.href === $node.href
-      ) as CSSStyleSheet;
+      );
       const cssText = styleSheet ? getCSSText(styleSheet) : '';
 
       if (cssText) {
         delete attributes.rel;
         delete attributes.href;
-        attributes.cssText = absoluteToStylesheet(cssText);
+        attributes.cssText = absToStyle(cssText);
       }
     }
 
@@ -92,6 +93,7 @@ function serialize($node: Node, $doc: HTMLDocument): SN | null {
     }
 
     return {
+      id,
       type: NT.ELEMENT_NODE,
       tagName: getTagName($node),
       attributes,
@@ -99,52 +101,36 @@ function serialize($node: Node, $doc: HTMLDocument): SN | null {
     };
   }
 
+  if ($node instanceof CDATASection) {
+    return { id, type: NT.CDATA_SECTION_NODE, textContent: '' };
+  }
+
   if ($node instanceof Text) {
     const $parentNode = $node.parentNode;
     let textContent = $node.textContent;
     const isStyle = $parentNode instanceof HTMLStyleElement;
     if (isStyle && textContent) {
-      textContent = absoluteToStylesheet(textContent);
+      textContent = absToStyle(textContent);
     } else if ($parentNode instanceof HTMLScriptElement) {
       textContent = 'SCRIPT_PLACEHOLDER';
     }
     return {
+      id,
       type: NT.TEXT_NODE,
       textContent: textContent || '',
       isStyle
     };
   }
 
-  if ($node instanceof CDATASection) {
-    return { type: NT.CDATA_SECTION_NODE, textContent: '' };
-  }
-
   if ($node instanceof Comment) {
     return {
+      id,
       type: NT.COMMENT_NODE,
       textContent: $node.textContent || ''
     };
   }
 
   return null;
-}
-
-export function serializeWithId(
-  $node: Node,
-  $doc: HTMLDocument
-): SNWithId | null {
-  const serializedNode = serialize($node, $doc);
-  if (!serializedNode) {
-    // @WARN not serialized
-    return null;
-  }
-  const addition = mirror.getData<ElementAddition>($node);
-  const id = addition ? addition.base : genId();
-
-  mirror.setData($node, { kind: 'element', base: id });
-  mirror.idNodeMap[id] = $node;
-
-  return Object.assign(serializedNode, { id });
 }
 
 export function snapshot($doc: HTMLDocument): AddedNode[] {

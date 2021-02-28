@@ -125,7 +125,7 @@ export class Player {
     this.$cursor.classList.add('__cursor');
 
     this.$iframe = document.createElement('iframe');
-    this.$iframe.setAttribute('sandbox', 'allow-same-origin allow-scripts');
+    this.$iframe.setAttribute('sandbox', 'allow-same-origin');
     this.$iframe.setAttribute('scrolling', 'no');
     this.$iframe.setAttribute('style', 'pointer-events: none');
 

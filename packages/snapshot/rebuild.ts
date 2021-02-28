@@ -1,9 +1,9 @@
 import { SNWithId, NT, AddedNode } from './types';
-import { mirror, ElementAddition } from './utils';
+import { mirror } from './utils';
 
 const HOVER_MATCH = /([^{}]+):hover([^{}]*{[^{}]+})/gi;
 
-export function addHoverClass(cssText: string): string {
+export function hover(cssText: string): string {
   return cssText.replace(HOVER_MATCH, '$1:hover$2 $1.\\:hover$2');
 }
 
@@ -25,51 +25,28 @@ export function buildNode(node: SNWithId, $doc: HTMLDocument): Node | null {
       ? $doc.createElementNS('http://www.w3.org/2000/svg', tagName)
       : $doc.createElement(tagName);
 
-    const SPECIAL_KEY = ['dataURL', 'mediaState', 'cssText'];
+    for (const [key, attrVal] of Object.entries(attributes)) {
+      if (typeof attrVal === 'boolean' && !attrVal) continue;
 
-    for (const [key, attrValue] of Object.entries(attributes)) {
-      if (typeof attrValue === 'boolean' && !attrValue) continue;
-      let value = attrValue === true ? '' : attrValue;
+      const value = attrVal === true ? '' : attrVal;
+      const isTextarea = /TEXTAREA/i.test(tagName);
 
-      if (!SPECIAL_KEY.includes(key)) {
-        const isTextarea = /TEXTAREA/i.test(tagName);
+      if (isTextarea && key === 'value') {
+        const $child = $doc.createTextNode(value);
+        $el.appendChild($child);
+        continue;
+      }
 
-        if (isTextarea && key === 'value') {
-          const $child = $doc.createTextNode(value);
-          $el.appendChild($child);
-          continue;
+      if (/IFRAME/i.test(tagName) && key === 'src') continue;
+
+      try {
+        if (isSVG && key === 'xlink:href') {
+          $el.setAttributeNS('http://www.w3.org/1999/xlink', key, value);
+        } else if (!/^on[a-z]+/.test(key)) {
+          $el.setAttribute(key, value);
         }
-
-        if (/IFRAME/i.test(tagName) && key === 'src') continue;
-
-        try {
-          if (isSVG && key === 'xlink:href') {
-            $el.setAttributeNS('http://www.w3.org/1999/xlink', key, value);
-          } else if (!/^on[a-z]+/.test(key)) {
-            $el.setAttribute(key, value);
-          }
-        } catch {
-          // skip invalid attribute
-        }
-      } else {
-        if (/STYLE/i.test(tagName) && key === 'cssText') {
-          value = addHoverClass(value);
-          const $child = $doc.createTextNode(value);
-          $el.appendChild($child);
-        } else if (/CANVAS/i.test(tagName) && key === 'dataURL') {
-          const $image = $doc.createElement('img');
-          $image.src = value;
-          $image.addEventListener('load', () => {
-            const ctx = ($el as HTMLCanvasElement).getContext('2d');
-            if (ctx) ctx.drawImage($image, 0, 0, $image.width, $image.height);
-          });
-        } else if (key === 'mediaState' && $el instanceof HTMLMediaElement) {
-          if (value === 'played') {
-            $el.play();
-          } else if (value === 'paused') {
-            $el.pause();
-          }
-        }
+      } catch {
+        // skip invalid attribute
       }
     }
     return $el;
@@ -77,9 +54,7 @@ export function buildNode(node: SNWithId, $doc: HTMLDocument): Node | null {
 
   if (node.type === NT.TEXT_NODE) {
     const { isStyle, textContent } = node;
-    return $doc.createTextNode(
-      isStyle ? addHoverClass(textContent) : textContent
-    );
+    return $doc.createTextNode(isStyle ? hover(textContent) : textContent);
   }
 
   if (node.type === NT.CDATA_SECTION_NODE) {
@@ -107,10 +82,7 @@ export function buildNodeWithSN(
     $doc.close();
     $doc.open();
   }
-  const eleData: ElementAddition = { kind: 'element', base: node.id };
-
-  mirror.setData($el, eleData);
-  mirror.idNodeMap[node.id] = $el;
+  mirror.set(node.id, $el);
 
   return $el;
 }
