@@ -1,36 +1,25 @@
+const ID_KEY = Symbol.for('#id');
+
 class Mirror {
-  private readonly idPool = new WeakMap<EventTarget, number>();
-  private readonly nodePool = new Map<number, Node>();
+  private readonly pool: Record<number, EventTarget> = {};
 
   set(id: number, $node: Node) {
-    this.idPool.set($node, id);
-    this.nodePool.set(id, $node);
+    this.pool[id] = $node;
+    Reflect.set($node, ID_KEY, id);
   }
 
-  getId<T extends EventTarget>($target: T) {
-    return this.idPool.get($target) || 0;
+  getId<T extends EventTarget>($target: T): number {
+    return Reflect.get($target, ID_KEY) || 0;
   }
 
   getNode<T extends Node>(id: number) {
-    return this.nodePool.get(id) as T | undefined;
+    return this.pool[id] as T | undefined;
   }
 
-  remove(nodeOrId: Node | number) {
-    let id: number;
-    let node: Node | undefined;
-
-    if (typeof nodeOrId === 'number') {
-      id = nodeOrId;
-      node = this.nodePool.get(nodeOrId);
-    } else {
-      id = this.getId(nodeOrId);
-      node = nodeOrId;
-    }
-
-    if (!node) return;
-
-    this.idPool.delete(node);
-    this.nodePool.delete(id);
+  remove(node: Node) {
+    const id = this.getId(node);
+    delete this.pool[id];
+    Reflect.deleteProperty(node, ID_KEY);
 
     const { childNodes } = node;
     if (childNodes) {
@@ -38,9 +27,8 @@ class Mirror {
     }
   }
 
-  has(nodeOrId: number | Node) {
-    if (typeof nodeOrId === 'number') return !!this.nodePool.has(nodeOrId);
-    return this.idPool.has(nodeOrId);
+  has(id: number) {
+    return !!this.pool[id];
   }
 }
 
