@@ -9,6 +9,10 @@
       "path": "examples"
     },
     {
+      "name": "test",
+      "path": "test"
+    },
+    {
       "name": "/",
       "path": "."
     }
