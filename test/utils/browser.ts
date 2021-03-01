@@ -1,15 +1,17 @@
-import 'mocha';
-import { Server } from 'http';
+import * as http from 'http';
 import { Browser } from 'puppeteer';
 import { createServer } from './server';
 import { launchBrowser } from './puppeteer';
 
 export function browserTest(
-  title: string,
-  func: (server: Server, browser: Browser) => void
+  message: string,
+  caseList: Array<{
+    message: string;
+    fn: (server: http.Server, browser: Browser) => void;
+  }> = []
 ) {
-  describe(title, () => {
-    let server: Server;
+  describe(message, () => {
+    let server: http.Server;
     let browser: Browser;
 
     before(async () => {
@@ -17,7 +19,9 @@ export function browserTest(
       browser = await launchBrowser();
     });
 
-    func(server, browser);
+    caseList.forEach(({ message, fn }) => {
+      it(message, () => fn(server, browser));
+    });
 
     after(async () => {
       server.close();

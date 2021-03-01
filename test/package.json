@@ -5,7 +5,7 @@
   "main": "index.js",
   "license": "MIT",
   "scripts": {
-    "test": "ts-mocha **/*.spec.ts"
+    "test": "mocha -r ts-node/register **/*.test.ts"
   },
   "dependencies": {
     "@mood/snapshot": "^0.0.1"
@@ -19,6 +19,7 @@
     "jest-snapshot": "^26.6.2",
     "mocha": "^8.3.0",
     "puppeteer": "^8.0.0",
-    "ts-mocha": "^8.0.0"
+    "ts-node": "^9.1.1",
+    "typescript": "^4.2.2"
   }
 }
