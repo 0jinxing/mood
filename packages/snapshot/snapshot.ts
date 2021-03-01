@@ -1,5 +1,5 @@
 import { mirror, abs, absToStyle } from './utils';
-import { NT, Attributes, SNWithId, AddedNode } from './types';
+import { NT, Attributes, SNWithId } from './types';
 
 let id = 0;
 function genId(): number {
@@ -33,10 +33,12 @@ function isSVGElement($el: Element): $el is SVGElement {
   return /SVG/i.test(getTagName($el)) || $el instanceof SVGElement;
 }
 
-export function serializeWithId(
+export function serialize(
   $node: Node,
   $doc: HTMLDocument
-): SNWithId | null {
+): SNWithId | SNWithId[] | null {
+  if ($node instanceof HTMLScriptElement) return null;
+
   const id = mirror.getId($node) || genId();
   mirror.set(id, $node);
 
@@ -68,7 +70,21 @@ export function serializeWithId(
       if (cssText) {
         delete attributes.rel;
         delete attributes.href;
-        attributes.cssText = absToStyle(cssText);
+
+        return [
+          {
+            id,
+            type: NT.ELEMENT_NODE,
+            tagName: 'STYLE',
+            attributes
+          },
+          {
+            id: genId(),
+            parentId: id,
+            type: NT.TEXT_NODE,
+            textContent: absToStyle(cssText)
+          }
+        ];
       }
     }
 
@@ -111,8 +127,6 @@ export function serializeWithId(
     const isStyle = $parentNode instanceof HTMLStyleElement;
     if (isStyle && textContent) {
       textContent = absToStyle(textContent);
-    } else if ($parentNode instanceof HTMLScriptElement) {
-      textContent = 'SCRIPT_PLACEHOLDER';
     }
     return {
       id,
@@ -133,8 +147,8 @@ export function serializeWithId(
   return null;
 }
 
-export function snapshot($doc: HTMLDocument): AddedNode[] {
-  const adds: AddedNode[] = [];
+export function snapshot($doc: HTMLDocument): SNWithId[] {
+  const adds: SNWithId[] = [];
   const queue: Node[] = [$doc];
 
   const serializeAdds = ($node: Node) => {
@@ -151,11 +165,15 @@ export function snapshot($doc: HTMLDocument): AddedNode[] {
       return;
     }
 
-    adds.push({
-      parentId: parentId,
-      nextId: nextId,
-      node: serializeWithId($node, $doc)!
-    });
+    const sn = serialize($node, $doc);
+
+    if (Array.isArray(sn)) {
+      sn.forEach(item => {
+        adds.push({ parentId: parentId, nextId: nextId, ...item });
+      });
+    } else if (sn) {
+      adds.push({ parentId: parentId, nextId: nextId, ...sn });
+    }
     $node.childNodes.forEach(serializeAdds);
   };
 

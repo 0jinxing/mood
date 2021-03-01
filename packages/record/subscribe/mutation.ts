@@ -1,9 +1,9 @@
 import {
-  serializeWithId,
+  serialize,
   abs,
   mirror,
-  AddedNode,
-  Attributes
+  Attributes,
+  SNWithId
 } from '@mood/snapshot';
 
 import {
@@ -20,7 +20,7 @@ export type AttrCursor = {
   attributes: Attributes;
 };
 
-export type AddedNodeMutation = AddedNode & { parentId: number };
+export type AddedNodeMutation = SNWithId & { parentId: number };
 
 export type RemovedNodeMutation = {
   id: number;
@@ -153,11 +153,15 @@ export function mutation(cb: MutationCallback) {
         return;
       }
 
-      adds.push({
-        parentId,
-        nextId,
-        node: serializeWithId($node, document)!
-      });
+      const sn = serialize($node, document);
+
+      if (Array.isArray(sn)) {
+        sn.forEach(item => {
+          adds.push({ parentId: parentId, nextId: nextId, ...item });
+        });
+      } else if (sn) {
+        adds.push({ parentId: parentId, nextId: nextId, ...sn });
+      }
     };
 
     movedSet.forEach($node => pushAdd($node));

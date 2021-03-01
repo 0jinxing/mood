@@ -1,4 +1,4 @@
-import { AddedNode } from '@mood/snapshot';
+import { SNWithId } from '@mood/snapshot';
 import { EventType } from './constant';
 import { InputParam } from './subscribe/input';
 import { MediaInteractionParam } from './subscribe/media-interaction';
@@ -29,7 +29,7 @@ export type LoadedEvent = {
 
 export type FullSnapshotEvent = {
   type: EventType.FULL_SNAPSHOT;
-  adds: AddedNode[];
+  adds: SNWithId[];
   offset: [top: number, left: number];
 };
 

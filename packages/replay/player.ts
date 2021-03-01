@@ -230,7 +230,7 @@ export class Player {
           }
 
           const $target = buildNodeWithSN(
-            add.node,
+            add,
             this.$iframe.contentDocument!
           );
 

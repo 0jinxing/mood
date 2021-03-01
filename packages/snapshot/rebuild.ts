@@ -1,4 +1,4 @@
-import { SNWithId, NT, AddedNode } from './types';
+import { SNWithId, NT } from './types';
 import { mirror } from './utils';
 
 const HOVER_MATCH = /([^{}]+):hover([^{}]*{[^{}]+})/gi;
@@ -87,8 +87,8 @@ export function buildNodeWithSN(
   return $el;
 }
 
-export function rebuild(adds: AddedNode[], $doc: HTMLDocument) {
-  adds.forEach(({ node, parentId, nextId }) => {
+export function rebuild(adds: SNWithId[], $doc: HTMLDocument) {
+  adds.forEach(({ parentId, nextId, ...node }) => {
     const $el = buildNodeWithSN(node, $doc)!;
 
     const $parent = parentId ? mirror.getNode(parentId) : undefined;

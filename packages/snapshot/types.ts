@@ -53,10 +53,4 @@ export type SN =
   | CDataNode
   | CommentNode;
 
-export type SNWithId = SN & { id: number };
-
-export type AddedNode = {
-  parentId?: number;
-  nextId?: number;
-  node: SNWithId;
-};
+export type SNWithId = SN & { id: number; parentId?: number; nextId?: number };
