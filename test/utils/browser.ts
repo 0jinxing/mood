@@ -5,7 +5,7 @@ import { launchBrowser } from './puppeteer';
 
 export function browserTest(
   message: string,
-  caseList: Array<{
+  test: Array<{
     message: string;
     fn: (server: http.Server, browser: Browser) => void;
   }> = []
@@ -19,13 +19,18 @@ export function browserTest(
       browser = await launchBrowser();
     });
 
-    caseList.forEach(({ message, fn }) => {
+    test.forEach(({ message, fn }) => {
       it(message, () => fn(server, browser));
     });
 
     after(async () => {
-      server.close();
-      browser.close();
+      await new Promise<void>((resolve, reject) => {
+        server.close(err => (err ? reject(err) : resolve()));
+      });
+
+      const pages = await browser.pages();
+      await Promise.all(pages.map(page => page.close()));
+      await browser.close();
     });
   });
 }
