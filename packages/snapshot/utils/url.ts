@@ -13,13 +13,15 @@ export function absToStyle(cssText: string) {
 }
 
 export function absToSrcset(value: string) {
+  if (!/\S+/.test(value)) return '';
+
   return value
     .split(',')
     .map(val => {
       const [url, size = ''] = val.trim().split(/\s+/);
       return `${absToDoc(url)} ${size}`.trim();
     })
-    .join(',');
+    .join(', ');
 }
 
 export function abs(name: string, value: string) {
