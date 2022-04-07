@@ -1,10 +1,4 @@
-import {
-  serialize,
-  abs,
-  mirror,
-  Attributes,
-  SNWithId
-} from '@mood/snapshot';
+import { serialize, abs, mirror, Attributes, SNWithId } from '@mood/snapshot';
 
 import {
   isAncestorRemoved,

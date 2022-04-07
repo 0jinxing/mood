@@ -1,7 +1,7 @@
 import * as fs from 'fs';
 import * as path from 'path';
 import * as inquirer from 'inquirer';
-import * as puppeteer from 'puppeteer';
+import { chromium } from '@playwright/test';
 
 function getCode(): string {
   const bundlePath = path.resolve('../packages/record/dist', 'index.iife.js');
@@ -10,7 +10,7 @@ function getCode(): string {
 
 (async () => {
   const code = getCode();
-  let events: any[];
+  let events: unknown[];
 
   start();
 
@@ -21,7 +21,8 @@ function getCode(): string {
         type: 'input',
         name: 'url',
         message:
-          'Enter the url you want to record, e.g https://react-redux.realworld.io: '
+          'Enter the url you want to record, e.g https://react-redux.realworld.io: ',
+        default: 'https://react-redux.realworld.io'
       }
     ]);
 
@@ -59,26 +60,26 @@ function getCode(): string {
   }
 
   async function record(url: string) {
-    const browser = await puppeteer.launch({
+    const browser = await chromium.launch({
       headless: false,
-      defaultViewport: null,
+      devtools: true,
       args: ['--start-maximized']
     });
-    const page = await browser.newPage();
-    await page.goto(url, {
-      waitUntil: 'domcontentloaded'
-    });
 
-    await page.exposeFunction('_replLog', event => {
-      events.push(event);
-    });
+    const page = await browser.newPage();
+
+    await page.goto(url, { waitUntil: 'domcontentloaded' });
+
+    await page.exposeFunction('_replLog', (event: unknown) =>
+      events.push(event)
+    );
 
     await page.evaluate(`;${code}
       window.__IS_RECORDING__ = true
       record({
         emit: event => window._replLog(event)
       });
-    `);
+     `);
 
     page.on('framenavigated', async () => {
       const isRecording = await page.evaluate('window.__IS_RECORDING__');

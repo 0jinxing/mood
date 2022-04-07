@@ -62,24 +62,3 @@ export type RecordEventWithTime = RecordEvent & { timestamp: number };
 
 export type EmitHandler = (data: IncrementalParam) => void;
 
-export type IsAny<T> = any extends T ? true : false;
-
-export type ValueOf<T extends object> = T[keyof T];
-
-export type FN = (...args: any[]) => any;
-
-export type MethodKeys<T extends object> = ValueOf<
-  {
-    [K in keyof T]: K extends string
-      ? T[K] extends FN
-        ? IsAny<T[K]> extends true
-          ? never
-          : K
-        : never
-      : never;
-  }
->;
-
-export type PropKeys<T extends object> = ValueOf<
-  { [K in keyof T]: T[K] extends FN ? never : K }
->;

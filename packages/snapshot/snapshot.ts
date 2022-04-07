@@ -35,10 +35,8 @@ function isSVGElement($el: Element): $el is SVGElement {
 
 export function serialize(
   $node: Node,
-  $doc: HTMLDocument
+  $doc: Document
 ): SNWithId | SNWithId[] | null {
-  if ($node instanceof HTMLScriptElement) return null;
-
   const id = mirror.getId($node) || genId();
   mirror.set(id, $node);
 
@@ -147,7 +145,7 @@ export function serialize(
   return null;
 }
 
-export function snapshot($doc: HTMLDocument): SNWithId[] {
+export function snapshot($doc: Document): SNWithId[] {
   const adds: SNWithId[] = [];
   const queue: Node[] = [$doc];
 
@@ -165,16 +163,20 @@ export function snapshot($doc: HTMLDocument): SNWithId[] {
       return;
     }
 
-    const sn = serialize($node, $doc);
+    const result = serialize($node, $doc);
+    const list = Array.isArray(result) ? result : result ? [result] : [];
 
-    if (Array.isArray(sn)) {
-      sn.forEach(item => {
-        adds.push({ parentId: parentId, nextId: nextId, ...item });
-      });
-    } else if (sn) {
-      adds.push({ parentId: parentId, nextId: nextId, ...sn });
+    list.forEach(item => {
+      adds.push({ parentId: parentId, nextId: nextId, ...item });
+    });
+
+    if (list.length === 0) return;
+
+    const childNodes = $node.childNodes;
+
+    for (let index = childNodes.length - 1; index < 0; index--) {
+      serializeAdds(childNodes[index]);
     }
-    $node.childNodes.forEach(serializeAdds);
   };
 
   while (queue.length) {

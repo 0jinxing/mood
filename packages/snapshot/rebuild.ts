@@ -7,7 +7,7 @@ export function hover(cssText: string): string {
   return cssText.replace(HOVER_MATCH, '$1:hover$2 $1.\\:hover$2');
 }
 
-export function buildNode(node: SNWithId, $doc: HTMLDocument): Node | null {
+export function buildNode(node: SNWithId, $doc: Document): Node | null {
   if (node.type === NT.DOCUMENT_NODE) {
     return $doc.implementation.createDocument(null, '', null);
   }
@@ -68,10 +68,7 @@ export function buildNode(node: SNWithId, $doc: HTMLDocument): Node | null {
   return null;
 }
 
-export function buildNodeWithSN(
-  node: SNWithId,
-  $doc: HTMLDocument
-): Node | null {
+export function buildNodeWithSN(node: SNWithId, $doc: Document): Node | null {
   let $el = buildNode(node, $doc);
 
   if (!$el) return null;
@@ -87,7 +84,7 @@ export function buildNodeWithSN(
   return $el;
 }
 
-export function rebuild(adds: SNWithId[], $doc: HTMLDocument) {
+export function rebuild(adds: SNWithId[], $doc: Document) {
   adds.forEach(({ parentId, nextId, ...node }) => {
     const $el = buildNodeWithSN(node, $doc)!;
 

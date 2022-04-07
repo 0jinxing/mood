@@ -1,6 +1,7 @@
+import { NonFunctionKeys } from 'utility-types';
 import { mirror } from '@mood/snapshot';
+
 import { IncrementalSource } from '../constant';
-import { PropKeys } from '../types';
 import { hookProp, on } from '../utils';
 
 export type InputValue = string | boolean;
@@ -56,9 +57,8 @@ export function input(cb: InputCallback) {
     if (inputType === 'radio' && name && value) {
       const selector = `input[type=radio][name=${name}]`;
 
-      const $$radio: NodeListOf<HTMLInputElement> = document.querySelectorAll(
-        selector
-      );
+      const $$radio: NodeListOf<HTMLInputElement> =
+        document.querySelectorAll(selector);
 
       // toggle
       for (const $el of Array.from($$radio)) {
@@ -79,7 +79,10 @@ export function input(cb: InputCallback) {
     [HTMLTextAreaElement.prototype, 'value']
   ];
 
-  type Properties<T extends object = any> = [prototype: T, key: PropKeys<T>];
+  type Properties<T extends object = any> = [
+    prototype: T,
+    key: NonFunctionKeys<T>
+  ];
   const hookHandlers = hookProperties.map(([prototype, key]: Properties) =>
     hookProp(prototype, key, function () {
       eventHandler({ target: this });
