@@ -174,8 +174,8 @@ export function snapshot($doc: Document): SNWithId[] {
 
     const childNodes = $node.childNodes;
 
-    for (let index = childNodes.length - 1; index < 0; index--) {
-      serializeAdds(childNodes[index]);
+    for (let i = childNodes.length - 1; i >= 0; i--) {
+      serializeAdds(childNodes[i]);
     }
   };
 
