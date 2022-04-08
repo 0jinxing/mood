@@ -1,4 +1,4 @@
-import { serialize, abs, mirror, Attributes, SNWithId } from '@mood/snapshot';
+import { serialize, rAttr, mirror, Attributes, SNWithId } from '@mood/snapshot';
 
 import {
   isAncestorRemoved,
@@ -91,7 +91,7 @@ export function mutation(cb: MutationCallback) {
             current = { $el: target, attributes: {} };
             attrs.push(current);
           }
-          current.attributes[attributeName!] = abs(attributeName!, value!);
+          current.attributes[attributeName!] = rAttr(attributeName!, value!);
         }
         // childList
         else if (type === 'childList') {

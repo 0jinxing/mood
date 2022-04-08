@@ -1,4 +1,4 @@
-import { mirror, abs, absToStyle } from './utils';
+import { mirror, rAttr, rStyle } from './utils';
 import { NT, Attributes, SNWithId } from './types';
 
 let id = 0;
@@ -57,7 +57,7 @@ export function serialize(
   if ($node instanceof Element) {
     const attributes: Attributes = {};
     for (const { name, value } of Array.from($node.attributes)) {
-      attributes[name] = abs(name, value);
+      attributes[name] = rAttr(name, value);
     }
     if ($node instanceof HTMLLinkElement) {
       const styleSheet = Array.from($doc.styleSheets).find(
@@ -80,7 +80,7 @@ export function serialize(
             id: genId(),
             parentId: id,
             type: NT.TEXT_NODE,
-            textContent: absToStyle(cssText)
+            textContent: rStyle(cssText)
           }
         ];
       }
@@ -124,7 +124,7 @@ export function serialize(
     let textContent = $node.textContent;
     const isStyle = $parentNode instanceof HTMLStyleElement;
     if (isStyle && textContent) {
-      textContent = absToStyle(textContent);
+      textContent = rStyle(textContent);
     }
     return {
       id,
