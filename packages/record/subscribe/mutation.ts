@@ -1,4 +1,4 @@
-import { serialize, rAttr, mirror, Attributes, SNWithId } from '@mood/snapshot';
+import { serialize, rAttr, mirror, Attrs, SNWithId } from '@mood/snapshot';
 
 import {
   isAncestorRemoved,
@@ -11,14 +11,14 @@ import { IncrementalSource } from '../constant';
 
 export type AttrCursor = {
   $el: Node;
-  attributes: Attributes;
+  attributes: Attrs;
 };
 
-export type AddedNodeMutation = SNWithId & { parentId: number };
+export type AddedNodeMutation = SNWithId & { pId: number };
 
 export type RemovedNodeMutation = {
   id: number;
-  parentId: number;
+  pId: number;
 };
 
 export type TextMutation = {
@@ -28,7 +28,7 @@ export type TextMutation = {
 
 export type AttrMutation = {
   id: number;
-  attributes: Attributes;
+  attributes: Attrs;
 };
 
 export type MutationParam = {
@@ -41,7 +41,7 @@ export type MutationParam = {
 
 export type MutationCallback = (param: MutationParam) => void;
 
-const genKey = (id: number, parentId: number) => `${id}@${parentId}`;
+const genKey = (id: number, pId: number) => `${id}@${pId}`;
 
 export function mutation(cb: MutationCallback) {
   const observer = new MutationObserver(mutations => {
@@ -59,9 +59,9 @@ export function mutation(cb: MutationCallback) {
       const id = mirror.getId($node);
       if (id) {
         movedSet.add($node);
-        const parentId = $parent ? mirror.getId($parent) : undefined;
-        if (parentId) {
-          movedMap.set(genKey(id, parentId), true);
+        const pId = $parent ? mirror.getId($parent) : undefined;
+        if (pId) {
+          movedMap.set(genKey(id, pId), true);
         }
       } else {
         addedSet.add($node);
@@ -98,9 +98,9 @@ export function mutation(cb: MutationCallback) {
           addedNodes.forEach($node => genAdds($node, target));
           removedNodes.forEach($node => {
             const id = mirror.getId($node);
-            const parentId = mirror.getId(target);
+            const pId = mirror.getId(target);
 
-            const movedKey = genKey(id, parentId);
+            const movedKey = genKey(id, pId);
 
             if (addedSet.has($node)) {
               deepDelete(addedSet, $node);
@@ -123,7 +123,7 @@ export function mutation(cb: MutationCallback) {
               deepDelete(movedSet, $node);
               movedMap.delete(movedKey);
             } else {
-              removes.push({ parentId, id });
+              removes.push({ pId, id });
             }
             mirror.remove($node);
           });
@@ -134,15 +134,15 @@ export function mutation(cb: MutationCallback) {
     const addQueue: Node[] = [];
 
     const pushAdd = ($node: Node) => {
-      const parentId = $node.parentNode
+      const pId = $node.parentNode
         ? mirror.getId($node.parentNode)
         : undefined;
 
-      const nextId = $node.nextSibling
+      const nId = $node.nextSibling
         ? mirror.getId($node.nextSibling)
         : undefined;
 
-      if (!parentId || nextId === 0) {
+      if (!pId || nId === 0) {
         addQueue.push($node);
         return;
       }
@@ -151,10 +151,10 @@ export function mutation(cb: MutationCallback) {
 
       if (Array.isArray(sn)) {
         sn.forEach(item => {
-          adds.push({ parentId: parentId, nextId: nextId, ...item });
+          adds.push({ pId: pId, nId: nId, ...item });
         });
       } else if (sn) {
-        adds.push({ parentId: parentId, nextId: nextId, ...sn });
+        adds.push({ pId: pId, nId: nId, ...sn });
       }
     };
 

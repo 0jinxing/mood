@@ -8,16 +8,16 @@ export function hover(cssText: string): string {
 }
 
 export function buildNode(node: SNWithId, $doc: Document): Node | null {
-  if (node.type === NT.DOCUMENT_NODE) {
+  if (node.type === NT.DOC_NODE) {
     return $doc.implementation.createDocument(null, '', null);
   }
 
-  if (node.type === NT.DOCUMENT_TYPE_NODE) {
+  if (node.type === NT.DOC_TYPE_NODE) {
     const { name, publicId, systemId } = node;
     return $doc.implementation.createDocumentType(name, publicId, systemId);
   }
 
-  if (node.type === NT.ELEMENT_NODE) {
+  if (node.type === NT.ELE_NODE) {
     const tagName = node.tagName;
 
     const { attributes, isSVG } = node;
@@ -57,7 +57,7 @@ export function buildNode(node: SNWithId, $doc: Document): Node | null {
     return $doc.createTextNode(isStyle ? hover(textContent) : textContent);
   }
 
-  if (node.type === NT.CDATA_SECTION_NODE) {
+  if (node.type === NT.CDATA_NODE) {
     return $doc.createCDATASection(node.textContent);
   }
 
@@ -73,7 +73,7 @@ export function buildNodeWithSN(node: SNWithId, $doc: Document): Node | null {
 
   if (!$el) return null;
 
-  if (node.type === NT.DOCUMENT_NODE) {
+  if (node.type === NT.DOC_NODE) {
     $el = $doc;
     // Close before open to make sure document was closed
     $doc.close();
@@ -85,13 +85,13 @@ export function buildNodeWithSN(node: SNWithId, $doc: Document): Node | null {
 }
 
 export function rebuild(adds: SNWithId[], $doc: Document) {
-  adds.forEach(({ parentId, nextId, ...node }) => {
+  adds.forEach(({ pId, nId, ...node }) => {
     const $el = buildNodeWithSN(node, $doc)!;
 
-    const $parent = parentId ? mirror.getNode(parentId) : undefined;
-    const $next = nextId ? mirror.getNode(nextId) : undefined;
+    const $parent = pId ? mirror.getNode(pId) : undefined;
+    const $next = nId ? mirror.getNode(nId) : undefined;
 
-    if (node.type === NT.DOCUMENT_NODE || node.type === NT.DOCUMENT_TYPE_NODE) {
+    if (node.type === NT.DOC_NODE || node.type === NT.DOC_TYPE_NODE) {
       /**
        * ignore
        */

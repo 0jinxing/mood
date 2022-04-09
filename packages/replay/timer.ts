@@ -1,4 +1,7 @@
-import { ActionWithDelay } from './types';
+export type ActionWithDelay = {
+  execAction: () => void;
+  delay: number;
+};
 
 export class Timer {
   public timeOffset: number = 0;
@@ -7,7 +10,7 @@ export class Timer {
   constructor(
     private speed: number = 1,
     private actions: ActionWithDelay[] = []
-  ) { }
+  ) {}
 
   public setSpeed(speed = 1) {
     this.speed = speed;

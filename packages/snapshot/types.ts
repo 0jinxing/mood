@@ -1,31 +1,30 @@
 export enum NT {
-  ELEMENT_NODE,
+  ELE_NODE,
   TEXT_NODE,
-  CDATA_SECTION_NODE,
-  PROCESSING_INSTRUCTION_NODE,
+  CDATA_NODE,
   COMMENT_NODE,
-  DOCUMENT_NODE,
-  DOCUMENT_TYPE_NODE,
-  DOCUMENT_FRAGMENT_NODE
+  DOC_NODE,
+  DOC_TYPE_NODE,
+  DOC_FRAGMENT_NODE
 }
 
-export type Attributes = { [key: string]: boolean | string };
+export type Attrs = { [key: string]: boolean | string };
 
-export type DocumentNode = {
-  type: NT.DOCUMENT_NODE;
+export type DocNode = {
+  type: NT.DOC_NODE;
 };
 
-export type DocumentTypeNode = {
-  type: NT.DOCUMENT_TYPE_NODE;
+export type DocTypeNode = {
+  type: NT.DOC_TYPE_NODE;
   name: string;
   publicId: string;
   systemId: string;
 };
 
-export type ElementNode = {
-  type: NT.ELEMENT_NODE;
+export type EleNode = {
+  type: NT.ELE_NODE;
   tagName: string;
-  attributes: Attributes;
+  attributes: Attrs;
   isSVG?: boolean;
 };
 
@@ -36,7 +35,7 @@ export type TextNode = {
 };
 
 export type CDataNode = {
-  type: NT.CDATA_SECTION_NODE;
+  type: NT.CDATA_NODE;
   textContent: '';
 };
 
@@ -46,11 +45,11 @@ export type CommentNode = {
 };
 
 export type SN =
-  | DocumentNode
-  | DocumentTypeNode
-  | ElementNode
+  | DocNode
+  | DocTypeNode
+  | EleNode
   | TextNode
   | CDataNode
   | CommentNode;
 
-export type SNWithId = SN & { id: number; parentId?: number; nextId?: number };
+export type SNWithId = SN & { id: number; pId?: number; nId?: number };

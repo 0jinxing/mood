@@ -11,11 +11,9 @@ import {
   ViewportResizeParam
 } from '@mood/record';
 
-import { Timer } from './timer';
-import { createReplayerService } from './fsm';
+import { ActionWithDelay, Timer } from './timer';
+import { createService } from './fsm';
 import getInjectStyle from './styles/inject-style';
-
-import { ActionWithDelay } from './types';
 
 const mitt: MittStatic = (mittProxy as any).default || mittProxy;
 
@@ -86,7 +84,7 @@ export class Player {
 
   private baselineTime = 0;
   private lastPlayedEvent: RecordEventWithTime;
-  private service: ReturnType<typeof createReplayerService>;
+  private service: ReturnType<typeof createService>;
 
   private config: PlayerConfig = defaultConfig;
 
@@ -96,7 +94,7 @@ export class Player {
   ) {
     this.setConfig(config);
 
-    this.service = createReplayerService({
+    this.service = createService({
       events,
       timeOffset: 0,
       speed: this.config.speed
@@ -196,7 +194,7 @@ export class Player {
       case MUTATION: {
         event.removes.forEach(rm => {
           const $el = mirror.getNode(rm.id);
-          const $parent = mirror.getNode(rm.parentId);
+          const $parent = mirror.getNode(rm.pId);
           if (!$el) {
             return;
           }
@@ -209,8 +207,8 @@ export class Player {
         const addedQueue: AddedNodeMutation[] = [];
 
         const appendNode = (add: AddedNodeMutation) => {
-          const $parent = add.parentId
-            ? mirror.getNode(add.parentId)
+          const $parent = add.pId
+            ? mirror.getNode(add.pId)
             : undefined;
 
           if (!$parent) {
@@ -220,19 +218,16 @@ export class Player {
 
           let $next: Node | undefined;
 
-          if (add.nextId) {
-            $next = mirror.getNode(add.nextId);
+          if (add.nId) {
+            $next = mirror.getNode(add.nId);
           }
 
-          if (add.nextId && !$next) {
+          if (add.nId && !$next) {
             addedQueue.push(add);
             return;
           }
 
-          const $target = buildNodeWithSN(
-            add,
-            this.$iframe.contentDocument!
-          );
+          const $target = buildNodeWithSN(add, this.$iframe.contentDocument!);
 
           if ($next && $next.parentElement) {
             // making sure the parent contains the reference nodes
@@ -251,7 +246,7 @@ export class Player {
 
         while (addedQueue.length) {
           if (
-            addedQueue.every(m => !m.parentId || !mirror.getNode(m.parentId))
+            addedQueue.every(m => !m.pId || !mirror.getNode(m.pId))
           ) {
             return;
           }

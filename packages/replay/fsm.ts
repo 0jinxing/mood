@@ -34,7 +34,7 @@ export type MachineStates = Record<
   }
 >;
 
-export function createReplayerService(context: MachineContext) {
+export function createService(context: MachineContext) {
   const states: MachineStates = {
     inited: { on: { play: 'playing' } },
     playing: {

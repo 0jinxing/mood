@@ -1,5 +1,5 @@
 import { mirror, rAttr, rStyle } from './utils';
-import { NT, Attributes, SNWithId } from './types';
+import { NT, Attrs, SNWithId } from './types';
 
 let id = 0;
 function genId(): number {
@@ -41,13 +41,13 @@ export function serialize(
   mirror.set(id, $node);
 
   if ($node instanceof Document) {
-    return { id, type: NT.DOCUMENT_NODE };
+    return { id, type: NT.DOC_NODE };
   }
 
   if ($node instanceof DocumentType) {
     return {
       id,
-      type: NT.DOCUMENT_TYPE_NODE,
+      type: NT.DOC_TYPE_NODE,
       name: $node.name,
       publicId: $node.publicId,
       systemId: $node.systemId
@@ -55,7 +55,7 @@ export function serialize(
   }
 
   if ($node instanceof Element) {
-    const attributes: Attributes = {};
+    const attributes: Attrs = {};
     for (const { name, value } of Array.from($node.attributes)) {
       attributes[name] = rAttr(name, value);
     }
@@ -72,13 +72,13 @@ export function serialize(
         return [
           {
             id,
-            type: NT.ELEMENT_NODE,
+            type: NT.ELE_NODE,
             tagName: 'STYLE',
             attributes
           },
           {
             id: genId(),
-            parentId: id,
+            pId: id,
             type: NT.TEXT_NODE,
             textContent: rStyle(cssText)
           }
@@ -108,7 +108,7 @@ export function serialize(
 
     return {
       id,
-      type: NT.ELEMENT_NODE,
+      type: NT.ELE_NODE,
       tagName: getTagName($node),
       attributes,
       isSVG: isSVGElement($node)
@@ -116,7 +116,7 @@ export function serialize(
   }
 
   if ($node instanceof CDATASection) {
-    return { id, type: NT.CDATA_SECTION_NODE, textContent: '' };
+    return { id, type: NT.CDATA_NODE, textContent: '' };
   }
 
   if ($node instanceof Text) {
@@ -150,15 +150,15 @@ export function snapshot($doc: Document): SNWithId[] {
   const queue: Node[] = [$doc];
 
   const serializeAdds = ($node: Node) => {
-    const parentId = $node.parentElement
+    const pId = $node.parentElement
       ? mirror.getId($node.parentElement)
       : undefined;
 
-    const nextId = $node.nextSibling
+    const nId = $node.nextSibling
       ? mirror.getId($node.nextSibling)
       : undefined;
 
-    if (nextId === 0 || parentId === 0) {
+    if (nId === 0 || pId === 0) {
       queue.unshift($node);
       return;
     }
@@ -167,7 +167,7 @@ export function snapshot($doc: Document): SNWithId[] {
     const list = Array.isArray(result) ? result : result ? [result] : [];
 
     list.forEach(item => {
-      adds.push({ parentId: parentId, nextId: nextId, ...item });
+      adds.push({ pId: pId, nId: nId, ...item });
     });
 
     if (list.length === 0) return;

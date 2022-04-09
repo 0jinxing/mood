@@ -18,13 +18,13 @@ export function isAncestorRemoved($target: Node): boolean {
 }
 
 export function isParentRemoved(
-  removes: Array<{ parentId: number; id: number }>,
+  removes: Array<{ pId: number; id: number }>,
   $node: Node
 ): boolean {
   const { parentNode } = $node;
   if (!parentNode) return false;
-  const parentId = mirror.getId(parentNode);
-  if (removes.some(r => r.id === parentId)) return true;
+  const pId = mirror.getId(parentNode);
+  if (removes.some(r => r.id === pId)) return true;
   return isParentRemoved(removes, parentNode);
 }
 
