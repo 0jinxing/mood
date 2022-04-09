@@ -28,7 +28,7 @@ const hMap: Record<string, undefined | ((v: string) => string)> = {
   src: rDoc,
   href: rDoc,
   srcset: rSrcset,
-  style: rSrcset
+  style: rStyle
 };
 
 export function rAttr(name: string, value: string) {
