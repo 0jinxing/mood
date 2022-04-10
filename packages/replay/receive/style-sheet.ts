@@ -1,7 +1,8 @@
 import { StyleSheetParam } from '@mood/record';
 import { mirror } from '@mood/snapshot';
+import { RecHandler } from '../types';
 
-export function receiveStyleSheet(event: StyleSheetParam) {
+export const recStyleSheet: RecHandler<StyleSheetParam> = event => {
   const $target = mirror.getNode<HTMLStyleElement>(event.id);
   if (!$target) return;
 
@@ -29,4 +30,4 @@ export function receiveStyleSheet(event: StyleSheetParam) {
   if (event.removes) {
     event.removes.forEach(({ index }) => sheet.deleteRule(index));
   }
-}
+};

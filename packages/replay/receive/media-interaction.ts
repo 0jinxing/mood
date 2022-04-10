@@ -1,7 +1,8 @@
 import { MediaInteractionParam } from '@mood/record';
 import { mirror } from '@mood/snapshot';
+import { RecHandler } from '../types';
 
-export function receiveMediaInteraction(event: MediaInteractionParam) {
+export const recMediaInteraction: RecHandler<MediaInteractionParam> = event => {
   const $target = mirror.getNode<HTMLMediaElement>(event.id);
 
   if (!$target) return;
@@ -15,4 +16,4 @@ export function receiveMediaInteraction(event: MediaInteractionParam) {
   } else if (event.action === 'pause') {
     $target.pause();
   }
-}
+};

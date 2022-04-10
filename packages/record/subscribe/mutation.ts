@@ -44,7 +44,7 @@ export type MutationCallback = (param: MutationParam) => void;
 
 const genKey = (id: number, pId: number) => `${id}@${pId}`;
 
-export function subscribeMutation(cb: MutationCallback) {
+export function subMutation(cb: MutationCallback) {
   const observer = new MutationObserver(mutations => {
     const attrs: AttrCursor[] = [];
     const texts: Array<{ value: string | null; $el: Node }> = [];

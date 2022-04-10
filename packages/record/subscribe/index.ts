@@ -1,24 +1,24 @@
-import { subscribeInput } from './input';
-import { subscribeScroll } from './scroll';
-import { subscribeViewportResize } from './viewport-resize';
-import { subscribeMouseInteraction } from './mouse-interaction';
-import { subscribeMouseMove } from './mouse-move';
-import { subscribeMediaInteraction } from './media-interaction';
-import { subscribeStyleSheet } from './style-sheet';
-import { subscribeMutation } from './mutation';
+import { subInput } from './input';
+import { subScroll } from './scroll';
+import { subViewportResize } from './viewport-resize';
+import { subMouseInteraction } from './mouse-interaction';
+import { subMouseMove } from './mouse-move';
+import { subMediaInteraction } from './media-interaction';
+import { subStyleSheet } from './style-sheet';
+import { subMutation } from './mutation';
 
 import { EmitHandler } from '../types';
 
 export function subscribe(emit: EmitHandler) {
   const unsubscribes = [
-    subscribeMutation,
-    subscribeMouseMove,
-    subscribeMouseInteraction,
-    subscribeScroll,
-    subscribeViewportResize,
-    subscribeInput,
-    subscribeMediaInteraction,
-    subscribeStyleSheet
+    subMutation,
+    subMouseMove,
+    subMouseInteraction,
+    subScroll,
+    subViewportResize,
+    subInput,
+    subMediaInteraction,
+    subStyleSheet
   ].map(o => o(emit));
 
   return () => {

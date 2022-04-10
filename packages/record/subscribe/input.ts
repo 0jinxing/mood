@@ -27,7 +27,7 @@ function isInputElement(
   );
 }
 
-export function subscribeInput(cb: InputCallback) {
+export function subInput(cb: InputCallback) {
   const cbWithDedup = (
     $target: HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement,
     value: InputValue

@@ -1,10 +1,10 @@
 import { ViewportResizeParam } from '@mood/record';
-import { ReceiveContext } from '../types';
+import { RecHandler } from '../types';
 
-export function receiveViewportResize(
-  enevt: ViewportResizeParam,
-  context: ReceiveContext
-) {
+export const recViewportResize: RecHandler<ViewportResizeParam> = (
+  enevt,
+  context
+) => {
   context.$iframe.width = `${enevt.width}px`;
   context.$iframe.height = `${enevt.height}px`;
-}
+};

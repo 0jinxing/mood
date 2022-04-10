@@ -19,7 +19,7 @@ export type StyleSheetParam = {
 
 export type StyleSheetCallback = (param: StyleSheetParam) => void;
 
-export function subscribeStyleSheet(cb: StyleSheetCallback) {
+export function subStyleSheet(cb: StyleSheetCallback) {
   const insertRule = CSSStyleSheet.prototype.insertRule;
   CSSStyleSheet.prototype.insertRule = function (rule: string, index?: number) {
     const id = mirror.getId(this.ownerNode);

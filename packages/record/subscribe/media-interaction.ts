@@ -12,7 +12,7 @@ export type MediaInteractionParam = {
 
 export type MediaInteractionCallback = (param: MediaInteractionParam) => void;
 
-export function subscribeMediaInteraction(cb: MediaInteractionCallback) {
+export function subMediaInteraction(cb: MediaInteractionCallback) {
   const handler = (act: MediaInteraction) => (event: Event) => {
     const { target } = event;
     if (target) {

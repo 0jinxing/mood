@@ -10,7 +10,7 @@ import {
 import { ActionWithDelay, createTimer, Timer } from './timer';
 import { createService } from './fsm';
 import { applyIncremental } from '../receive';
-import { ReceiveContext } from '../types';
+import { RecCtx } from '../types';
 
 export type PlayerConfig = {
   speed: number;
@@ -109,7 +109,7 @@ export class Player {
   private apply(event: IncrementalSnapshotEvent, sync: boolean) {
     const { $iframe, $cursor, baseline, timer } = this;
 
-    const context: ReceiveContext = {
+    const context: RecCtx = {
       $iframe,
       $cursor,
       baseline,

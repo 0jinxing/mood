@@ -11,7 +11,7 @@ export type ScrollParam = {
 
 export type ScrollCallback = (param: ScrollParam) => void;
 
-export function subscribeScroll(cb: ScrollCallback) {
+export function subScroll(cb: ScrollCallback) {
   const updatePosition = throttle<UIEvent>(({ target }) => {
     if (!target) return;
 

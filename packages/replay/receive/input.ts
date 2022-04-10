@@ -1,7 +1,8 @@
 import { InputParam } from '@mood/record';
 import { mirror } from '@mood/snapshot';
+import { RecHandler } from '../types';
 
-export function receiveInput(event: InputParam) {
+export const receInput: RecHandler<InputParam> = event => {
   const $target = mirror.getNode<HTMLInputElement>(event.id);
 
   if (!$target) return;
@@ -11,4 +12,4 @@ export function receiveInput(event: InputParam) {
   } else {
     $target.value = event.value;
   }
-}
+};

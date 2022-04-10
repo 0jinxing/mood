@@ -9,7 +9,7 @@ export type ViewportResizeParam = {
 
 export type ViewportResizeCallback = (param: ViewportResizeParam) => void;
 
-export function subscribeViewportResize(cb: ViewportResizeCallback) {
+export function subViewportResize(cb: ViewportResizeCallback) {
   const source = IncSource.VIEWPORT_RESIZE;
 
   const updateDimension = throttle(

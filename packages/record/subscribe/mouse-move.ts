@@ -12,7 +12,7 @@ export type MouseMoveParam = {
 
 export type MousemoveCallback = (param: MouseMoveParam) => void;
 
-export function subscribeMouseMove(cb: MousemoveCallback) {
+export function subMouseMove(cb: MousemoveCallback) {
   let positions: MousePositions = [];
   const throttleCb = throttle((touch: boolean) => {
     cb({

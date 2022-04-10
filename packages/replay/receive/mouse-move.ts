@@ -1,13 +1,13 @@
 import { MouseMoveParam } from '@mood/record';
-import { ReceiveContext } from '../types';
+import { RecHandler } from '../types';
 import { chunk } from '../utils/chunk';
 import { moveAndHover } from '../utils/hover';
 
-export function receiveMouseMove(
-  event: MouseMoveParam,
-  context: ReceiveContext,
-  sync: boolean
-) {
+export const recMouseMove: RecHandler<MouseMoveParam> = (
+  event,
+  context,
+  sync
+) => {
   const $doc = context.$iframe.contentDocument!;
   if (sync) {
     const [id, x, y] = event.positions.slice(event.positions.length - 4);
@@ -21,4 +21,4 @@ export function receiveMouseMove(
       context.timer.addAction(action);
     });
   }
-}
+};

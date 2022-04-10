@@ -26,7 +26,7 @@ export type MouseInteractionParam = {
 
 export type MouseInteractionCallback = (param: MouseInteractionParam) => void;
 
-export function subscribeMouseInteraction(cb: MouseInteractionCallback) {
+export function subMouseInteraction(cb: MouseInteractionCallback) {
   const handlers: Function[] = [];
 
   const getHandler = (action: MouseInteraction) => {

@@ -1,13 +1,13 @@
 import { MouseInteractionParam } from '@mood/record';
 import { mirror } from '@mood/snapshot';
-import { ReceiveContext } from '../types';
+import { RecHandler } from '../types';
 import { moveAndHover } from '../utils/hover';
 
-export function receiveMouseInteraction(
-  event: MouseInteractionParam,
-  context: ReceiveContext,
-  sync: boolean
-) {
+export const recMouseInteraction: RecHandler<MouseInteractionParam> = (
+  event,
+  context,
+  sync
+) => {
   const $target = mirror.getNode<HTMLElement>(event.id);
   if (!$target) return;
 
@@ -39,4 +39,4 @@ export function receiveMouseInteraction(
       }
     }
   }
-}
+};

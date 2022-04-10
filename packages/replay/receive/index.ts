@@ -1,30 +1,30 @@
-import { IncrementalSnapshotEvent, IncSource } from '@mood/record';
-import { ReceiveContext } from '../types';
-import { receiveInput } from './input';
-import { receiveMediaInteraction } from './media-interaction';
-import { receiveMouseInteraction } from './mouse-interaction';
-import { receiveMouseMove } from './mouse-move';
-import { receiveMutation } from './mutation';
-import { receiveViewportResize } from './viewport-resize';
-import { receiveScroll } from './scroll';
-import { receiveStyleSheet } from './style-sheet';
+import { IncrementalParam, IncSource } from '@mood/record';
+import { RecCtx, RecHandler } from '../types';
+import { receInput } from './input';
+import { recMediaInteraction } from './media-interaction';
+import { recMouseInteraction } from './mouse-interaction';
+import { recMouseMove } from './mouse-move';
+import { recMutation } from './mutation';
+import { recViewportResize } from './viewport-resize';
+import { recScroll } from './scroll';
+import { recStyleSheet } from './style-sheet';
 
 export function applyIncremental(
-  event: IncrementalSnapshotEvent,
-  context: ReceiveContext,
+  event: IncrementalParam,
+  context: RecCtx,
   sync: boolean
 ) {
-  const handlers = {
-    [IncSource.MUTATION]: receiveMutation,
-    [IncSource.MOUSE_MOVE]: receiveMouseMove,
-    [IncSource.MOUSE_INTERACTION]: receiveMouseInteraction,
-    [IncSource.SCROLL]: receiveScroll,
-    [IncSource.VIEWPORT_RESIZE]: receiveViewportResize,
-    [IncSource.INPUT]: receiveInput,
-    [IncSource.TOUCH_MOVE]: receiveMouseMove,
-    [IncSource.MEDIA_INTERACTION]: receiveMediaInteraction,
-    [IncSource.STYLE_SHEETRULE]: receiveStyleSheet
-  } as const;
+  const handlerMap: { [key in IncSource]: RecHandler } = {
+    [IncSource.MUTATION]: recMutation,
+    [IncSource.MOUSE_MOVE]: recMouseMove,
+    [IncSource.MOUSE_INTERACTION]: recMouseInteraction,
+    [IncSource.SCROLL]: recScroll,
+    [IncSource.VIEWPORT_RESIZE]: recViewportResize,
+    [IncSource.INPUT]: receInput,
+    [IncSource.TOUCH_MOVE]: recMouseMove,
+    [IncSource.MEDIA_INTERACTION]: recMediaInteraction,
+    [IncSource.STYLE_SHEETRULE]: recStyleSheet
+  };
 
-  handlers[event.source]?.(event as any, context, sync);
+  handlerMap[event.source](event, context, sync);
 }
