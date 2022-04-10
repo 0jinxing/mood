@@ -1,26 +1,25 @@
 import { mirror } from '@mood/snapshot';
 import { on, throttle } from '../utils';
 
-import { IncrementalSource } from '../constant';
+import { IncSource } from '../constant';
 
-// repeat => id, x, y, timestamp
 export type MousePositions = number[];
 
 export type MouseMoveParam = {
-  source: IncrementalSource.MOUSE_MOVE | IncrementalSource.TOUCH_MOVE;
+  source: IncSource.MOUSE_MOVE | IncSource.TOUCH_MOVE;
   positions: MousePositions;
 };
 
 export type MousemoveCallback = (param: MouseMoveParam) => void;
 
-export function mouseMove(cb: MousemoveCallback) {
+export function subscribeMouseMove(cb: MousemoveCallback) {
   let positions: MousePositions = [];
-  const throttleCb = throttle((isTouch: boolean) => {
+  const throttleCb = throttle((touch: boolean) => {
     cb({
       positions,
-      source: isTouch
-        ? IncrementalSource.TOUCH_MOVE
-        : IncrementalSource.MOUSE_MOVE
+      source: touch
+        ? IncSource.TOUCH_MOVE
+        : IncSource.MOUSE_MOVE
     });
 
     positions = [];
@@ -30,9 +29,7 @@ export function mouseMove(cb: MousemoveCallback) {
     const { clientX, clientY } =
       event instanceof TouchEvent ? event.changedTouches[0] : event;
 
-    positions.splice(
-      positions.length,
-      0,
+    positions.push(
       mirror.getId(target as Node),
       clientX,
       clientY,
@@ -40,7 +37,7 @@ export function mouseMove(cb: MousemoveCallback) {
     );
 
     throttleCb(event instanceof TouchEvent);
-  }, Math.floor(1000 / 30));
+  }, 30);
 
   const handlers = [
     on('mousemove', updatePosition),

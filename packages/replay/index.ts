@@ -1,5 +1,5 @@
 import { RecordEventWithTime } from '@mood/record';
-import { Player, PlayerConfig } from './player';
+import { Player, PlayerConfig } from './models/player';
 
 export function replay(
   events: RecordEventWithTime[],

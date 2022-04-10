@@ -12,6 +12,7 @@
   "license": "MIT",
   "dependencies": {
     "@mood/snapshot": "0.0.1",
+    "@mood/utils": "workspace:^0.0.1",
     "utility-types": "^3.10.0"
   }
 }

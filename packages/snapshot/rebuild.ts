@@ -20,8 +20,8 @@ export function buildNode(node: SNWithId, $doc: Document): Node | null {
   if (node.type === NT.ELE_NODE) {
     const tagName = node.tagName;
 
-    const { attributes, isSVG } = node;
-    const $el = isSVG
+    const { attributes, svg } = node;
+    const $el = svg
       ? $doc.createElementNS('http://www.w3.org/2000/svg', tagName)
       : $doc.createElement(tagName);
 
@@ -40,7 +40,7 @@ export function buildNode(node: SNWithId, $doc: Document): Node | null {
       if (/IFRAME/i.test(tagName) && key === 'src') continue;
 
       try {
-        if (isSVG && key === 'xlink:href') {
+        if (svg && key === 'xlink:href') {
           $el.setAttributeNS('http://www.w3.org/1999/xlink', key, value);
         } else if (!/^on[a-z]+/.test(key)) {
           $el.setAttribute(key, value);
@@ -53,8 +53,8 @@ export function buildNode(node: SNWithId, $doc: Document): Node | null {
   }
 
   if (node.type === NT.TEXT_NODE) {
-    const { isStyle, textContent } = node;
-    return $doc.createTextNode(isStyle ? hover(textContent) : textContent);
+    const { style, textContent } = node;
+    return $doc.createTextNode(style ? hover(textContent) : textContent);
   }
 
   if (node.type === NT.CDATA_NODE) {

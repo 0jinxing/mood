@@ -1,8 +1,10 @@
 const URL_MATCH = /url\(["']?(.*?)["']?\)/gi;
 
+let $anchor: HTMLAnchorElement;
 export function rDoc(value: string) {
-  const { href } = new URL(value, location.origin);
-  return href;
+  $anchor = $anchor || document.createElement('a');
+  $anchor.href = value;
+  return $anchor.href;
 }
 
 export function rStyle(cssText: string) {

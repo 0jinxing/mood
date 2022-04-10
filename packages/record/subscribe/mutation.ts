@@ -1,13 +1,14 @@
 import { serialize, rAttr, mirror, Attrs, SNWithId } from '@mood/snapshot';
 
 import {
-  isAncestorRemoved,
   deepDelete,
+  isAncestorRemoved,
   isAncestorInSet,
   isParentRemoved
 } from '../utils';
 
-import { IncrementalSource } from '../constant';
+import { IncSource } from '../constant';
+import { each } from '@mood/utils';
 
 export type AttrCursor = {
   $el: Node;
@@ -32,7 +33,7 @@ export type AttrMutation = {
 };
 
 export type MutationParam = {
-  source: IncrementalSource.MUTATION;
+  source: IncSource.MUTATION;
   texts: TextMutation[];
   attributes: AttrMutation[];
   removes: RemovedNodeMutation[];
@@ -43,10 +44,10 @@ export type MutationCallback = (param: MutationParam) => void;
 
 const genKey = (id: number, pId: number) => `${id}@${pId}`;
 
-export function mutation(cb: MutationCallback) {
+export function subscribeMutation(cb: MutationCallback) {
   const observer = new MutationObserver(mutations => {
     const attrs: AttrCursor[] = [];
-    const texts: Array<{ value: string; $el: Node }> = [];
+    const texts: Array<{ value: string | null; $el: Node }> = [];
     const removes: RemovedNodeMutation[] = [];
     const adds: AddedNodeMutation[] = [];
 
@@ -67,14 +68,14 @@ export function mutation(cb: MutationCallback) {
         addedSet.add($node);
         removedSet.delete($node);
       }
-      $node.childNodes.forEach($childNode => genAdds($childNode));
+      each($node.childNodes, $childNode => genAdds($childNode), true);
     };
 
     mutations.forEach(
       ({ type, target, oldValue, addedNodes, removedNodes, attributeName }) => {
         // characterData
         if (type === 'characterData') {
-          const value = target.textContent!;
+          const value = target.textContent;
 
           if (value === oldValue) return;
 
@@ -82,7 +83,9 @@ export function mutation(cb: MutationCallback) {
         }
         // attributes
         else if (type === 'attributes') {
-          const value = (target as HTMLElement).getAttribute(attributeName!);
+          const attrName = attributeName || '';
+
+          const value = (target as HTMLElement).getAttribute(attrName);
 
           if (oldValue === value) return;
 
@@ -91,7 +94,7 @@ export function mutation(cb: MutationCallback) {
             current = { $el: target, attributes: {} };
             attrs.push(current);
           }
-          current.attributes[attributeName!] = rAttr(attributeName!, value!);
+          current.attributes[attrName] = rAttr(attrName, value || '');
         }
         // childList
         else if (type === 'childList') {
@@ -134,9 +137,7 @@ export function mutation(cb: MutationCallback) {
     const addQueue: Node[] = [];
 
     const pushAdd = ($node: Node) => {
-      const pId = $node.parentNode
-        ? mirror.getId($node.parentNode)
-        : undefined;
+      const pId = $node.parentNode ? mirror.getId($node.parentNode) : undefined;
 
       const nId = $node.nextSibling
         ? mirror.getId($node.nextSibling)
@@ -190,7 +191,7 @@ export function mutation(cb: MutationCallback) {
     }
 
     const payload: MutationParam = {
-      source: IncrementalSource.MUTATION,
+      source: IncSource.MUTATION,
 
       texts: texts
         .map(text => ({

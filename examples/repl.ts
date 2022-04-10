@@ -112,7 +112,7 @@ function getCode(): string {
           <meta name="viewport" content="width=device-width, initial-scale=1.0" />
           <meta http-equiv="X-UA-Compatible" content="ie=edge" />
           <title>Record @${time}</title>
-          <link rel="stylesheet" href="../../packages/replay/styles/index.css" />
+          <link rel="stylesheet" href="../../packages/replay/index.css" />
         </head>
         <body>
           <script src="../../packages/replay/dist/index.iife.js"></script>

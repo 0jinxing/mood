@@ -1,8 +1,10 @@
 import { mirror } from '@mood/snapshot';
+import { each } from '@mood/utils';
 
 export function deepDelete(addsSet: Set<Node>, $node: Node) {
   addsSet.delete($node);
-  $node.childNodes.forEach(childN => deepDelete(addsSet, childN));
+  each($node.childNodes, childN => deepDelete(addsSet, childN), true);
+  // $node.childNodes.forEach(childN => deepDelete(addsSet, childN));
 }
 
 export function isAncestorRemoved($target: Node): boolean {

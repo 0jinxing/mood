@@ -2,12 +2,14 @@
   "name": "@mood/snapshot",
   "version": "0.0.1",
   "description": "",
-  "main": "dist/index.cjs.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "publish": "npm publish --access public"
   },
   "keywords": [],
   "author": "",
-  "license": "MIT"
+  "license": "MIT",
+  "dependencies": {
+    "@mood/utils": "workspace:^0.0.1"
+  }
 }

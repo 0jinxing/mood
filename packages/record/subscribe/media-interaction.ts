@@ -1,23 +1,23 @@
 import { mirror } from '@mood/snapshot';
 import { on } from '../utils';
-import { IncrementalSource } from '../constant';
+import { IncSource } from '../constant';
 
 export type MediaInteraction = 'play' | 'pause';
 
 export type MediaInteractionParam = {
-  source: IncrementalSource.MEDIA_INTERACTION;
+  source: IncSource.MEDIA_INTERACTION;
   action: MediaInteraction;
   id: number;
 };
 
 export type MediaInteractionCallback = (param: MediaInteractionParam) => void;
 
-export function mediaInteraction(cb: MediaInteractionCallback) {
+export function subscribeMediaInteraction(cb: MediaInteractionCallback) {
   const handler = (act: MediaInteraction) => (event: Event) => {
     const { target } = event;
     if (target) {
       cb({
-        source: IncrementalSource.MEDIA_INTERACTION,
+        source: IncSource.MEDIA_INTERACTION,
         id: mirror.getId(target),
         action: act
       });

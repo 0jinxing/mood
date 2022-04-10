@@ -1,5 +1,6 @@
 import { mirror, rAttr, rStyle } from './utils';
 import { NT, Attrs, SNWithId } from './types';
+import { reduce, each } from '@mood/utils';
 
 let id = 0;
 function genId(): number {
@@ -13,11 +14,10 @@ function getTagName($el: Element) {
 
 function getCSSText(styleSheet: CSSStyleSheet): string {
   try {
-    const rules = styleSheet.cssRules;
-    return Array.from(rules).reduce(
-      (css, rule) => css + getCSSRuleText(rule),
-      ''
-    );
+    const handler = (text: string, item: CSSRule) => {
+      return text + getCSSRuleText(item);
+    };
+    return reduce(styleSheet.cssRules, handler, '');
   } catch {
     return '';
   }
@@ -55,26 +55,33 @@ export function serialize(
   }
 
   if ($node instanceof Element) {
-    const attributes: Attrs = {};
-    for (const { name, value } of Array.from($node.attributes)) {
-      attributes[name] = rAttr(name, value);
-    }
+    const attrs: Attrs = {};
+
+    each($node.attributes, ({ name, value }) => {
+      attrs[name] = rAttr(name, value);
+    });
+
     if ($node instanceof HTMLLinkElement) {
-      const styleSheet = Array.from($doc.styleSheets).find(
-        sheet => sheet.href === $node.href
-      );
+      let styleSheet: CSSStyleSheet | undefined;
+
+      each($doc.styleSheets, item => {
+        if (item.href !== $node.href) return;
+        styleSheet = item;
+        return true;
+      });
+
       const cssText = styleSheet ? getCSSText(styleSheet) : '';
 
       if (cssText) {
-        delete attributes.rel;
-        delete attributes.href;
+        attrs.rel = '';
+        attrs.href = '';
 
         return [
           {
             id,
             type: NT.ELE_NODE,
             tagName: 'STYLE',
-            attributes
+            attributes: attrs
           },
           {
             id: genId(),
@@ -87,12 +94,12 @@ export function serialize(
     }
 
     if ($node instanceof HTMLInputElement) {
-      const type = attributes.type;
+      const type = attrs.type;
       const value = $node.value;
       if (type !== 'radio' && type !== 'checkbox') {
-        attributes.value = value;
+        attrs.value = value;
       } else {
-        attributes.checked = $node.checked;
+        attrs.checked = $node.checked;
       }
     }
 
@@ -101,17 +108,17 @@ export function serialize(
       $node instanceof HTMLSelectElement
     ) {
       const value = $node.value;
-      attributes.value = value;
+      attrs.value = value;
     } else if ($node instanceof HTMLOptionElement) {
-      attributes.selected = $node.selected;
+      attrs.selected = $node.selected;
     }
 
     return {
       id,
       type: NT.ELE_NODE,
       tagName: getTagName($node),
-      attributes,
-      isSVG: isSVGElement($node)
+      attributes: attrs,
+      svg: isSVGElement($node)
     };
   }
 
@@ -122,15 +129,15 @@ export function serialize(
   if ($node instanceof Text) {
     const $parentNode = $node.parentNode;
     let textContent = $node.textContent;
-    const isStyle = $parentNode instanceof HTMLStyleElement;
-    if (isStyle && textContent) {
+    const style = $parentNode instanceof HTMLStyleElement;
+    if (style && textContent) {
       textContent = rStyle(textContent);
     }
     return {
       id,
       type: NT.TEXT_NODE,
       textContent: textContent || '',
-      isStyle
+      style: style
     };
   }
 
@@ -147,41 +154,25 @@ export function serialize(
 
 export function snapshot($doc: Document): SNWithId[] {
   const adds: SNWithId[] = [];
-  const queue: Node[] = [$doc];
 
-  const serializeAdds = ($node: Node) => {
+  const walk = ($node: Node) => {
     const pId = $node.parentElement
       ? mirror.getId($node.parentElement)
       : undefined;
 
-    const nId = $node.nextSibling
-      ? mirror.getId($node.nextSibling)
-      : undefined;
-
-    if (nId === 0 || pId === 0) {
-      queue.unshift($node);
-      return;
-    }
+    const nId = $node.nextSibling ? mirror.getId($node.nextSibling) : undefined;
 
     const result = serialize($node, $doc);
     const list = Array.isArray(result) ? result : result ? [result] : [];
 
-    list.forEach(item => {
-      adds.push({ pId: pId, nId: nId, ...item });
-    });
+    adds.push(...list.map(i => ({ pId: pId, nId: nId, ...i })));
 
     if (list.length === 0) return;
 
-    const childNodes = $node.childNodes;
-
-    for (let i = childNodes.length - 1; i >= 0; i--) {
-      serializeAdds(childNodes[i]);
-    }
+    each($node.childNodes, walk, true);
   };
 
-  while (queue.length) {
-    serializeAdds(queue.pop()!);
-  }
+  walk($doc);
 
   return adds;
 }

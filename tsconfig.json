@@ -12,7 +12,8 @@
     "preserveConstEnums": true,
     "sourceMap": true,
     "rootDir": ".",
-    "baseUrl": "."
+    "baseUrl": ".",
+    "allowSyntheticDefaultImports": true
   },
   "compileOnSave": false
 }

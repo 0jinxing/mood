@@ -5,24 +5,25 @@ export type Throttled = {
 
 export function throttle<T>(func: (arg: T) => void, wait: number) {
   let timeout: ReturnType<typeof setTimeout> | undefined;
-  let previous = 0;
-  let lastArgs: any[];
+  let prev = 0;
+  let curArgs: any[];
 
-  const later = () => {
-    previous = Date.now();
+  const callback = () => {
+    prev = Date.now();
     timeout = undefined;
-    func.apply(null, lastArgs);
+
+    func.apply(null, curArgs);
   };
 
   const throttled: Throttled = (...args: any[]) => {
     throttled.timestamp = Date.now();
-    lastArgs = args;
-    previous = previous || throttled.timestamp;
+    curArgs = args;
+    prev = prev || throttled.timestamp;
 
-    const remaining = wait - (throttled.timestamp - previous);
-    if (!timeout) {
-      timeout = setTimeout(later, remaining);
-    }
+    if (timeout) return;
+
+    const ms = wait - throttled.timestamp + prev;
+    timeout = setTimeout(callback, ms);
   };
   throttled.timestamp = 0;
 

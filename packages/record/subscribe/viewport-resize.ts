@@ -1,19 +1,21 @@
-import { queryWindowHeight, queryWindowWidth, on, throttle } from '../utils';
-import { IncrementalSource } from '../constant';
+import { queryViewport, on, throttle } from '../utils';
+import { IncSource } from '../constant';
 
 export type ViewportResizeParam = {
-  source: IncrementalSource.VIEWPORT_RESIZE;
+  source: IncSource.VIEWPORT_RESIZE;
   width: number;
   height: number;
 };
 
 export type ViewportResizeCallback = (param: ViewportResizeParam) => void;
 
-export function viewportResize(cb: ViewportResizeCallback) {
-  const updateDimension = throttle(() => {
-    const height = queryWindowHeight();
-    const width = queryWindowWidth();
-    cb({ source: IncrementalSource.VIEWPORT_RESIZE, height, width });
-  }, 200);
+export function subscribeViewportResize(cb: ViewportResizeCallback) {
+  const source = IncSource.VIEWPORT_RESIZE;
+
+  const updateDimension = throttle(
+    () => cb({ source, ...queryViewport() }),
+    200
+  );
+
   return on('resize', updateDimension, window);
 }

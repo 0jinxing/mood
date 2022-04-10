@@ -1,9 +1,13 @@
+import { each } from '@mood/utils';
+
 type WithId<T> = T & { __id?: number };
 
 class Mirror {
-  private readonly pool: Record<number, EventTarget> = {};
+  private readonly pool: Record<number, EventTarget | undefined> = {};
 
   set(id: number, $node: WithId<Node>) {
+    if ($node.__id === id) return;
+
     this.pool[id] = $node;
     $node.__id = id;
   }
@@ -19,13 +23,12 @@ class Mirror {
   remove(node: WithId<Node>) {
     const id = this.getId(node);
 
-    delete this.pool[id];
-    delete node.__id;
+    if (!id) return;
 
-    const { childNodes } = node;
-    if (childNodes) {
-      childNodes.forEach($childNode => this.remove($childNode));
-    }
+    this.pool[id] = undefined;
+    node.__id = undefined;
+
+    each(node.childNodes, $childNode => this.remove($childNode), true);
   }
 
   has(id: number) {

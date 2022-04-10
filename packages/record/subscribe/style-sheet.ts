@@ -1,5 +1,5 @@
 import { mirror } from '@mood/snapshot';
-import { IncrementalSource } from '../constant';
+import { IncSource } from '../constant';
 
 export type StyleSheetDeleteRule = {
   index: number;
@@ -11,7 +11,7 @@ export type StyleSheetAddRule = {
 };
 
 export type StyleSheetParam = {
-  source: IncrementalSource.STYLE_SHEETRULE;
+  source: IncSource.STYLE_SHEETRULE;
   id: number;
   removes?: StyleSheetDeleteRule[];
   adds?: StyleSheetAddRule[];
@@ -19,13 +19,13 @@ export type StyleSheetParam = {
 
 export type StyleSheetCallback = (param: StyleSheetParam) => void;
 
-export function styleSheet(cb: StyleSheetCallback) {
+export function subscribeStyleSheet(cb: StyleSheetCallback) {
   const insertRule = CSSStyleSheet.prototype.insertRule;
   CSSStyleSheet.prototype.insertRule = function (rule: string, index?: number) {
     const id = mirror.getId(this.ownerNode);
     id &&
       cb({
-        source: IncrementalSource.STYLE_SHEETRULE,
+        source: IncSource.STYLE_SHEETRULE,
         id,
         adds: [{ rule, index }]
       });
@@ -37,7 +37,7 @@ export function styleSheet(cb: StyleSheetCallback) {
     const id = mirror.getId(this.ownerNode);
     id &&
       cb({
-        source: IncrementalSource.STYLE_SHEETRULE,
+        source: IncSource.STYLE_SHEETRULE,
         id,
         removes: [{ index }]
       });

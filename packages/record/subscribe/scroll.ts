@@ -1,9 +1,9 @@
 import { mirror } from '@mood/snapshot';
 import { on, throttle } from '../utils';
-import { IncrementalSource } from '../constant';
+import { IncSource } from '../constant';
 
 export type ScrollParam = {
-  source: IncrementalSource.SCROLL;
+  source: IncSource.SCROLL;
   id: number;
   x: number;
   y: number;
@@ -11,7 +11,7 @@ export type ScrollParam = {
 
 export type ScrollCallback = (param: ScrollParam) => void;
 
-export function scroll(cb: ScrollCallback) {
+export function subscribeScroll(cb: ScrollCallback) {
   const updatePosition = throttle<UIEvent>(({ target }) => {
     if (!target) return;
 
@@ -20,7 +20,7 @@ export function scroll(cb: ScrollCallback) {
     if (target === document) $scroll = document.scrollingElement as HTMLElement;
 
     cb({
-      source: IncrementalSource.SCROLL,
+      source: IncSource.SCROLL,
       id,
       x: $scroll.scrollLeft,
       y: $scroll.scrollTop

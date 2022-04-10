@@ -25,13 +25,13 @@ export type EleNode = {
   type: NT.ELE_NODE;
   tagName: string;
   attributes: Attrs;
-  isSVG?: boolean;
+  svg?: boolean;
 };
 
 export type TextNode = {
   type: NT.TEXT_NODE;
   textContent: string;
-  isStyle?: boolean;
+  style?: boolean;
 };
 
 export type CDataNode = {

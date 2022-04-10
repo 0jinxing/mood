@@ -1,13 +1,14 @@
 import { NonFunctionKeys } from 'utility-types';
 import { mirror } from '@mood/snapshot';
 
-import { IncrementalSource } from '../constant';
+import { IncSource } from '../constant';
 import { hookProp, on } from '../utils';
+import { each } from '@mood/utils';
 
 export type InputValue = string | boolean;
 
 export type InputParam = {
-  source: IncrementalSource.INPUT;
+  source: IncSource.INPUT;
   id: number;
   value: InputValue;
 };
@@ -26,7 +27,7 @@ function isInputElement(
   );
 }
 
-export function input(cb: InputCallback) {
+export function subscribeInput(cb: InputCallback) {
   const cbWithDedup = (
     $target: HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement,
     value: InputValue
@@ -37,7 +38,7 @@ export function input(cb: InputCallback) {
 
     lastInputValueMap.set($target, value);
     const id = mirror.getId($target);
-    cb({ source: IncrementalSource.INPUT, value, id });
+    cb({ source: IncSource.INPUT, value, id });
   };
 
   const eventHandler = (event: Pick<Event, 'target'>) => {
@@ -61,10 +62,10 @@ export function input(cb: InputCallback) {
         document.querySelectorAll(selector);
 
       // toggle
-      for (const $el of Array.from($$radio)) {
-        if (!$el.checked || $el === $target) return;
+      each($$radio, $el => {
+        if (!$el.checked || $el === $target) return true;
         cbWithDedup($el as HTMLInputElement, false);
-      }
+      });
     }
   };
 

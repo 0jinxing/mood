@@ -1,6 +1,6 @@
 import { mirror } from '@mood/snapshot';
 import { on } from '../utils';
-import { IncrementalSource } from '../constant';
+import { IncSource } from '../constant';
 
 const ACTIONS = <const>[
   'mouseup',
@@ -17,7 +17,7 @@ const ACTIONS = <const>[
 export type MouseInteraction = typeof ACTIONS[number];
 
 export type MouseInteractionParam = {
-  source: IncrementalSource.MOUSE_INTERACTION;
+  source: IncSource.MOUSE_INTERACTION;
   action: MouseInteraction;
   id: number;
   x: number;
@@ -26,7 +26,7 @@ export type MouseInteractionParam = {
 
 export type MouseInteractionCallback = (param: MouseInteractionParam) => void;
 
-export function mouseInteraction(cb: MouseInteractionCallback) {
+export function subscribeMouseInteraction(cb: MouseInteractionCallback) {
   const handlers: Function[] = [];
 
   const getHandler = (action: MouseInteraction) => {
@@ -37,7 +37,7 @@ export function mouseInteraction(cb: MouseInteractionCallback) {
         event instanceof TouchEvent ? event.changedTouches[0] : event;
 
       cb({
-        source: IncrementalSource.MOUSE_INTERACTION,
+        source: IncSource.MOUSE_INTERACTION,
         action,
         id,
         x: clientX,

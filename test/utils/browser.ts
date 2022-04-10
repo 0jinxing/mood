@@ -1,7 +1,13 @@
 import * as http from 'http';
-import { Browser, Page } from 'puppeteer';
+import { Browser, Page, chromium } from '@playwright/test';
 import { createServer } from './server';
-import { launchBrowser } from './puppeteer';
+
+export function launchBrowser() {
+  return chromium.launch({
+    headless: true,
+    args: ['--no-sandbox']
+  });
+}
 
 export function browserTest(
   message: string,
@@ -28,9 +34,6 @@ export function browserTest(
       await new Promise<void>((resolve, reject) =>
         server.close(err => (err ? reject(err) : resolve()))
       );
-
-      const pages = await browser.pages();
-      await Promise.all(pages.map(page => page.close()));
 
       await browser.close();
     });

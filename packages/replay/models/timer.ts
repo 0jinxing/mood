@@ -5,6 +5,7 @@ export type ActionWithDelay = {
 
 export class Timer {
   public timeOffset: number = 0;
+
   private raf: number;
 
   constructor(
@@ -71,4 +72,8 @@ export class Timer {
     }
     return start;
   }
+}
+
+export function createTimer() {
+  return new Timer();
 }

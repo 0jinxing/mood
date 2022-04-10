@@ -1,5 +1,5 @@
 import { SNWithId } from '@mood/snapshot';
-import { EventType } from './constant';
+import { ET } from './constant';
 import { InputParam } from './subscribe/input';
 import { MediaInteractionParam } from './subscribe/media-interaction';
 import { MouseInteractionParam } from './subscribe/mouse-interaction';
@@ -20,32 +20,32 @@ export type IncrementalParam =
   | StyleSheetParam;
 
 export type DomContentLoadedEvent = {
-  type: EventType.DOM_CONTENT_LOADED;
+  type: ET.DOM_CONTENT_LOADED;
 };
 
 export type LoadedEvent = {
-  type: EventType.LOADED;
+  type: ET.LOADED;
 };
 
 export type FullSnapshotEvent = {
-  type: EventType.FULL_SNAPSHOT;
+  type: ET.FULL_SNAPSHOT;
   adds: SNWithId[];
   offset: [top: number, left: number];
 };
 
 export type IncrementalSnapshotEvent = {
-  type: EventType.INCREMENTAL_SNAPSHOT;
+  type: ET.INCREMENTAL_SNAPSHOT;
 } & IncrementalParam;
 
 export type MetaEvent = {
-  type: EventType.META;
+  type: ET.META;
   href: string;
   width: number;
   height: number;
 };
 
 export type CustomEvent<T = unknown> = {
-  type: EventType.CUSTOM;
+  type: ET.CUSTOM;
   tag: string;
   payload: T;
 };

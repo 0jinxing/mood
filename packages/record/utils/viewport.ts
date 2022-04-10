@@ -1,16 +1,13 @@
-// viewport
-export function queryWindowHeight(): number {
-  return (
-    window.innerHeight ||
-    (document.documentElement && document.documentElement.clientHeight) ||
-    (document.body && document.body.clientHeight)
-  );
-}
-
-export function queryWindowWidth(): number {
-  return (
+export function queryViewport() {
+  const width =
     window.innerWidth ||
-    (document.documentElement && document.documentElement.clientWidth) ||
-    (document.body && document.body.clientWidth)
-  );
+    document.documentElement?.clientWidth ||
+    document.body?.clientWidth;
+
+  const height =
+    window.innerHeight ||
+    document.documentElement?.clientHeight ||
+    document.body?.clientHeight;
+
+  return { width, height };
 }

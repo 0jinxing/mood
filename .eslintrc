@@ -4,7 +4,7 @@
     "browser": true,
     "mocha": true
   },
-  "extends": ["standard", "prettier"],
+  "extends": ["prettier"],
   "parserOptions": {
     "lib": ["dom", "es2018"],
     "ecmaVersion": 11
@@ -13,10 +13,10 @@
   "plugins": ["@typescript-eslint"],
   "rules": {
     "no-useless-constructor": "off",
-    
+
     "no-unused-vars": "off",
     "@typescript-eslint/no-unused-vars": "off",
-    
+
     "node/no-callback-literal": "off",
 
     "semi": ["error", "always"],
