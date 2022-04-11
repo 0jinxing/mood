@@ -8,6 +8,7 @@ import { recMutation } from './mutation';
 import { recViewportResize } from './viewport-resize';
 import { recScroll } from './scroll';
 import { recStyleSheet } from './style-sheet';
+import { recSelection } from './selection';
 
 export function applyIncremental(
   event: IncrementalParam,
@@ -23,7 +24,8 @@ export function applyIncremental(
     [IncSource.INPUT]: receInput,
     [IncSource.TOUCH_MOVE]: recMouseMove,
     [IncSource.MEDIA_INTERACTION]: recMediaInteraction,
-    [IncSource.STYLE_SHEETRULE]: recStyleSheet
+    [IncSource.STYLE_SHEETRULE]: recStyleSheet,
+    [IncSource.SELECTION]: recSelection
   };
 
   handlerMap[event.source](event, context, sync);

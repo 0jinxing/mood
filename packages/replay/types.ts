@@ -1,4 +1,4 @@
-import { IncrementalParam } from 'packages/record';
+import { IncrementalParam } from '@mood/record';
 import { Timer } from './models/timer';
 
 export type RecCtx = {

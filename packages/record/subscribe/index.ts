@@ -6,6 +6,7 @@ import { subMouseMove } from './mouse-move';
 import { subMediaInteraction } from './media-interaction';
 import { subStyleSheet } from './style-sheet';
 import { subMutation } from './mutation';
+import { subSelection } from './selection';
 
 import { EmitHandler } from '../types';
 
@@ -18,7 +19,8 @@ export function subscribe(emit: EmitHandler) {
     subViewportResize,
     subInput,
     subMediaInteraction,
-    subStyleSheet
+    subStyleSheet,
+    subSelection
   ].map(o => o(emit));
 
   return () => {

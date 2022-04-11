@@ -6,6 +6,7 @@ import { MouseInteractionParam } from './subscribe/mouse-interaction';
 import { MouseMoveParam } from './subscribe/mouse-move';
 import { MutationParam } from './subscribe/mutation';
 import { ScrollParam } from './subscribe/scroll';
+import { SelectionParams } from './subscribe/selection';
 import { StyleSheetParam } from './subscribe/style-sheet';
 import { ViewportResizeParam } from './subscribe/viewport-resize';
 
@@ -17,7 +18,8 @@ export type IncrementalParam =
   | ViewportResizeParam
   | InputParam
   | MediaInteractionParam
-  | StyleSheetParam;
+  | StyleSheetParam
+  | SelectionParams;
 
 export type DomContentLoadedEvent = {
   type: ET.DOM_CONTENT_LOADED;
@@ -61,4 +63,3 @@ export type RecordEvent =
 export type RecordEventWithTime = RecordEvent & { timestamp: number };
 
 export type EmitHandler = (data: IncrementalParam) => void;
-
