@@ -2,7 +2,7 @@ function toString(value: unknown) {
   if (typeof value === 'object' || typeof value === 'function') {
     return Object.prototype.toString.call(value);
   }
-  return value + '';
+  return JSON.stringify(value);
 }
 
 export function stringify(target: unknown): string {
@@ -15,6 +15,7 @@ export function stringify(target: unknown): string {
     const kv = Object.entries(target)
       .map(([name, value]) => `${name}:${toString(value)}`)
       .join('\n\t');
+
     return `{\n\t${kv}\n}`;
   }
 
