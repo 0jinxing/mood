@@ -1,4 +1,4 @@
-import { SelectionParams } from '@mood/record/subscribe/selection';
+import { SelectionParams } from '@mood/record';
 import { mirror } from '@mood/snapshot';
 import { each } from '@mood/utils';
 import { RecHandler } from '../types';

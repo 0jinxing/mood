@@ -9,6 +9,7 @@ import { subMutation } from './mutation';
 import { subSelection } from './selection';
 
 import { EmitHandler } from '../types';
+import { subConsole } from './console';
 
 export function subscribe(emit: EmitHandler) {
   const unsubscribes = [
@@ -20,7 +21,8 @@ export function subscribe(emit: EmitHandler) {
     subInput,
     subMediaInteraction,
     subStyleSheet,
-    subSelection
+    subSelection,
+    subConsole
   ].map(o => o(emit));
 
   return () => {
@@ -36,3 +38,5 @@ export * from './mutation';
 export * from './scroll';
 export * from './style-sheet';
 export * from './viewport-resize';
+export * from './selection';
+export * from './console';

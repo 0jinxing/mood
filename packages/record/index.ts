@@ -65,7 +65,6 @@ export function record(options: RecordOptions) {
     const adds = snapshot(document);
 
     if (!adds) {
-      console.warn('Failed to snapshot the document');
       throw new Error('Failed to snapshot the document');
     }
 

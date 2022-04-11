@@ -9,6 +9,7 @@ import { recViewportResize } from './viewport-resize';
 import { recScroll } from './scroll';
 import { recStyleSheet } from './style-sheet';
 import { recSelection } from './selection';
+import { recConsole } from './console';
 
 export function applyIncremental(
   event: IncrementalParam,
@@ -25,7 +26,8 @@ export function applyIncremental(
     [SOURCE.TOUCH_MOVE]: recMouseMove,
     [SOURCE.MEDIA_INTERACTION]: recMediaInteraction,
     [SOURCE.STYLE_SHEETRULE]: recStyleSheet,
-    [SOURCE.SELECTION]: recSelection
+    [SOURCE.SELECTION]: recSelection,
+    [SOURCE.CONSOLE]: recConsole
   };
 
   handlerMap[event.source](event, context, sync);
@@ -40,3 +42,4 @@ export * from './viewport-resize';
 export * from './scroll';
 export * from './style-sheet';
 export * from './selection';
+export * from './console';

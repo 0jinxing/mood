@@ -1,5 +1,6 @@
 import { SNWithId } from '@mood/snapshot';
 import { ET } from './constant';
+import { ConsoleParams } from './subscribe/console';
 import { InputParam } from './subscribe/input';
 import { MediaInteractionParam } from './subscribe/media-interaction';
 import { MouseInteractionParam } from './subscribe/mouse-interaction';
@@ -19,7 +20,8 @@ export type IncrementalParam =
   | InputParam
   | MediaInteractionParam
   | StyleSheetParam
-  | SelectionParams;
+  | SelectionParams
+  | ConsoleParams;
 
 export type DomContentLoadedEvent = {
   type: ET.DOM_CONTENT_LOADED;
