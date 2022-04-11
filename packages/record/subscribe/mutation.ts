@@ -7,7 +7,7 @@ import {
   isParentRemoved
 } from '../utils';
 
-import { IncSource } from '../constant';
+import { SOURCE } from '../constant';
 import { each } from '@mood/utils';
 
 export type AttrCursor = {
@@ -33,7 +33,7 @@ export type AttrMutation = {
 };
 
 export type MutationParam = {
-  source: IncSource.MUTATION;
+  source: SOURCE.MUTATION;
   texts: TextMutation[];
   attributes: AttrMutation[];
   removes: RemovedNodeMutation[];
@@ -191,7 +191,7 @@ export function subMutation(cb: MutationCallback) {
     }
 
     const payload: MutationParam = {
-      source: IncSource.MUTATION,
+      source: SOURCE.MUTATION,
 
       texts: texts
         .map(text => ({

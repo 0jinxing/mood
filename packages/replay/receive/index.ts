@@ -1,4 +1,4 @@
-import { IncrementalParam, IncSource } from '@mood/record';
+import { IncrementalParam, SOURCE } from '@mood/record';
 import { RecCtx, RecHandler } from '../types';
 import { receInput } from './input';
 import { recMediaInteraction } from './media-interaction';
@@ -15,17 +15,17 @@ export function applyIncremental(
   context: RecCtx,
   sync: boolean
 ) {
-  const handlerMap: { [key in IncSource]: RecHandler } = {
-    [IncSource.MUTATION]: recMutation,
-    [IncSource.MOUSE_MOVE]: recMouseMove,
-    [IncSource.MOUSE_INTERACTION]: recMouseInteraction,
-    [IncSource.SCROLL]: recScroll,
-    [IncSource.VIEWPORT_RESIZE]: recViewportResize,
-    [IncSource.INPUT]: receInput,
-    [IncSource.TOUCH_MOVE]: recMouseMove,
-    [IncSource.MEDIA_INTERACTION]: recMediaInteraction,
-    [IncSource.STYLE_SHEETRULE]: recStyleSheet,
-    [IncSource.SELECTION]: recSelection
+  const handlerMap: { [key in SOURCE]: RecHandler } = {
+    [SOURCE.MUTATION]: recMutation,
+    [SOURCE.MOUSE_MOVE]: recMouseMove,
+    [SOURCE.MOUSE_INTERACTION]: recMouseInteraction,
+    [SOURCE.SCROLL]: recScroll,
+    [SOURCE.VIEWPORT_RESIZE]: recViewportResize,
+    [SOURCE.INPUT]: receInput,
+    [SOURCE.TOUCH_MOVE]: recMouseMove,
+    [SOURCE.MEDIA_INTERACTION]: recMediaInteraction,
+    [SOURCE.STYLE_SHEETRULE]: recStyleSheet,
+    [SOURCE.SELECTION]: recSelection
   };
 
   handlerMap[event.source](event, context, sync);

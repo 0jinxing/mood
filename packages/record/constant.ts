@@ -7,7 +7,7 @@ export enum ET {
   CUSTOM
 }
 
-export enum IncSource {
+export enum SOURCE {
   MUTATION,
   MOUSE_MOVE,
   MOUSE_INTERACTION,

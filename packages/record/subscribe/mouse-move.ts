@@ -1,12 +1,12 @@
 import { mirror } from '@mood/snapshot';
 import { on, throttle } from '../utils';
 
-import { IncSource } from '../constant';
+import { SOURCE } from '../constant';
 
 export type MousePositions = number[];
 
 export type MouseMoveParam = {
-  source: IncSource.MOUSE_MOVE | IncSource.TOUCH_MOVE;
+  source: SOURCE.MOUSE_MOVE | SOURCE.TOUCH_MOVE;
   positions: MousePositions;
 };
 
@@ -18,8 +18,8 @@ export function subMouseMove(cb: MousemoveCallback) {
     cb({
       positions,
       source: touch
-        ? IncSource.TOUCH_MOVE
-        : IncSource.MOUSE_MOVE
+        ? SOURCE.TOUCH_MOVE
+        : SOURCE.MOUSE_MOVE
     });
 
     positions = [];

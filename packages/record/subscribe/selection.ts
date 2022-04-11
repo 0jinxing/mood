@@ -1,9 +1,9 @@
 import { mirror } from '@mood/snapshot';
-import { IncSource } from '../constant';
+import { SOURCE } from '../constant';
 import { on } from '../utils';
 
 export type SelectionParams = {
-  source: IncSource.SELECTION;
+  source: SOURCE.SELECTION;
   ranges: number[];
 };
 
@@ -36,7 +36,7 @@ export function subSelection(cb: SelectionCallback) {
       );
     }
 
-    cb({ source: IncSource.SELECTION, ranges });
+    cb({ source: SOURCE.SELECTION, ranges });
   };
 
   return on('selectionchange', updateSelection);

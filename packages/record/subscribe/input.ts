@@ -1,14 +1,14 @@
 import { NonFunctionKeys } from 'utility-types';
 import { mirror } from '@mood/snapshot';
 
-import { IncSource } from '../constant';
+import { SOURCE } from '../constant';
 import { hookProp, on } from '../utils';
 import { each } from '@mood/utils';
 
 export type InputValue = string | boolean;
 
 export type InputParam = {
-  source: IncSource.INPUT;
+  source: SOURCE.INPUT;
   id: number;
   value: InputValue;
 };
@@ -38,7 +38,7 @@ export function subInput(cb: InputCallback) {
 
     lastInputValueMap.set($target, value);
     const id = mirror.getId($target);
-    cb({ source: IncSource.INPUT, value, id });
+    cb({ source: SOURCE.INPUT, value, id });
   };
 
   const eventHandler = (event: Pick<Event, 'target'>) => {

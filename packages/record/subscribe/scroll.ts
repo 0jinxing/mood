@@ -1,9 +1,9 @@
 import { mirror } from '@mood/snapshot';
 import { on, throttle } from '../utils';
-import { IncSource } from '../constant';
+import { SOURCE } from '../constant';
 
 export type ScrollParam = {
-  source: IncSource.SCROLL;
+  source: SOURCE.SCROLL;
   id: number;
   x: number;
   y: number;
@@ -20,7 +20,7 @@ export function subScroll(cb: ScrollCallback) {
     if (target === document) $scroll = document.scrollingElement as HTMLElement;
 
     cb({
-      source: IncSource.SCROLL,
+      source: SOURCE.SCROLL,
       id,
       x: $scroll.scrollLeft,
       y: $scroll.scrollTop

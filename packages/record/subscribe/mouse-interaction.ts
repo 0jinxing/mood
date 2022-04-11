@@ -1,6 +1,6 @@
 import { mirror } from '@mood/snapshot';
 import { on } from '../utils';
-import { IncSource } from '../constant';
+import { SOURCE } from '../constant';
 
 const ACTIONS = <const>[
   'mouseup',
@@ -17,7 +17,7 @@ const ACTIONS = <const>[
 export type MouseInteraction = typeof ACTIONS[number];
 
 export type MouseInteractionParam = {
-  source: IncSource.MOUSE_INTERACTION;
+  source: SOURCE.MOUSE_INTERACTION;
   action: MouseInteraction;
   id: number;
   x: number;
@@ -37,7 +37,7 @@ export function subMouseInteraction(cb: MouseInteractionCallback) {
         event instanceof TouchEvent ? event.changedTouches[0] : event;
 
       cb({
-        source: IncSource.MOUSE_INTERACTION,
+        source: SOURCE.MOUSE_INTERACTION,
         action,
         id,
         x: clientX,

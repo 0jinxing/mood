@@ -1,11 +1,11 @@
 import { mirror } from '@mood/snapshot';
 import { on } from '../utils';
-import { IncSource } from '../constant';
+import { SOURCE } from '../constant';
 
 export type MediaInteraction = 'play' | 'pause';
 
 export type MediaInteractionParam = {
-  source: IncSource.MEDIA_INTERACTION;
+  source: SOURCE.MEDIA_INTERACTION;
   action: MediaInteraction;
   id: number;
 };
@@ -17,7 +17,7 @@ export function subMediaInteraction(cb: MediaInteractionCallback) {
     const { target } = event;
     if (target) {
       cb({
-        source: IncSource.MEDIA_INTERACTION,
+        source: SOURCE.MEDIA_INTERACTION,
         id: mirror.getId(target),
         action: act
       });

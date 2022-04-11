@@ -2,7 +2,7 @@ import { rebuild } from '@mood/snapshot';
 import {
   RecordEventWithTime,
   FullSnapshotEvent,
-  IncSource,
+  SOURCE,
   ET,
   IncrementalSnapshotEvent
 } from '@mood/record';
@@ -96,8 +96,8 @@ export class Player {
     }
 
     if (
-      event.source === IncSource.MOUSE_MOVE ||
-      event.source === IncSource.TOUCH_MOVE
+      event.source === SOURCE.MOUSE_MOVE ||
+      event.source === SOURCE.TOUCH_MOVE
     ) {
       const [, , , timestamp] = event.positions;
       return timestamp - this.baseline;
