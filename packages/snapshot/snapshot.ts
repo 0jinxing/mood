@@ -81,7 +81,7 @@ export function serialize(
             id,
             type: NT.ELE_NODE,
             tagName: 'STYLE',
-            attributes: attrs
+            attrs: attrs
           },
           {
             id: genId(),
@@ -117,7 +117,7 @@ export function serialize(
       id,
       type: NT.ELE_NODE,
       tagName: getTagName($node),
-      attributes: attrs,
+      attrs: attrs,
       svg: isSVGElement($node)
     };
   }

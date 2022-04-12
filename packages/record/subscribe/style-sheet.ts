@@ -1,5 +1,5 @@
 import { mirror } from '@mood/snapshot';
-import { SOURCE } from '../constant';
+import { SourceType } from '../constant';
 
 export type StyleSheetDeleteRule = {
   index: number;
@@ -10,23 +10,23 @@ export type StyleSheetAddRule = {
   index?: number;
 };
 
-export type StyleSheetParam = {
-  source: SOURCE.STYLE_SHEETRULE;
+export type SubscribeToStyleSheetArg = {
   id: number;
+  source: SourceType.STYLE_SHEETRULE;
   removes?: StyleSheetDeleteRule[];
   adds?: StyleSheetAddRule[];
 };
 
-export type StyleSheetCallback = (param: StyleSheetParam) => void;
+export type SubscribeToStyleSheetEmit = (arg: SubscribeToStyleSheetArg) => void;
 
-export function subStyleSheet(cb: StyleSheetCallback) {
+export function subscribeToStyleSheet(cb: SubscribeToStyleSheetEmit) {
   const insertRule = CSSStyleSheet.prototype.insertRule;
   CSSStyleSheet.prototype.insertRule = function (rule: string, index?: number) {
     const id = mirror.getId(this.ownerNode);
     id &&
       cb({
-        source: SOURCE.STYLE_SHEETRULE,
         id,
+        source: SourceType.STYLE_SHEETRULE,
         adds: [{ rule, index }]
       });
     return insertRule.apply(this, [rule, index]);
@@ -37,7 +37,7 @@ export function subStyleSheet(cb: StyleSheetCallback) {
     const id = mirror.getId(this.ownerNode);
     id &&
       cb({
-        source: SOURCE.STYLE_SHEETRULE,
+        source: SourceType.STYLE_SHEETRULE,
         id,
         removes: [{ index }]
       });

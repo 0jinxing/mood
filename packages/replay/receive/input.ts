@@ -1,8 +1,8 @@
-import { InputParam } from '@mood/record';
 import { mirror } from '@mood/snapshot';
-import { RecHandler } from '../types';
+import { SubscribeToInputArg } from '@mood/record';
+import { ReceiveHandler } from '../types';
 
-export const receInput: RecHandler<InputParam> = event => {
+export const receiveToInput: ReceiveHandler<SubscribeToInputArg> = event => {
   const $target = mirror.getNode<HTMLInputElement>(event.id);
 
   if (!$target) return;

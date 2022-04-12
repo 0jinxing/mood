@@ -1,16 +1,18 @@
 import { queryViewport, on, throttle } from '../utils';
-import { SOURCE } from '../constant';
+import { SourceType } from '../constant';
 
-export type ViewportResizeParam = {
-  source: SOURCE.VIEWPORT_RESIZE;
+export type SubscribeToViewportResizeArg = {
+  source: SourceType.VIEWPORT_RESIZE;
   width: number;
   height: number;
 };
 
-export type ViewportResizeCallback = (param: ViewportResizeParam) => void;
+export type SubscribeToViewportResizeEmit = (
+  arg: SubscribeToViewportResizeArg
+) => void;
 
-export function subViewportResize(cb: ViewportResizeCallback) {
-  const source = SOURCE.VIEWPORT_RESIZE;
+export function subscribeToViewportResize(cb: SubscribeToViewportResizeEmit) {
+  const source = SourceType.VIEWPORT_RESIZE;
 
   const updateDimension = throttle(
     () => cb({ source, ...queryViewport() }),

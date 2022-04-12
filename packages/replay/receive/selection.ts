@@ -1,10 +1,10 @@
-import { SelectionParams } from '@mood/record';
+import { SubscribeToSelectionArg } from '@mood/record';
 import { mirror } from '@mood/snapshot';
 import { each } from '@mood/utils';
-import { RecHandler } from '../types';
+import { ReceiveHandler } from '../types';
 import { chunk } from '../utils/chunk';
 
-export const recSelection: RecHandler<SelectionParams> = (event, context) => {
+export const receiveToSelection: ReceiveHandler<SubscribeToSelectionArg> = (event, context) => {
   const $doc = context.$iframe.contentDocument!;
 
   const ranges = chunk(event.ranges, 4).map(([sId, sOffset, eId, eOffset]) => {

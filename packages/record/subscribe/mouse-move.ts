@@ -1,35 +1,30 @@
 import { mirror } from '@mood/snapshot';
 import { on, throttle } from '../utils';
 
-import { SOURCE } from '../constant';
+import { SourceType } from '../constant';
 
 export type MousePositions = number[];
 
-export type MouseMoveParam = {
-  source: SOURCE.MOUSE_MOVE | SOURCE.TOUCH_MOVE;
-  positions: MousePositions;
+export type SubscribeToMouseMoveArg = {
+  source: SourceType.MOUSE_MOVE | SourceType.TOUCH_MOVE;
+  ps: MousePositions;
 };
 
-export type MousemoveCallback = (param: MouseMoveParam) => void;
+export type SubscribeToMousemoveEmit = (arg: SubscribeToMouseMoveArg) => void;
 
-export function subMouseMove(cb: MousemoveCallback) {
-  let positions: MousePositions = [];
+export function subscribeToMouseMove(cb: SubscribeToMousemoveEmit) {
+  let ps: MousePositions = [];
   const throttleCb = throttle((touch: boolean) => {
-    cb({
-      positions,
-      source: touch
-        ? SOURCE.TOUCH_MOVE
-        : SOURCE.MOUSE_MOVE
-    });
+    cb({ ps, source: touch ? SourceType.TOUCH_MOVE : SourceType.MOUSE_MOVE });
 
-    positions = [];
+    ps = [];
   }, 500);
   const updatePosition = throttle<MouseEvent | TouchEvent>(event => {
     const { target } = event;
     const { clientX, clientY } =
       event instanceof TouchEvent ? event.changedTouches[0] : event;
 
-    positions.push(
+    ps.push(
       mirror.getId(target as Node),
       clientX,
       clientY,

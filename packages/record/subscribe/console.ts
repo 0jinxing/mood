@@ -1,5 +1,4 @@
-import { FunctionKeys } from 'utility-types';
-import { SOURCE } from '../constant';
+import { SourceType } from '../constant';
 import { stringify } from '../utils/stringify';
 
 const keys = ['debug', 'error', 'info', 'log', 'warn'] as const;
@@ -10,22 +9,22 @@ export type PLogHandler = {
   [k in PLogKey]: (...args: unknown[]) => any;
 };
 
-export type ConsoleParams = {
-  source: SOURCE.CONSOLE;
+export type SubscribeToConsoleArg = {
+  source: SourceType.CONSOLE;
   level: PLogKey;
   args: string[];
 };
 
-export type ConsoleCallback = (params: ConsoleParams) => void;
+export type SubscribeToConsoleEmit = (arg: SubscribeToConsoleArg) => void;
 
-export function subConsole(cb: ConsoleCallback) {
+export function subscribeToConsole(cb: SubscribeToConsoleEmit) {
   console['@raw'] = Object.assign({}, console);
 
   const proxy: Partial<PLogHandler> = keys.reduce((proxy, level) => {
     const handler = (...args: unknown[]) => {
       console['@raw']?.[level]?.apply(console, args);
 
-      cb({ source: SOURCE.CONSOLE, level, args: args.map(stringify) });
+      cb({ source: SourceType.CONSOLE, level, args: args.map(stringify) });
     };
 
     return { ...proxy, [level]: handler };

@@ -1,4 +1,4 @@
-export enum ET {
+export enum EventType {
   META,
   LOADED,
   DOM_CONTENT_LOADED,
@@ -7,7 +7,7 @@ export enum ET {
   CUSTOM
 }
 
-export enum SOURCE {
+export enum SourceType {
   MUTATION,
   MOUSE_MOVE,
   MOUSE_INTERACTION,

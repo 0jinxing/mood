@@ -1,29 +1,35 @@
 import { mirror } from '@mood/snapshot';
 import { on } from '../utils';
-import { SOURCE } from '../constant';
+import { SourceType } from '../constant';
 
-export type MediaInteraction = 'play' | 'pause';
+const actions = <const>['play', 'pause'];
 
-export type MediaInteractionParam = {
-  source: SOURCE.MEDIA_INTERACTION;
-  action: MediaInteraction;
+export type SubscribeToMediaInteraction = typeof actions[number];
+
+export type MediaInteractionArg = {
+  source: SourceType.MEDIA_INTERACTION;
+  action: SubscribeToMediaInteraction;
   id: number;
 };
 
-export type MediaInteractionCallback = (param: MediaInteractionParam) => void;
+export type SubscribeToMediaInteractionEmit = (
+  arg: MediaInteractionArg
+) => void;
 
-export function subMediaInteraction(cb: MediaInteractionCallback) {
-  const handler = (act: MediaInteraction) => (event: Event) => {
+export function subscribeToMediaInteraction(
+  cb: SubscribeToMediaInteractionEmit
+) {
+  const handler = (act: SubscribeToMediaInteraction) => (event: Event) => {
     const { target } = event;
     if (target) {
       cb({
-        source: SOURCE.MEDIA_INTERACTION,
+        source: SourceType.MEDIA_INTERACTION,
         id: mirror.getId(target),
         action: act
       });
     }
   };
-  const handlers = [on('play', handler('play')), on('pause', handler('pause'))];
+  const handlers = actions.map(k => on(k, handler(k)));
   return () => {
     handlers.forEach(h => h());
   };

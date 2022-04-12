@@ -1,9 +1,9 @@
-import { AddedNodeMutation, MutationParam } from '@mood/record';
+import { AddedNodeMutation, SubscribeToMutationArg } from '@mood/record';
 import { buildNodeWithSN, mirror } from '@mood/snapshot';
 import { each } from '@mood/utils';
-import { RecHandler } from '../types';
+import { ReceiveHandler } from '../types';
 
-export const recMutation: RecHandler<MutationParam> = (event, context) => {
+export const receiveToMutation: ReceiveHandler<SubscribeToMutationArg> = (event, context) => {
   
   each(event.removes, rm => {
     const $el = mirror.getNode(rm.id);
@@ -46,11 +46,11 @@ export const recMutation: RecHandler<MutationParam> = (event, context) => {
     $target.textContent = text.value;
   });
 
-  each(event.attributes, mutation => {
+  each(event.attrs, mutation => {
     const $target = mirror.getNode<Element>(mutation.id);
     if (!$target) return;
 
-    each(Object.entries(mutation.attributes), ([name, value]) => {
+    each(Object.entries(mutation.attrs), ([name, value]) => {
       if (value) $target.setAttribute(name, value + '');
       else $target.removeAttribute(name);
     });

@@ -1,21 +1,21 @@
 import { NonFunctionKeys } from 'utility-types';
 import { mirror } from '@mood/snapshot';
 
-import { SOURCE } from '../constant';
+import { SourceType } from '../constant';
 import { hookProp, on } from '../utils';
 import { each } from '@mood/utils';
 
-export type InputValue = string | boolean;
+export type SubscribeToInputValue = string | boolean;
 
-export type InputParam = {
-  source: SOURCE.INPUT;
+export type SubscribeToInputArg = {
+  source: SourceType.INPUT;
   id: number;
-  value: InputValue;
+  value: SubscribeToInputValue;
 };
 
-export type InputCallback = (param: InputParam) => void;
+export type SubscribeToInputEmit = (arg: SubscribeToInputArg) => void;
 
-const lastInputValueMap: WeakMap<EventTarget, InputValue> = new WeakMap();
+const cache: WeakMap<EventTarget, SubscribeToInputValue> = new WeakMap();
 
 function isInputElement(
   $el: HTMLElement | EventTarget | Node
@@ -27,18 +27,18 @@ function isInputElement(
   );
 }
 
-export function subInput(cb: InputCallback) {
+export function subscribeToInput(cb: SubscribeToInputEmit) {
   const cbWithDedup = (
     $target: HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement,
-    value: InputValue
+    value: SubscribeToInputValue
   ) => {
-    const lastInputValue = lastInputValueMap.get($target);
+    const oldValue = cache.get($target);
 
-    if (lastInputValue && lastInputValue === value) return;
+    if (oldValue && oldValue === value) return;
 
-    lastInputValueMap.set($target, value);
+    cache.set($target, value);
     const id = mirror.getId($target);
-    cb({ source: SOURCE.INPUT, value, id });
+    cb({ source: SourceType.INPUT, value, id });
   };
 
   const eventHandler = (event: Pick<Event, 'target'>) => {
@@ -46,7 +46,7 @@ export function subInput(cb: InputCallback) {
 
     if (!$target || !isInputElement($target)) return;
 
-    const value: InputValue =
+    const value: SubscribeToInputValue =
       $target instanceof HTMLInputElement
         ? $target.value || $target.checked
         : $target.value;

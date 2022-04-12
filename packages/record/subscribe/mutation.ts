@@ -7,44 +7,31 @@ import {
   isParentRemoved
 } from '../utils';
 
-import { SOURCE } from '../constant';
+import { SourceType } from '../constant';
 import { each } from '@mood/utils';
 
-export type AttrCursor = {
-  $el: Node;
-  attributes: Attrs;
-};
+export type AttrCursor = { $el: Node; attrs: Attrs };
 
 export type AddedNodeMutation = SNWithId & { pId: number };
+export type RemovedNodeMutation = { id: number; pId: number };
 
-export type RemovedNodeMutation = {
-  id: number;
-  pId: number;
-};
+export type TextMutation = { id: number; value: string | null };
 
-export type TextMutation = {
-  id: number;
-  value: string | null;
-};
+export type AttrMutation = { id: number; attrs: Attrs };
 
-export type AttrMutation = {
-  id: number;
-  attributes: Attrs;
-};
-
-export type MutationParam = {
-  source: SOURCE.MUTATION;
+export type SubscribeToMutationArg = {
+  source: SourceType.MUTATION;
   texts: TextMutation[];
-  attributes: AttrMutation[];
+  attrs: AttrMutation[];
   removes: RemovedNodeMutation[];
   adds: AddedNodeMutation[];
 };
 
-export type MutationCallback = (param: MutationParam) => void;
+export type SubscribeToMutationEmit = (arg: SubscribeToMutationArg) => void;
 
 const genKey = (id: number, pId: number) => `${id}@${pId}`;
 
-export function subMutation(cb: MutationCallback) {
+export function subscribeToMutation(cb: SubscribeToMutationEmit) {
   const observer = new MutationObserver(mutations => {
     const attrs: AttrCursor[] = [];
     const texts: Array<{ value: string | null; $el: Node }> = [];
@@ -91,10 +78,10 @@ export function subMutation(cb: MutationCallback) {
 
           let current = attrs.find(attr => attr.$el === target);
           if (!current) {
-            current = { $el: target, attributes: {} };
+            current = { $el: target, attrs: {} };
             attrs.push(current);
           }
-          current.attributes[attrName] = rAttr(attrName, value || '');
+          current.attrs[attrName] = rAttr(attrName, value || '');
         }
         // childList
         else if (type === 'childList') {
@@ -190,8 +177,8 @@ export function subMutation(cb: MutationCallback) {
       pushAdd(addQueue.shift()!);
     }
 
-    const payload: MutationParam = {
-      source: SOURCE.MUTATION,
+    const payload: SubscribeToMutationArg = {
+      source: SourceType.MUTATION,
 
       texts: texts
         .map(text => ({
@@ -200,9 +187,9 @@ export function subMutation(cb: MutationCallback) {
         }))
         .filter(text => mirror.has(text.id)),
 
-      attributes: attrs.map(attr => ({
+      attrs: attrs.map(attr => ({
         id: mirror.getId(attr.$el),
-        attributes: attr.attributes
+        attrs: attr.attrs
       })),
 
       removes,
@@ -211,7 +198,7 @@ export function subMutation(cb: MutationCallback) {
 
     if (
       !payload.texts.length &&
-      !payload.attributes.length &&
+      !payload.attrs.length &&
       !payload.removes.length &&
       !payload.adds.length
     ) {

@@ -1,8 +1,8 @@
 import { mirror } from '@mood/snapshot';
 import { on } from '../utils';
-import { SOURCE } from '../constant';
+import { SourceType } from '../constant';
 
-const ACTIONS = <const>[
+const actions = <const>[
   'mouseup',
   'mousedown',
   'click',
@@ -14,22 +14,26 @@ const ACTIONS = <const>[
   'touchend'
 ];
 
-export type MouseInteraction = typeof ACTIONS[number];
+export type SubscribeToMouseInteraction = typeof actions[number];
 
-export type MouseInteractionParam = {
-  source: SOURCE.MOUSE_INTERACTION;
-  action: MouseInteraction;
+export type SubscribeToMouseInteractionArg = {
+  source: SourceType.MOUSE_INTERACTION;
+  action: SubscribeToMouseInteraction;
   id: number;
   x: number;
   y: number;
 };
 
-export type MouseInteractionCallback = (param: MouseInteractionParam) => void;
+export type SubscribeToMouseInteractionEmit = (
+  arg: SubscribeToMouseInteractionArg
+) => void;
 
-export function subMouseInteraction(cb: MouseInteractionCallback) {
+export function subscribeToMouseInteraction(
+  cb: SubscribeToMouseInteractionEmit
+) {
   const handlers: Function[] = [];
 
-  const getHandler = (action: MouseInteraction) => {
+  const getHandler = (action: SubscribeToMouseInteraction) => {
     return (event: MouseEvent | TouchEvent) => {
       const id = mirror.getId(event.target as Node);
 
@@ -37,7 +41,7 @@ export function subMouseInteraction(cb: MouseInteractionCallback) {
         event instanceof TouchEvent ? event.changedTouches[0] : event;
 
       cb({
-        source: SOURCE.MOUSE_INTERACTION,
+        source: SourceType.MOUSE_INTERACTION,
         action,
         id,
         x: clientX,
@@ -46,7 +50,7 @@ export function subMouseInteraction(cb: MouseInteractionCallback) {
     };
   };
 
-  ACTIONS.forEach((action: MouseInteraction) => {
+  actions.forEach((action: SubscribeToMouseInteraction) => {
     const handler = getHandler(action);
     handlers.push(on(action, handler));
   });

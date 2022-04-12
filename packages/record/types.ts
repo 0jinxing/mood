@@ -1,55 +1,55 @@
 import { SNWithId } from '@mood/snapshot';
-import { ET } from './constant';
-import { ConsoleParams } from './subscribe/console';
-import { InputParam } from './subscribe/input';
-import { MediaInteractionParam } from './subscribe/media-interaction';
-import { MouseInteractionParam } from './subscribe/mouse-interaction';
-import { MouseMoveParam } from './subscribe/mouse-move';
-import { MutationParam } from './subscribe/mutation';
-import { ScrollParam } from './subscribe/scroll';
-import { SelectionParams } from './subscribe/selection';
-import { StyleSheetParam } from './subscribe/style-sheet';
-import { ViewportResizeParam } from './subscribe/viewport-resize';
+import { EventType } from './constant';
+import { SubscribeToConsoleArg } from './subscribe/console';
+import { SubscribeToInputArg } from './subscribe/input';
+import { MediaInteractionArg } from './subscribe/media-interaction';
+import { SubscribeToMouseInteractionArg } from './subscribe/mouse-interaction';
+import { SubscribeToMouseMoveArg } from './subscribe/mouse-move';
+import { SubscribeToMutationArg } from './subscribe/mutation';
+import { SubscribeToScrollArg } from './subscribe/scroll';
+import { SubscribeToSelectionArg } from './subscribe/selection';
+import { SubscribeToStyleSheetArg } from './subscribe/style-sheet';
+import { SubscribeToViewportResizeArg } from './subscribe/viewport-resize';
 
-export type IncrementalParam =
-  | MutationParam
-  | MouseMoveParam
-  | MouseInteractionParam
-  | ScrollParam
-  | ViewportResizeParam
-  | InputParam
-  | MediaInteractionParam
-  | StyleSheetParam
-  | SelectionParams
-  | ConsoleParams;
+export type SubscribeEmitArg =
+  | SubscribeToMutationArg
+  | SubscribeToMouseMoveArg
+  | SubscribeToMouseInteractionArg
+  | SubscribeToScrollArg
+  | SubscribeToViewportResizeArg
+  | SubscribeToInputArg
+  | MediaInteractionArg
+  | SubscribeToStyleSheetArg
+  | SubscribeToSelectionArg
+  | SubscribeToConsoleArg;
 
 export type DomContentLoadedEvent = {
-  type: ET.DOM_CONTENT_LOADED;
+  type: EventType.DOM_CONTENT_LOADED;
 };
 
 export type LoadedEvent = {
-  type: ET.LOADED;
+  type: EventType.LOADED;
 };
 
 export type FullSnapshotEvent = {
-  type: ET.FULL_SNAPSHOT;
+  type: EventType.FULL_SNAPSHOT;
   adds: SNWithId[];
   offset: [top: number, left: number];
 };
 
 export type IncrementalSnapshotEvent = {
-  type: ET.INCREMENTAL_SNAPSHOT;
-} & IncrementalParam;
+  type: EventType.INCREMENTAL_SNAPSHOT;
+} & SubscribeEmitArg;
 
 export type MetaEvent = {
-  type: ET.META;
+  type: EventType.META;
   href: string;
   width: number;
   height: number;
 };
 
 export type CustomEvent<T = unknown> = {
-  type: ET.CUSTOM;
+  type: EventType.CUSTOM;
   tag: string;
   payload: T;
 };
@@ -64,4 +64,4 @@ export type RecordEvent =
 
 export type RecordEventWithTime = RecordEvent & { timestamp: number };
 
-export type EmitHandler = (data: IncrementalParam) => void;
+export type EmitHandler = (data: SubscribeEmitArg) => void;

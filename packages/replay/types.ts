@@ -1,15 +1,15 @@
-import { IncrementalParam } from '@mood/record';
+import { SubscribeEmitArg } from '@mood/record';
 import { Timer } from './models/timer';
 
-export type RecCtx = {
+export type ReceiveContext = {
   $iframe: HTMLIFrameElement;
   $cursor: HTMLElement;
   baseline: number;
   timer: Timer;
 };
 
-export type RecHandler<T extends IncrementalParam = IncrementalParam> = (
+export type ReceiveHandler<T extends SubscribeEmitArg = SubscribeEmitArg> = (
   event: T,
-  context: RecCtx,
+  context: ReceiveContext,
   sync: boolean
 ) => void;

@@ -20,12 +20,12 @@ export function buildNode(node: SNWithId, $doc: Document): Node | null {
   if (node.type === NT.ELE_NODE) {
     const tagName = node.tagName;
 
-    const { attributes, svg } = node;
+    const { attrs, svg } = node;
     const $el = svg
       ? $doc.createElementNS('http://www.w3.org/2000/svg', tagName)
       : $doc.createElement(tagName);
 
-    for (const [key, attrVal] of Object.entries(attributes)) {
+    for (const [key, attrVal] of Object.entries(attrs)) {
       if (typeof attrVal === 'boolean' && !attrVal) continue;
 
       const value = attrVal === true ? '' : attrVal;

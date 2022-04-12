@@ -2,15 +2,15 @@ import { rebuild } from '@mood/snapshot';
 import {
   RecordEventWithTime,
   FullSnapshotEvent,
-  SOURCE,
-  ET,
+  SourceType,
+  EventType,
   IncrementalSnapshotEvent
 } from '@mood/record';
 
 import { ActionWithDelay, createTimer, Timer } from './timer';
 import { createService } from './fsm';
 import { applyIncremental } from '../receive';
-import { RecCtx } from '../types';
+import { ReceiveContext } from '../types';
 
 export type PlayerConfig = {
   speed: number;
@@ -91,15 +91,15 @@ export class Player {
   }
 
   private getDelay(event: RecordEventWithTime): number {
-    if (event.type !== ET.INCREMENTAL_SNAPSHOT) {
+    if (event.type !== EventType.INCREMENTAL_SNAPSHOT) {
       return event.timestamp - this.baseline;
     }
 
     if (
-      event.source === SOURCE.MOUSE_MOVE ||
-      event.source === SOURCE.TOUCH_MOVE
+      event.source === SourceType.MOUSE_MOVE ||
+      event.source === SourceType.TOUCH_MOVE
     ) {
-      const [, , , timestamp] = event.positions;
+      const [, , , timestamp] = event.ps;
       return timestamp - this.baseline;
     }
 
@@ -109,7 +109,7 @@ export class Player {
   private apply(event: IncrementalSnapshotEvent, sync: boolean) {
     const { $iframe, $cursor, baseline, timer } = this;
 
-    const context: RecCtx = {
+    const context: ReceiveContext = {
       $iframe,
       $cursor,
       baseline,
@@ -140,18 +140,18 @@ export class Player {
     let castFn: Function | undefined;
 
     switch (event.type) {
-      case ET.DOM_CONTENT_LOADED:
-      case ET.LOADED: {
+      case EventType.DOM_CONTENT_LOADED:
+      case EventType.LOADED: {
         break;
       }
-      case ET.META: {
+      case EventType.META: {
         castFn = () => {
           this.$iframe.width = `${event.width}px`;
           this.$iframe.height = `${event.height}px`;
         };
         break;
       }
-      case ET.FULL_SNAPSHOT: {
+      case EventType.FULL_SNAPSHOT: {
         castFn = () => {
           this.rebuild(event);
           const [top, left] = event.offset;
@@ -159,7 +159,7 @@ export class Player {
         };
         break;
       }
-      case ET.INCREMENTAL_SNAPSHOT: {
+      case EventType.INCREMENTAL_SNAPSHOT: {
         castFn = () => {
           this.apply(event, isSync);
         };

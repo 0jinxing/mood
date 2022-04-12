@@ -1,15 +1,15 @@
 import { mirror } from '@mood/snapshot';
-import { SOURCE } from '../constant';
+import { SourceType } from '../constant';
 import { on } from '../utils';
 
-export type SelectionParams = {
-  source: SOURCE.SELECTION;
+export type SubscribeToSelectionArg = {
+  source: SourceType.SELECTION;
   ranges: number[];
 };
 
-export type SelectionCallback = (params: SelectionParams) => void;
+export type SubscribeToSelectionEmit = (arg: SubscribeToSelectionArg) => void;
 
-export function subSelection(cb: SelectionCallback) {
+export function subscribeToSelection(cb: SubscribeToSelectionEmit) {
   let collapsed = true;
 
   const updateSelection = () => {
@@ -36,7 +36,7 @@ export function subSelection(cb: SelectionCallback) {
       );
     }
 
-    cb({ source: SOURCE.SELECTION, ranges });
+    cb({ source: SourceType.SELECTION, ranges });
   };
 
   return on('selectionchange', updateSelection);

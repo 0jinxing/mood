@@ -1,28 +1,28 @@
-import { subInput } from './input';
-import { subScroll } from './scroll';
-import { subViewportResize } from './viewport-resize';
-import { subMouseInteraction } from './mouse-interaction';
-import { subMouseMove } from './mouse-move';
-import { subMediaInteraction } from './media-interaction';
-import { subStyleSheet } from './style-sheet';
-import { subMutation } from './mutation';
-import { subSelection } from './selection';
+import { subscribeToInput } from './input';
+import { subscribeToScroll } from './scroll';
+import { subscribeToViewportResize } from './viewport-resize';
+import { subscribeToMouseInteraction } from './mouse-interaction';
+import { subscribeToMouseMove } from './mouse-move';
+import { subscribeToMediaInteraction } from './media-interaction';
+import { subscribeToStyleSheet } from './style-sheet';
+import { subscribeToMutation } from './mutation';
+import { subscribeToSelection } from './selection';
+import { subscribeToConsole } from './console';
 
 import { EmitHandler } from '../types';
-import { subConsole } from './console';
 
 export function subscribe(emit: EmitHandler) {
   const unsubscribes = [
-    subMutation,
-    subMouseMove,
-    subMouseInteraction,
-    subScroll,
-    subViewportResize,
-    subInput,
-    subMediaInteraction,
-    subStyleSheet,
-    subSelection,
-    subConsole
+    subscribeToMutation,
+    subscribeToMouseMove,
+    subscribeToMouseInteraction,
+    subscribeToScroll,
+    subscribeToViewportResize,
+    subscribeToInput,
+    subscribeToMediaInteraction,
+    subscribeToStyleSheet,
+    subscribeToSelection,
+    subscribeToConsole
   ].map(o => o(emit));
 
   return () => {

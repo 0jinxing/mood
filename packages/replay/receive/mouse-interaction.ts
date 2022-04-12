@@ -1,9 +1,9 @@
-import { MouseInteractionParam } from '@mood/record';
+import { SubscribeToMouseInteractionArg } from '@mood/record';
 import { mirror } from '@mood/snapshot';
-import { RecHandler } from '../types';
+import { ReceiveHandler } from '../types';
 import { moveAndHover } from '../utils/hover';
 
-export const recMouseInteraction: RecHandler<MouseInteractionParam> = (
+export const receiveToMouseInteraction: ReceiveHandler<SubscribeToMouseInteractionArg> = (
   event,
   context,
   sync

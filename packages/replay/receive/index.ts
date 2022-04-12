@@ -1,33 +1,33 @@
-import { IncrementalParam, SOURCE } from '@mood/record';
-import { RecCtx, RecHandler } from '../types';
-import { receInput } from './input';
-import { recMediaInteraction } from './media-interaction';
-import { recMouseInteraction } from './mouse-interaction';
-import { recMouseMove } from './mouse-move';
-import { recMutation } from './mutation';
-import { recViewportResize } from './viewport-resize';
-import { recScroll } from './scroll';
-import { recStyleSheet } from './style-sheet';
-import { recSelection } from './selection';
-import { recConsole } from './console';
+import { SubscribeEmitArg, SourceType } from '@mood/record';
+import { ReceiveContext, ReceiveHandler } from '../types';
+import { receiveToInput } from './input';
+import { receiveToMediaInteraction } from './media-interaction';
+import { receiveToMouseInteraction } from './mouse-interaction';
+import { receiveToMouseMove } from './mouse-move';
+import { receiveToMutation } from './mutation';
+import { receiveToViewportResize } from './viewport-resize';
+import { receiveToScroll } from './scroll';
+import { receiveToStyleSheet } from './style-sheet';
+import { receiveToSelection } from './selection';
+import { receiveToConsole } from './console';
 
 export function applyIncremental(
-  event: IncrementalParam,
-  context: RecCtx,
+  event: SubscribeEmitArg,
+  context: ReceiveContext,
   sync: boolean
 ) {
-  const handlerMap: { [key in SOURCE]: RecHandler } = {
-    [SOURCE.MUTATION]: recMutation,
-    [SOURCE.MOUSE_MOVE]: recMouseMove,
-    [SOURCE.MOUSE_INTERACTION]: recMouseInteraction,
-    [SOURCE.SCROLL]: recScroll,
-    [SOURCE.VIEWPORT_RESIZE]: recViewportResize,
-    [SOURCE.INPUT]: receInput,
-    [SOURCE.TOUCH_MOVE]: recMouseMove,
-    [SOURCE.MEDIA_INTERACTION]: recMediaInteraction,
-    [SOURCE.STYLE_SHEETRULE]: recStyleSheet,
-    [SOURCE.SELECTION]: recSelection,
-    [SOURCE.CONSOLE]: recConsole
+  const handlerMap: { [key in SourceType]: ReceiveHandler } = {
+    [SourceType.MUTATION]: receiveToMutation,
+    [SourceType.MOUSE_MOVE]: receiveToMouseMove,
+    [SourceType.MOUSE_INTERACTION]: receiveToMouseInteraction,
+    [SourceType.SCROLL]: receiveToScroll,
+    [SourceType.VIEWPORT_RESIZE]: receiveToViewportResize,
+    [SourceType.INPUT]: receiveToInput,
+    [SourceType.TOUCH_MOVE]: receiveToMouseMove,
+    [SourceType.MEDIA_INTERACTION]: receiveToMediaInteraction,
+    [SourceType.STYLE_SHEETRULE]: receiveToStyleSheet,
+    [SourceType.SELECTION]: receiveToSelection,
+    [SourceType.CONSOLE]: receiveToConsole
   };
 
   handlerMap[event.source](event, context, sync);

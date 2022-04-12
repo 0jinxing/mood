@@ -24,7 +24,7 @@ export type DocTypeNode = {
 export type EleNode = {
   type: NT.ELE_NODE;
   tagName: string;
-  attributes: Attrs;
+  attrs: Attrs;
   svg?: boolean;
 };
 
