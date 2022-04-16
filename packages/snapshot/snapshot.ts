@@ -1,5 +1,5 @@
 import { mirror, rAttr, rStyle } from './utils';
-import { NT, Attrs, SNWithId } from './types';
+import { NodeType, Attrs, SNWithId } from './types';
 import { reduce, each } from '@mood/utils';
 
 let id = 0;
@@ -41,13 +41,13 @@ export function serialize(
   mirror.set(id, $node);
 
   if ($node instanceof Document) {
-    return { id, type: NT.DOC_NODE };
+    return { id, type: NodeType.DOC_NODE };
   }
 
   if ($node instanceof DocumentType) {
     return {
       id,
-      type: NT.DOC_TYPE_NODE,
+      type: NodeType.DOC_TYPE_NODE,
       name: $node.name,
       publicId: $node.publicId,
       systemId: $node.systemId
@@ -79,14 +79,14 @@ export function serialize(
         return [
           {
             id,
-            type: NT.ELE_NODE,
+            type: NodeType.ELE_NODE,
             tagName: 'STYLE',
             attrs: attrs
           },
           {
             id: genId(),
             pId: id,
-            type: NT.TEXT_NODE,
+            type: NodeType.TEXT_NODE,
             textContent: rStyle(cssText)
           }
         ];
@@ -115,7 +115,7 @@ export function serialize(
 
     return {
       id,
-      type: NT.ELE_NODE,
+      type: NodeType.ELE_NODE,
       tagName: getTagName($node),
       attrs: attrs,
       svg: isSVGElement($node)
@@ -123,7 +123,7 @@ export function serialize(
   }
 
   if ($node instanceof CDATASection) {
-    return { id, type: NT.CDATA_NODE, textContent: '' };
+    return { id, type: NodeType.CDATA_NODE, textContent: '' };
   }
 
   if ($node instanceof Text) {
@@ -135,7 +135,7 @@ export function serialize(
     }
     return {
       id,
-      type: NT.TEXT_NODE,
+      type: NodeType.TEXT_NODE,
       textContent: textContent || '',
       style: style
     };
@@ -144,7 +144,7 @@ export function serialize(
   if ($node instanceof Comment) {
     return {
       id,
-      type: NT.COMMENT_NODE,
+      type: NodeType.COMMENT_NODE,
       textContent: $node.textContent || ''
     };
   }

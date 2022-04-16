@@ -1,14 +1,16 @@
 import { SNWithId } from '@mood/snapshot';
-import { SubscribeToConsoleArg } from './subscribe/console';
-import { SubscribeToInputArg } from './subscribe/input';
-import { MediaInteractionArg } from './subscribe/media-interaction';
-import { SubscribeToMouseInteractionArg } from './subscribe/mouse-interaction';
-import { SubscribeToMouseMoveArg } from './subscribe/mouse-move';
-import { SubscribeToMutationArg } from './subscribe/mutation';
-import { SubscribeToScrollArg } from './subscribe/scroll';
-import { SubscribeToSelectionArg } from './subscribe/selection';
-import { SubscribeToStyleSheetArg } from './subscribe/style-sheet';
-import { SubscribeToViewportResizeArg } from './subscribe/viewport-resize';
+import {
+  SubscribeToConsoleArg,
+  SubscribeToInputArg,
+  MediaInteractionArg,
+  SubscribeToMouseInteractionArg,
+  SubscribeToMouseMoveArg,
+  SubscribeToMutationArg,
+  SubscribeToScrollArg,
+  SubscribeToSelectionArg,
+  SubscribeToStyleSheetArg,
+  SubscribeToViewportResizeArg
+} from './subscribe';
 
 export enum EventType {
   META,

@@ -123,7 +123,7 @@ function getCode(): string {
               '<\\/script>'
             )};
             /*-->*/
-            const replayer = replay(events);
+            const replayer = createPlayer(events);
             replayer.play();
           </script>
         </body>

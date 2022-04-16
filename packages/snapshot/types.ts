@@ -1,4 +1,4 @@
-export enum NT {
+export enum NodeType {
   ELE_NODE,
   TEXT_NODE,
   CDATA_NODE,
@@ -11,36 +11,36 @@ export enum NT {
 export type Attrs = { [key: string]: boolean | string };
 
 export type DocNode = {
-  type: NT.DOC_NODE;
+  type: NodeType.DOC_NODE;
 };
 
 export type DocTypeNode = {
-  type: NT.DOC_TYPE_NODE;
+  type: NodeType.DOC_TYPE_NODE;
   name: string;
   publicId: string;
   systemId: string;
 };
 
 export type EleNode = {
-  type: NT.ELE_NODE;
+  type: NodeType.ELE_NODE;
   tagName: string;
   attrs: Attrs;
   svg?: boolean;
 };
 
 export type TextNode = {
-  type: NT.TEXT_NODE;
+  type: NodeType.TEXT_NODE;
   textContent: string;
   style?: boolean;
 };
 
 export type CDataNode = {
-  type: NT.CDATA_NODE;
+  type: NodeType.CDATA_NODE;
   textContent: '';
 };
 
 export type CommentNode = {
-  type: NT.COMMENT_NODE;
+  type: NodeType.COMMENT_NODE;
   textContent: string;
 };
 

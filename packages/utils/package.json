@@ -1,5 +1,6 @@
 {
   "name": "@mood/utils",
+  "main": "dist/index.js",
   "version": "0.0.1",
   "license": "MIT"
 }

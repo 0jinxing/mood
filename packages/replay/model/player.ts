@@ -1,3 +1,4 @@
+import mitt, { Emitter } from 'mitt';
 import { rebuild } from '@mood/snapshot';
 import {
   RecordEventWithTime,
@@ -14,12 +15,18 @@ import { ReceiveContext } from '../types';
 
 export type PlayerConfig = {
   speed: number;
-  root: HTMLElement;
+  root: HTMLElement | Element;
   styleRules: string[];
 };
 
 export type PlayerMetaData = {
   totalTime: number;
+};
+
+type EmitterEvents = {
+  duration: number;
+  status: 'inited' | 'playing' | 'paused' | 'ended';
+  cast: RecordEventWithTime;
 };
 
 const defaultConfig: PlayerConfig = {
@@ -39,11 +46,13 @@ export class Player {
 
   private lastEvent: RecordEventWithTime;
 
-  private service: ReturnType<typeof createService>;
-
-  private timer: Timer;
-
   private config: PlayerConfig = defaultConfig;
+
+  service: ReturnType<typeof createService>;
+
+  timer: Timer;
+
+  emitter: Emitter<EmitterEvents>;
 
   constructor(
     private events: RecordEventWithTime[],
@@ -61,14 +70,16 @@ export class Player {
       speed: this.config.speed
     });
     this.service.start();
+
+    this.emitter = mitt();
   }
 
   private setupDOM() {
     this.$wrapper = document.createElement('div');
-    this.$wrapper.classList.add('__wrapper');
+    this.$wrapper.classList.add('mood-container');
 
     this.$cursor = document.createElement('div');
-    this.$cursor.classList.add('__cursor');
+    this.$cursor.classList.add('mood-cursor');
 
     this.$iframe = document.createElement('iframe');
     this.$iframe.setAttribute('sandbox', 'allow-same-origin');
@@ -168,6 +179,7 @@ export class Player {
     }
 
     const wrappedCastFn = () => {
+      this.emitter.emit('cast', event);
       castFn?.();
 
       this.lastEvent = event;
@@ -217,7 +229,7 @@ export class Player {
 
     for (const event of this.events) {
       if (
-        event.timestamp <= this.lastEvent.timestamp ||
+        event.timestamp <= this.lastEvent?.timestamp ||
         event === this.lastEvent
       ) {
         continue;

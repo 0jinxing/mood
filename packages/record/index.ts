@@ -126,3 +126,4 @@ export function addCustomEvent<T>(tag: string, payload: T) {
 
 export * from './types';
 export * from './subscribe';
+export * from './utils';

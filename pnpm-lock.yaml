@@ -40,6 +40,29 @@ importers:
       tslib: 2.3.1
       typescript: 4.6.3
 
+  components:
+    specifiers:
+      '@mood/record': workspace:0.0.1
+      '@mood/replay': workspace:^0.0.1
+      '@types/react': ^18.0.0
+      '@types/react-dom': ^18.0.0
+      '@vitejs/plugin-react': ^1.3.0
+      react: ^18.0.0
+      react-dom: ^18.0.0
+      typescript: ^4.6.3
+      vite: ^2.9.2
+    dependencies:
+      '@mood/record': link:../packages/record
+      '@mood/replay': link:../packages/replay
+      react: 18.0.0
+      react-dom: 18.0.0_react@18.0.0
+    devDependencies:
+      '@types/react': 18.0.5
+      '@types/react-dom': 18.0.1
+      '@vitejs/plugin-react': 1.3.1
+      typescript: 4.6.3
+      vite: 2.9.5
+
   examples:
     specifiers:
       '@playwright/test': ^1.20.2
@@ -90,11 +113,13 @@ importers:
       '@mood/snapshot': 0.0.1
       '@mood/utils': workspace:^0.0.1
       '@xstate/fsm': ^1.4.0
+      mitt: ^3.0.0
     dependencies:
       '@mood/record': link:../record
       '@mood/snapshot': link:../snapshot
       '@mood/utils': link:../utils
       '@xstate/fsm': 1.6.5
+      mitt: 3.0.0
 
   packages/snapshot:
     specifiers:
@@ -3857,6 +3882,10 @@ packages:
   /minimist/1.2.6:
     resolution: {integrity: sha512-Jsjnk4bw3YJqYzbdyBiNsPWHPfO++UGG749Cxs6peCu5Xg4nrena6OVxOYxrQTqww0Jmwt+Ref8rggumkTLz9Q==}
     dev: true
+
+  /mitt/3.0.0:
+    resolution: {integrity: sha512-7dX2/10ITVyqh4aOSVI9gdape+t9l2/8QxHrFmUXu4EEUpdlxl6RudZUPZoc+zuY2hk1j7XxVroIVIan/pD/SQ==}
+    dev: false
 
   /mixin-deep/1.3.2:
     resolution: {integrity: sha512-WRoDn//mXBiJ1H40rqa3vH0toePwSsGb45iInWlTySa+Uu4k3tYUSxa2v1KqAiLtvlrSzaExqS1gtk96A9zvEA==}

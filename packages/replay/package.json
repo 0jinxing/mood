@@ -2,7 +2,7 @@
   "name": "@mood/replay",
   "version": "0.0.1",
   "description": "",
-  "main": "dist/index.cjs.js",
+  "main": "dist/index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "publish": "npm publish --access public"
@@ -14,6 +14,7 @@
     "@mood/record": "0.0.1",
     "@mood/snapshot": "0.0.1",
     "@mood/utils": "workspace:^0.0.1",
-    "@xstate/fsm": "^1.4.0"
+    "@xstate/fsm": "^1.4.0",
+    "mitt": "^3.0.0"
   }
 }

@@ -1,6 +1,5 @@
 import { SourceType } from '../types';
-import { hookMethod } from '../utils';
-import { stringify } from '../utils/stringify';
+import { stringify, hookMethod } from '../utils';
 
 const keys = ['debug', 'error', 'info', 'log', 'warn'] as const;
 
