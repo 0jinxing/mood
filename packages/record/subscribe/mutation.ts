@@ -7,16 +7,14 @@ import {
   isParentRemoved
 } from '../utils';
 
-import { SourceType } from '../constant';
 import { each } from '@mood/utils';
+import { SourceType } from '../types';
 
 export type AttrCursor = { $el: Node; attrs: Attrs };
 
 export type AddedNodeMutation = SNWithId & { pId: number };
 export type RemovedNodeMutation = { id: number; pId: number };
-
 export type TextMutation = { id: number; value: string | null };
-
 export type AttrMutation = { id: number; attrs: Attrs };
 
 export type SubscribeToMutationArg = {
@@ -85,8 +83,9 @@ export function subscribeToMutation(cb: SubscribeToMutationEmit) {
         }
         // childList
         else if (type === 'childList') {
-          addedNodes.forEach($node => genAdds($node, target));
-          removedNodes.forEach($node => {
+          each(addedNodes, $node => genAdds($node, target));
+
+          each(removedNodes, $node => {
             const id = mirror.getId($node);
             const pId = mirror.getId(target);
 
@@ -177,7 +176,7 @@ export function subscribeToMutation(cb: SubscribeToMutationEmit) {
       pushAdd(addQueue.shift()!);
     }
 
-    const payload: SubscribeToMutationArg = {
+    const arg: SubscribeToMutationArg = {
       source: SourceType.MUTATION,
 
       texts: texts
@@ -197,15 +196,16 @@ export function subscribeToMutation(cb: SubscribeToMutationEmit) {
     };
 
     if (
-      !payload.texts.length &&
-      !payload.attrs.length &&
-      !payload.removes.length &&
-      !payload.adds.length
+      !arg.texts.length &&
+      !arg.attrs.length &&
+      !arg.removes.length &&
+      !arg.adds.length
     ) {
       return;
     }
-    cb(payload);
+    cb(arg);
   });
+
   observer.observe(document, {
     attributes: true,
     attributeOldValue: true,

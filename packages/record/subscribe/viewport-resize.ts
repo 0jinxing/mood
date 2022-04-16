@@ -1,5 +1,5 @@
+import { SourceType } from '../types';
 import { queryViewport, on, throttle } from '../utils';
-import { SourceType } from '../constant';
 
 export type SubscribeToViewportResizeArg = {
   source: SourceType.VIEWPORT_RESIZE;

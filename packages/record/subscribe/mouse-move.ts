@@ -1,7 +1,6 @@
 import { mirror } from '@mood/snapshot';
+import { SourceType } from '../types';
 import { on, throttle } from '../utils';
-
-import { SourceType } from '../constant';
 
 export type MousePositions = number[];
 

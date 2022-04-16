@@ -1,5 +1,5 @@
 import { mirror } from '@mood/snapshot';
-import { SourceType } from '../constant';
+import { SourceType } from '../types';
 import { on } from '../utils';
 
 export type SubscribeToSelectionArg = {
@@ -15,8 +15,7 @@ export function subscribeToSelection(cb: SubscribeToSelectionEmit) {
   const updateSelection = () => {
     const selection = document.getSelection();
 
-    if (!selection) return;
-    if (collapsed && selection?.isCollapsed) return;
+    if (!selection || (collapsed && selection?.isCollapsed)) return;
 
     collapsed = selection.isCollapsed || false;
 

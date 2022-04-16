@@ -1,5 +1,5 @@
 import { SubscribeEmitArg } from '@mood/record';
-import { Timer } from './models/timer';
+import { Timer } from './model/timer';
 
 export type ReceiveContext = {
   $iframe: HTMLIFrameElement;

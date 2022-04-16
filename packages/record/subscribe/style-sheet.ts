@@ -1,5 +1,6 @@
 import { mirror } from '@mood/snapshot';
-import { SourceType } from '../constant';
+import { SourceType } from '../types';
+import { hookMethod } from '../utils';
 
 export type StyleSheetDeleteRule = {
   index: number;
@@ -20,32 +21,26 @@ export type SubscribeToStyleSheetArg = {
 export type SubscribeToStyleSheetEmit = (arg: SubscribeToStyleSheetArg) => void;
 
 export function subscribeToStyleSheet(cb: SubscribeToStyleSheetEmit) {
-  const insertRule = CSSStyleSheet.prototype.insertRule;
-  CSSStyleSheet.prototype.insertRule = function (rule: string, index?: number) {
-    const id = mirror.getId(this.ownerNode);
-    id &&
-      cb({
-        id,
-        source: SourceType.STYLE_SHEETRULE,
-        adds: [{ rule, index }]
-      });
-    return insertRule.apply(this, [rule, index]);
-  };
+  const proto = CSSStyleSheet.prototype;
 
-  const deleteRule = CSSStyleSheet.prototype.deleteRule;
-  CSSStyleSheet.prototype.deleteRule = function (index: number) {
+  const insertHoc = hookMethod(
+    proto,
+    'insertRule',
+    (rule: string, index?: number) => {
+      const id = mirror.getId(this.ownerNode);
+      if (!id) return;
+      cb({ id, source: SourceType.STYLE_SHEETRULE, adds: [{ rule, index }] });
+    }
+  );
+
+  const deleteHoc = hookMethod(proto, 'deleteRule', (index: number) => {
     const id = mirror.getId(this.ownerNode);
-    id &&
-      cb({
-        source: SourceType.STYLE_SHEETRULE,
-        id,
-        removes: [{ index }]
-      });
-    return deleteRule.apply(this, [index]);
-  };
+    if (!id) return;
+    cb({ source: SourceType.STYLE_SHEETRULE, id, removes: [{ index }] });
+  });
 
   return () => {
-    CSSStyleSheet.prototype.insertRule = insertRule;
-    CSSStyleSheet.prototype.deleteRule = deleteRule;
+    insertHoc();
+    deleteHoc();
   };
 }

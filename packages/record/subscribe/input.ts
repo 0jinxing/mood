@@ -1,9 +1,9 @@
 import { NonFunctionKeys } from 'utility-types';
 import { mirror } from '@mood/snapshot';
 
-import { SourceType } from '../constant';
 import { hookProp, on } from '../utils';
 import { each } from '@mood/utils';
+import { SourceType } from '../types';
 
 export type SubscribeToInputValue = string | boolean;
 

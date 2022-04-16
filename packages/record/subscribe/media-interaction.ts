@@ -1,6 +1,6 @@
 import { mirror } from '@mood/snapshot';
+import { SourceType } from '../types';
 import { on } from '../utils';
-import { SourceType } from '../constant';
 
 const actions = <const>['play', 'pause'];
 

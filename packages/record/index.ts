@@ -1,8 +1,12 @@
 import { snapshot } from '@mood/snapshot';
 import { subscribe } from './subscribe';
 import { on, queryViewport } from './utils';
-import { RecordEvent, RecordEventWithTime, EmitHandler } from './types';
-import { EventType } from './constant';
+import {
+  RecordEvent,
+  RecordEventWithTime,
+  EmitHandler,
+  EventType
+} from './types';
 
 export type RecordOptions = {
   emit: (e: RecordEventWithTime, checkout?: true) => void;
@@ -71,7 +75,11 @@ export function record(options: RecordOptions) {
     const top = document.documentElement.scrollTop || 0;
     const left = document.documentElement.scrollLeft || 0;
 
-    wrappedEmitWithTime({ type: EventType.FULL_SNAPSHOT, adds, offset: [top, left] });
+    wrappedEmitWithTime({
+      type: EventType.FULL_SNAPSHOT,
+      adds,
+      offset: [top, left]
+    });
   };
 
   const unsubscribes: Function[] = [];
@@ -117,5 +125,4 @@ export function addCustomEvent<T>(tag: string, payload: T) {
 }
 
 export * from './types';
-export * from './constant';
 export * from './subscribe';

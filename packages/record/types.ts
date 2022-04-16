@@ -1,5 +1,4 @@
 import { SNWithId } from '@mood/snapshot';
-import { EventType } from './constant';
 import { SubscribeToConsoleArg } from './subscribe/console';
 import { SubscribeToInputArg } from './subscribe/input';
 import { MediaInteractionArg } from './subscribe/media-interaction';
@@ -10,6 +9,29 @@ import { SubscribeToScrollArg } from './subscribe/scroll';
 import { SubscribeToSelectionArg } from './subscribe/selection';
 import { SubscribeToStyleSheetArg } from './subscribe/style-sheet';
 import { SubscribeToViewportResizeArg } from './subscribe/viewport-resize';
+
+export enum EventType {
+  META,
+  LOADED,
+  DOM_CONTENT_LOADED,
+  FULL_SNAPSHOT,
+  INCREMENTAL_SNAPSHOT,
+  CUSTOM
+}
+
+export enum SourceType {
+  MUTATION,
+  MOUSE_MOVE,
+  MOUSE_INTERACTION,
+  SCROLL,
+  VIEWPORT_RESIZE,
+  INPUT,
+  TOUCH_MOVE,
+  MEDIA_INTERACTION,
+  STYLE_SHEETRULE,
+  SELECTION,
+  CONSOLE
+}
 
 export type SubscribeEmitArg =
   | SubscribeToMutationArg
