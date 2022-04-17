@@ -1,11 +1,6 @@
 import { serialize, rAttr, mirror, Attrs, SNWithId } from '@mood/snapshot';
 
-import {
-  deepDelete,
-  isAncestorRemoved,
-  isAncestorInSet,
-  isParentRemoved
-} from '../utils';
+import { deepDelete, isAncestorRemoved, isAncestorInSet, isParentRemoved } from '../utils';
 
 import { each } from '@mood/utils';
 import { SourceType } from '../types';
@@ -56,78 +51,74 @@ export function subscribeToMutation(cb: SubscribeToMutationEmit) {
       each($node.childNodes, $childNode => genAdds($childNode), true);
     };
 
-    mutations.forEach(
-      ({ type, target, oldValue, addedNodes, removedNodes, attributeName }) => {
-        // characterData
-        if (type === 'characterData') {
-          const value = target.textContent;
+    mutations.forEach(({ type, target, oldValue, addedNodes, removedNodes, attributeName }) => {
+      // characterData
+      if (type === 'characterData') {
+        const value = target.textContent;
 
-          if (value === oldValue) return;
+        if (value === oldValue) return;
 
-          texts.push({ value, $el: target });
-        }
-        // attributes
-        else if (type === 'attributes') {
-          const attrName = attributeName || '';
-
-          const value = (target as HTMLElement).getAttribute(attrName);
-
-          if (oldValue === value) return;
-
-          let current = attrs.find(attr => attr.$el === target);
-          if (!current) {
-            current = { $el: target, attrs: {} };
-            attrs.push(current);
-          }
-          current.attrs[attrName] = rAttr(attrName, value || '');
-        }
-        // childList
-        else if (type === 'childList') {
-          each(addedNodes, $node => genAdds($node, target));
-
-          each(removedNodes, $node => {
-            const id = mirror.getId($node);
-            const pId = mirror.getId(target);
-
-            const movedKey = genKey(id, pId);
-
-            if (addedSet.has($node)) {
-              deepDelete(addedSet, $node);
-              removedSet.add($node);
-            } else if (addedSet.has(target) && !id) {
-              /**
-               * If target was newly added and removed child node was
-               * not serialized, it means the child node has been removed
-               * before callback fired, so we can ignore it because
-               * newly added node will be serialized without child nodes.
-               */
-            } else if (isAncestorRemoved(target)) {
-              /**
-               * If parent id was not in the mirror map any more, it
-               * means the parent node has already been removed. So
-               * the node is also removed which we do not need to track
-               * and replay.
-               */
-            } else if (movedSet.has($node) && movedMap.get(movedKey)) {
-              deepDelete(movedSet, $node);
-              movedMap.delete(movedKey);
-            } else {
-              removes.push({ pId, id });
-            }
-            mirror.remove($node);
-          });
-        }
+        texts.push({ value, $el: target });
       }
-    );
+      // attributes
+      else if (type === 'attributes') {
+        const attrName = attributeName || '';
+
+        const value = (target as HTMLElement).getAttribute(attrName);
+
+        if (oldValue === value) return;
+
+        let current = attrs.find(attr => attr.$el === target);
+        if (!current) {
+          current = { $el: target, attrs: {} };
+          attrs.push(current);
+        }
+        current.attrs[attrName] = rAttr(attrName, value || '');
+      }
+      // childList
+      else if (type === 'childList') {
+        each(addedNodes, $node => genAdds($node, target));
+
+        each(removedNodes, $node => {
+          const id = mirror.getId($node);
+          const pId = mirror.getId(target);
+
+          const movedKey = genKey(id, pId);
+
+          if (addedSet.has($node)) {
+            deepDelete(addedSet, $node);
+            removedSet.add($node);
+          } else if (addedSet.has(target) && !id) {
+            /**
+             * If target was newly added and removed child node was
+             * not serialized, it means the child node has been removed
+             * before callback fired, so we can ignore it because
+             * newly added node will be serialized without child nodes.
+             */
+          } else if (isAncestorRemoved(target)) {
+            /**
+             * If parent id was not in the mirror map any more, it
+             * means the parent node has already been removed. So
+             * the node is also removed which we do not need to track
+             * and replay.
+             */
+          } else if (movedSet.has($node) && movedMap.get(movedKey)) {
+            deepDelete(movedSet, $node);
+            movedMap.delete(movedKey);
+          } else {
+            removes.push({ pId, id });
+          }
+          mirror.remove($node);
+        });
+      }
+    });
 
     const addQueue: Node[] = [];
 
     const pushAdd = ($node: Node) => {
       const pId = $node.parentNode ? mirror.getId($node.parentNode) : undefined;
 
-      const nId = $node.nextSibling
-        ? mirror.getId($node.nextSibling)
-        : undefined;
+      const nId = $node.nextSibling ? mirror.getId($node.nextSibling) : undefined;
 
       if (!pId || nId === 0) {
         addQueue.push($node);
@@ -148,10 +139,7 @@ export function subscribeToMutation(cb: SubscribeToMutationEmit) {
     movedSet.forEach($node => pushAdd($node));
 
     for (const $node of addedSet) {
-      if (
-        !isAncestorInSet(removedSet, $node) &&
-        !isParentRemoved(removes, $node)
-      ) {
+      if (!isAncestorInSet(removedSet, $node) && !isParentRemoved(removes, $node)) {
         pushAdd($node);
       } else if (isAncestorInSet(movedSet, $node)) {
         pushAdd($node);
@@ -161,11 +149,7 @@ export function subscribeToMutation(cb: SubscribeToMutationEmit) {
     }
 
     while (addQueue.length) {
-      if (
-        addQueue.every(
-          ({ parentNode }) => parentNode && !mirror.getId(parentNode)
-        )
-      ) {
+      if (addQueue.every(({ parentNode }) => parentNode && !mirror.getId(parentNode))) {
         /**
          * If all nodes in queue could not find a serialized parent,
          * it may be a bug or corner case. We need to escape the
@@ -195,12 +179,7 @@ export function subscribeToMutation(cb: SubscribeToMutationEmit) {
       adds
     };
 
-    if (
-      !arg.texts.length &&
-      !arg.attrs.length &&
-      !arg.removes.length &&
-      !arg.adds.length
-    ) {
+    if (!arg.texts.length && !arg.attrs.length && !arg.removes.length && !arg.adds.length) {
       return;
     }
     cb(arg);

@@ -19,10 +19,7 @@ export function isAncestorRemoved($target: Node): boolean {
   return isAncestorRemoved($target.parentNode);
 }
 
-export function isParentRemoved(
-  removes: Array<{ pId: number; id: number }>,
-  $node: Node
-): boolean {
+export function isParentRemoved(removes: Array<{ pId: number; id: number }>, $node: Node): boolean {
   const { parentNode } = $node;
   if (!parentNode) return false;
   const pId = mirror.getId(parentNode);

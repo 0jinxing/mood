@@ -1,28 +1,25 @@
 export type ActionWithDelay = {
-  execAction: () => void;
+  exec: () => void;
   delay: number;
 };
 
 export class Timer {
-  public timeOffset: number = 0;
+  public offset: number = 0;
 
   private raf: number;
 
-  constructor(
-    private speed: number = 1,
-    private actions: ActionWithDelay[] = []
-  ) {}
+  constructor(private speed: number = 1, private actions: ActionWithDelay[] = []) {}
 
   public setSpeed(speed = 1) {
     this.speed = speed;
   }
 
-  public addAction(action: ActionWithDelay) {
-    const index = this.findActionIndex(action);
+  public insert(action: ActionWithDelay) {
+    const index = this.findIndex(action);
     this.actions.splice(index, 0, action);
   }
 
-  public addActions(actions: ActionWithDelay[]) {
+  public concat(actions: ActionWithDelay[]) {
     this.actions.push(...actions);
   }
 
@@ -30,17 +27,17 @@ export class Timer {
     const { actions, speed } = this;
 
     actions.sort((a1, a2) => a1.delay - a2.delay);
-    this.timeOffset = 0;
+    this.offset = 0;
     let lastTimestamp = performance.now();
 
     const check = (time: number) => {
-      this.timeOffset += (time - lastTimestamp) * speed;
+      this.offset += (time - lastTimestamp) * speed;
       lastTimestamp = time;
       while (actions.length) {
         const action = actions[0];
-        if (this.timeOffset >= action.delay) {
+        if (this.offset >= action.delay) {
           actions.shift();
-          action.execAction();
+          action.exec();
         } else {
           break;
         }
@@ -57,7 +54,7 @@ export class Timer {
     this.actions = [];
   }
 
-  private findActionIndex(action: ActionWithDelay): number {
+  private findIndex(action: ActionWithDelay): number {
     let start = 0;
     let end = this.actions.length - 1;
     while (start <= end) {

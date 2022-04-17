@@ -1,15 +1,12 @@
 import { snapshot } from '@mood/snapshot';
 import { subscribe } from './subscribe';
-import { on, queryViewport } from './utils';
-import {
-  RecordEvent,
-  RecordEventWithTime,
-  EmitHandler,
-  EventType
-} from './types';
+import { queryViewport } from './utils';
+import { RecordEvent, RecordEventWithTime, EmitHandler, EventType } from './types';
+import { on } from '@mood/utils';
 
 export type RecordOptions = {
   emit: (e: RecordEventWithTime, checkout?: true) => void;
+  subscribes?: (emit: EmitHandler) => () => void;
   checkoutEveryNth?: number;
   checkoutEveryNms?: number;
 };
@@ -37,11 +34,9 @@ export function record(options: RecordOptions) {
 
     if (event.type === EventType.INCREMENTAL_SNAPSHOT) {
       incrementalSnapshotCount += 1;
-      const exceedCount =
-        checkoutEveryNth && incrementalSnapshotCount >= checkoutEveryNth;
+      const exceedCount = checkoutEveryNth && incrementalSnapshotCount >= checkoutEveryNth;
       const exceedTime =
-        checkoutEveryNms &&
-        event.timestamp - lastFullSnapshotEvent.timestamp > checkoutEveryNms;
+        checkoutEveryNms && event.timestamp - lastFullSnapshotEvent.timestamp > checkoutEveryNms;
 
       if (exceedCount || exceedTime) {
         takeFullSnapshot(true);
@@ -94,10 +89,7 @@ export function record(options: RecordOptions) {
     unsubscribes.push(subscribe(incEmitWithTime));
   };
 
-  if (
-    document.readyState === 'interactive' ||
-    document.readyState === 'complete'
-  ) {
+  if (document.readyState === 'interactive' || document.readyState === 'complete') {
     initial();
   } else {
     unsubscribes.push(

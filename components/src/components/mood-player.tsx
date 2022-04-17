@@ -19,7 +19,7 @@ const MoodPlayer: FC<MoodPlayerProps> = props => {
   });
 
   const handle = () => {
-    player.current?.resume(100000);
+    player.current?.play();
   };
 
   const handlePlay = () => {

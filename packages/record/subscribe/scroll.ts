@@ -1,6 +1,6 @@
 import { mirror } from '@mood/snapshot';
+import { on, throttle } from '@mood/utils';
 import { SourceType } from '../types';
-import { on, throttle } from '../utils';
 
 export type SubscribeToScrollArg = {
   source: SourceType.SCROLL;
@@ -19,12 +19,7 @@ export function subscribeToScroll(cb: SubscribeToScrollEmit) {
     let $scroll: HTMLElement = target as HTMLElement;
     if (target === document) $scroll = document.scrollingElement as HTMLElement;
 
-    cb({
-      id,
-      source: SourceType.SCROLL,
-      x: $scroll.scrollLeft,
-      y: $scroll.scrollTop
-    });
+    cb({ id, source: SourceType.SCROLL, x: $scroll.scrollLeft, y: $scroll.scrollTop });
   }, 100);
   return on('scroll', updatePosition);
 }

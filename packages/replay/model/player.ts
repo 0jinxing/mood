@@ -38,13 +38,13 @@ const defaultConfig: PlayerConfig = {
 export class Player {
   private $iframe: HTMLIFrameElement;
 
-  private $wrapper: HTMLElement;
+  private $container: HTMLElement;
 
   private $cursor: HTMLElement;
 
   private baseline = 0;
 
-  private lastEvent: RecordEventWithTime;
+  private prev: RecordEventWithTime;
 
   private config: PlayerConfig = defaultConfig;
 
@@ -54,29 +54,21 @@ export class Player {
 
   emitter: Emitter<EmitterEvents>;
 
-  constructor(
-    private events: RecordEventWithTime[],
-    config: Partial<PlayerConfig> = {}
-  ) {
-    this.timer = createTimer();
-
+  constructor(private events: RecordEventWithTime[], config: Partial<PlayerConfig> = {}) {
     this.setConfig(config);
 
-    this.setupDOM();
+    this.timer = createTimer();
+    this.service = createService({ events, speed: this.config.speed });
+    this.emitter = mitt();
 
-    this.service = createService({
-      events,
-      timeOffset: 0,
-      speed: this.config.speed
-    });
     this.service.start();
 
-    this.emitter = mitt();
+    this.setup();
   }
 
-  private setupDOM() {
-    this.$wrapper = document.createElement('div');
-    this.$wrapper.classList.add('mood-container');
+  private setup() {
+    this.$container = document.createElement('div');
+    this.$container.classList.add('mood-container');
 
     this.$cursor = document.createElement('div');
     this.$cursor.classList.add('mood-cursor');
@@ -86,10 +78,17 @@ export class Player {
     this.$iframe.setAttribute('scrolling', 'no');
     this.$iframe.setAttribute('style', 'pointer-events: none');
 
-    this.$wrapper.appendChild(this.$iframe);
-    this.$wrapper.appendChild(this.$cursor);
+    this.$container.appendChild(this.$iframe);
+    this.$container.appendChild(this.$cursor);
 
-    this.config.root.appendChild(this.$wrapper);
+    this.config.root.appendChild(this.$container);
+
+    const index = this.events.findIndex(i => i.type === EventType.FULL_SNAPSHOT);
+    this.baseline = this.events[index].timestamp;
+
+    for (const event of this.events.slice(0, index + 1)) {
+      this.getCastFn(event, true)();
+    }
   }
 
   private setConfig(config: Partial<PlayerConfig>) {
@@ -102,19 +101,18 @@ export class Player {
   }
 
   private getDelay(event: RecordEventWithTime): number {
+    const baseline = this.prev?.timestamp || this.baseline;
+
     if (event.type !== EventType.INCREMENTAL_SNAPSHOT) {
-      return event.timestamp - this.baseline;
+      return event.timestamp - baseline;
     }
 
-    if (
-      event.source === SourceType.MOUSE_MOVE ||
-      event.source === SourceType.TOUCH_MOVE
-    ) {
+    if (event.source === SourceType.MOUSE_MOVE || event.source === SourceType.TOUCH_MOVE) {
       const [, , , timestamp] = event.ps;
-      return timestamp - this.baseline;
+      return timestamp - baseline;
     }
 
-    return event.timestamp - this.baseline;
+    return event.timestamp - baseline;
   }
 
   private apply(event: IncrementalSnapshotEvent, sync: boolean) {
@@ -138,16 +136,14 @@ export class Player {
     const { documentElement, head } = contentDocument;
     documentElement.insertBefore($style, head);
 
-    const stylesRules = ['noscript { display: none !important; }'].concat(
-      this.config.styleRules
-    );
+    const stylesRules = ['noscript { display: none !important; }'].concat(this.config.styleRules);
 
     for (let ind = 0; ind < stylesRules.length && $style.sheet; ind++) {
       $style.sheet.insertRule(stylesRules[ind], ind);
     }
   }
 
-  private getCastFn(event: RecordEventWithTime, isSync = false) {
+  private getCastFn(event: RecordEventWithTime, sync = false) {
     let castFn: Function | undefined;
 
     switch (event.type) {
@@ -155,6 +151,7 @@ export class Player {
       case EventType.LOADED: {
         break;
       }
+
       case EventType.META: {
         castFn = () => {
           this.$iframe.width = `${event.width}px`;
@@ -162,6 +159,7 @@ export class Player {
         };
         break;
       }
+
       case EventType.FULL_SNAPSHOT: {
         castFn = () => {
           this.rebuild(event);
@@ -170,10 +168,9 @@ export class Player {
         };
         break;
       }
+
       case EventType.INCREMENTAL_SNAPSHOT: {
-        castFn = () => {
-          this.apply(event, isSync);
-        };
+        castFn = () => this.apply(event, sync);
         break;
       }
     }
@@ -182,7 +179,7 @@ export class Player {
       this.emitter.emit('cast', event);
       castFn?.();
 
-      this.lastEvent = event;
+      this.prev = event;
     };
 
     return wrappedCastFn;
@@ -196,7 +193,7 @@ export class Player {
   }
 
   public getCurrentTime(): number {
-    return this.timer.timeOffset + this.getTimeOffset();
+    return this.timer.offset + this.getTimeOffset();
   }
 
   public pause() {
@@ -204,51 +201,23 @@ export class Player {
     this.service.send({ type: 'pause' });
   }
 
-  public play(timeOffset = 0) {
+  public play() {
     this.timer.clear();
-    this.baseline = this.events[0].timestamp + timeOffset;
-    const actions: ActionWithDelay[] = [];
-    for (const event of this.events) {
-      const sync = event.timestamp < this.baseline;
-      const execAction = this.getCastFn(event, sync);
-
-      if (sync) execAction();
-      else {
-        actions.push({ execAction, delay: this.getDelay(event) });
-      }
-    }
-    this.timer.addActions(actions);
-    this.timer.start();
-    this.service.send({ type: 'play' });
-  }
-
-  public resume(timeOffset = 0) {
-    this.timer.clear();
-    this.baseline = this.events[0].timestamp + timeOffset;
     const actions: ActionWithDelay[] = [];
 
     for (const event of this.events) {
-      if (
-        event.timestamp <= this.lastEvent?.timestamp ||
-        event === this.lastEvent
-      ) {
-        continue;
-      }
-      const castFn = this.getCastFn(event);
-      actions.push({
-        execAction: castFn,
-        delay: this.getDelay(event)
-      });
+      if (event.timestamp <= this.prev?.timestamp || event === this.prev) continue;
+      const exec = this.getCastFn(event);
+      actions.push({ exec, delay: this.getDelay(event) });
     }
-    this.timer.addActions(actions);
+    this.timer.concat(actions);
     this.timer.start();
     this.service.send({ type: 'resume' });
   }
+
+  public seek(timeOffset = 0) {}
 }
 
-export function createPlayer(
-  events: RecordEventWithTime[],
-  config: Partial<PlayerConfig> = {}
-) {
+export function createPlayer(events: RecordEventWithTime[], config: Partial<PlayerConfig> = {}) {
   return new Player(events, config);
 }

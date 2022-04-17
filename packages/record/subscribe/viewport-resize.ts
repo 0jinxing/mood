@@ -1,5 +1,6 @@
+import { on, throttle } from '@mood/utils';
 import { SourceType } from '../types';
-import { queryViewport, on, throttle } from '../utils';
+import { queryViewport } from '../utils';
 
 export type SubscribeToViewportResizeArg = {
   source: SourceType.VIEWPORT_RESIZE;
@@ -7,17 +8,12 @@ export type SubscribeToViewportResizeArg = {
   height: number;
 };
 
-export type SubscribeToViewportResizeEmit = (
-  arg: SubscribeToViewportResizeArg
-) => void;
+export type SubscribeToViewportResizeEmit = (arg: SubscribeToViewportResizeArg) => void;
 
 export function subscribeToViewportResize(cb: SubscribeToViewportResizeEmit) {
   const source = SourceType.VIEWPORT_RESIZE;
 
-  const updateDimension = throttle(
-    () => cb({ source, ...queryViewport() }),
-    200
-  );
+  const updateDimension = throttle(() => cb({ source, ...queryViewport() }), 200);
 
   return on('resize', updateDimension, window);
 }

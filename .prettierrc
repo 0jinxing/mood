@@ -4,5 +4,6 @@
   "semi": true,
   "trailingComma": "none",
   "proseWrap": "never",
-  "arrowParens": "avoid"
+  "arrowParens": "avoid",
+  "printWidth": 100
 }

@@ -1,6 +1,6 @@
 import { mirror } from '@mood/snapshot';
+import { on } from '@mood/utils';
 import { SourceType } from '../types';
-import { on } from '../utils';
 
 const actions = <const>[
   'mouseup',

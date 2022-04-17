@@ -1,10 +1,6 @@
 import { NonFunctionKeys, FunctionKeys } from 'utility-types';
 
-export function hook<T extends object>(
-  target: T,
-  key: keyof T,
-  descriptor: PropertyDescriptor
-) {
+export function hook<T extends object>(target: T, key: keyof T, descriptor: PropertyDescriptor) {
   const original = Object.getOwnPropertyDescriptor(target, key);
   Object.defineProperty(target, key, descriptor);
 
@@ -17,19 +13,16 @@ export function hookProp<T extends object>(
   setter: (val: any) => void
 ) {
   const original = Object.getOwnPropertyDescriptor(target, key);
-  return hook(target, key, {
-    set(val) {
-      original?.set?.call(this, val);
-      setter.call(this, val);
-    }
-  });
+
+  const set = function (val: unknown) {
+    original?.set?.call(this, val);
+    setter.call(this, val);
+  };
+
+  return hook(target, key, { set });
 }
 
-export function hookMethod<T extends object>(
-  target: T,
-  key: FunctionKeys<T>,
-  hoc: Function
-) {
+export function hookMethod<T extends object>(target: T, key: FunctionKeys<T>, hoc: Function) {
   const original = Object.getOwnPropertyDescriptor(target, key);
   const fn: Function = original?.value;
 
@@ -37,12 +30,11 @@ export function hookMethod<T extends object>(
     throw new Error('Failed to hook method');
   }
 
-  return hook(target, key, {
-    ...original,
-    value: function (...args: unknown[]) {
-      const result = fn(...args);
-      hoc(...args);
-      return result;
-    }
-  });
+  const value = function (...args: unknown[]) {
+    const result = fn(...args);
+    hoc(...args);
+    return result;
+  };
+
+  return hook(target, key, { ...original, value });
 }

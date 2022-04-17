@@ -2,5 +2,8 @@
   "name": "@mood/utils",
   "main": "dist/index.js",
   "version": "0.0.1",
-  "license": "MIT"
+  "license": "MIT",
+  "dependencies": {
+    "utility-types": "^3.10.0"
+  }
 }

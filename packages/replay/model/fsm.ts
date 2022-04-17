@@ -1,12 +1,6 @@
 import { RecordEventWithTime } from '@mood/record';
 import { createMachine, interpret } from '@xstate/fsm';
 
-export type MachineContext = {
-  events: RecordEventWithTime[];
-  timeOffset: number;
-  speed: number;
-};
-
 export type MachineEventType =
   | 'play'
   | 'pause'
@@ -15,15 +9,11 @@ export type MachineEventType =
   | 'replay'
   | 'fast_forward'
   | 'back_to_normal';
+export type MachineState = 'inited' | 'playing' | 'paused' | 'ended' | 'skipping';
+
+export type MachineContext = { events: RecordEventWithTime[]; speed: number };
 
 export type MachineEvent = { type: MachineEventType };
-
-export type MachineState =
-  | 'inited'
-  | 'playing'
-  | 'paused'
-  | 'ended'
-  | 'skipping';
 
 export type MachineStates = Record<
   MachineState,

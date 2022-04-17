@@ -4,10 +4,13 @@ import commonjs from '@rollup/plugin-commonjs';
 import resolve from '@rollup/plugin-node-resolve';
 import glob from 'glob';
 
+import { terser } from 'rollup-plugin-terser';
+
 const plugins = [
   resolve({ browser: true, extensions: ['.js', '.ts'] }),
   commonjs({ extensions: ['.js', '.ts'] }),
-  typescript()
+  typescript(),
+  terser()
 ];
 
 const packages = glob.sync('packages/*').map(p => {
