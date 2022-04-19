@@ -18,7 +18,8 @@ const packages = glob.sync('packages/*').map(p => {
     input: path.resolve(`${p}/index.ts`),
     plugins,
     output: [
-      { file: path.resolve(`${p}/dist/index.js`), format: 'esm', sourcemap: true },
+      { file: path.resolve(`${p}/dist/index.js`), format: 'cjs', sourcemap: true },
+      { file: path.resolve(`${p}/dist/index.es.js`), format: 'esm', sourcemap: true },
       {
         name: 'window',
         file: path.resolve(`${p}/dist/index.iife.js`),

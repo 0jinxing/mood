@@ -2,11 +2,9 @@ import * as path from 'path';
 import * as fs from 'fs';
 import { expect } from 'chai';
 import { browserTest, execExport } from './utils/browser';
-import { EleNode, NT, SNWithId } from '@mood/snapshot';
+import { EleNode, NodeType, SNWithId } from '@mood/snapshot';
 
-const SNAPSHOT_CODE_PATH = path.resolve(
-  '../packages/snapshot/dist/index.iife.js'
-);
+const SNAPSHOT_CODE_PATH = path.resolve('../packages/snapshot/dist/index.iife.js');
 
 function getCode() {
   const code = fs.readFileSync(SNAPSHOT_CODE_PATH, 'utf-8');
@@ -27,7 +25,7 @@ browserTest('snapshot', [
       const [data] = await execExport<SNWithId[]>(page, 'snapshot(document)');
 
       const images = data.filter(
-        item => item.type === NT.ELE_NODE && item.tagName === 'IMG'
+        item => item.type === NodeType.ELE_NODE && item.tagName === 'IMG'
       ) as EleNode[];
 
       expect(images.length).eq(3);
@@ -49,7 +47,7 @@ browserTest('snapshot', [
       await page.evaluate(getCode());
       const [data] = await execExport<SNWithId[]>(page, 'snapshot(document)');
       const images = data.filter(
-        item => item.type === NT.ELE_NODE && item.tagName === 'IMG'
+        item => item.type === NodeType.ELE_NODE && item.tagName === 'IMG'
       ) as EleNode[];
 
       expect(images.map(item => item.attrs.srcset)).to.deep.eq([

@@ -1,6 +1,7 @@
 {
   "name": "@mood/utils",
   "main": "dist/index.js",
+  "module": "dist/index.es.js",
   "version": "0.0.1",
   "license": "MIT",
   "dependencies": {
