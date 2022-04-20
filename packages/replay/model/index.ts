@@ -1,3 +1,3 @@
 export * from './fsm';
 export * from './player';
-export * from './timer';
+export * from './scheduler';

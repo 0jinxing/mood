@@ -1,11 +1,11 @@
 import { SubscribeEmitArg } from '@mood/record';
-import { Timer } from './model/timer';
+import { Scheduler } from './model/scheduler';
 
 export type ReceiveContext = {
   $iframe: HTMLIFrameElement;
   $cursor: HTMLElement;
   baseline: number;
-  timer: Timer;
+  scheduler: Scheduler;
 };
 
 export type ReceiveHandler<T extends SubscribeEmitArg = SubscribeEmitArg> = (

@@ -4,13 +4,14 @@ import { each } from '@mood/utils';
 import { ReceiveHandler } from '../types';
 
 export const receiveToMutation: ReceiveHandler<SubscribeToMutationArg> = (event, context) => {
-  
   each(event.removes, rm => {
     const $el = mirror.getNode(rm.id);
     const $parent = mirror.getNode(rm.pId);
+
     if (!$el) return;
 
     if ($parent) $parent.removeChild($el);
+
     mirror.remove($el);
   });
 

@@ -5,7 +5,7 @@ import { moveAndHover } from '../utils/hover';
 
 export const receiveToMouseInteraction: ReceiveHandler<SubscribeToMouseInteractionArg> = (
   event,
-  context,
+  { $iframe, $cursor },
   sync
 ) => {
   const $target = mirror.getNode<HTMLElement>(event.id);
@@ -24,18 +24,10 @@ export const receiveToMouseInteraction: ReceiveHandler<SubscribeToMouseInteracti
     case 'touchend':
     case 'touchstart': {
       if (!sync) {
-        moveAndHover(
-          event.x,
-          event.y,
-          event.id,
-          context.$cursor,
-          context.$iframe.contentDocument!
-        );
+        moveAndHover(event.x, event.y, event.id, $cursor, $iframe.contentDocument!);
 
-        context.$cursor.classList.remove('active');
-        setTimeout(() => {
-          context.$cursor.classList.add('active');
-        });
+        $cursor.classList.remove('active');
+        setTimeout(() => $cursor.classList.add('active'));
       }
     }
   }

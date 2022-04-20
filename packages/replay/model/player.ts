@@ -8,7 +8,7 @@ import {
   IncrementalSnapshotEvent
 } from '@mood/record';
 
-import { ActionWithDelay, createTimer, Timer } from './timer';
+import { createScheduler, Scheduler } from './scheduler';
 import { createService } from './fsm';
 import { applyIncremental } from '../receive';
 import { ReceiveContext } from '../types';
@@ -26,7 +26,7 @@ export type PlayerMetaData = {
 type EmitterEvents = {
   duration: number;
   status: 'inited' | 'playing' | 'paused' | 'ended';
-  cast: RecordEventWithTime;
+  picked: RecordEventWithTime;
 };
 
 const defaultConfig: PlayerConfig = {
@@ -50,14 +50,15 @@ export class Player {
 
   service: ReturnType<typeof createService>;
 
-  timer: Timer;
+  scheduler: Scheduler;
 
   emitter: Emitter<EmitterEvents>;
 
   constructor(private events: RecordEventWithTime[], config: Partial<PlayerConfig> = {}) {
+    this.scheduler = createScheduler();
+
     this.setConfig(config);
 
-    this.timer = createTimer();
     this.service = createService({ events, speed: this.config.speed });
     this.emitter = mitt();
 
@@ -87,22 +88,22 @@ export class Player {
     this.baseline = this.events[index].timestamp;
 
     for (const event of this.events.slice(0, index + 1)) {
-      this.getCastFn(event, true)();
+      const handler = this.picked(event, true);
+      handler();
     }
   }
 
   private setConfig(config: Partial<PlayerConfig>) {
     this.config = Object.assign({}, this.config, config);
-    this.timer.setSpeed(this.config.speed);
+    this.scheduler.speed = this.config.speed;
   }
 
   private getTimeOffset(): number {
+    throw 'TODO';
     return this.baseline - this.events[0].timestamp;
   }
 
-  private getDelay(event: RecordEventWithTime): number {
-    const baseline = this.prev?.timestamp || this.baseline;
-
+  private getDelay(event: RecordEventWithTime, baseline: number): number {
     if (event.type !== EventType.INCREMENTAL_SNAPSHOT) {
       return event.timestamp - baseline;
     }
@@ -116,13 +117,13 @@ export class Player {
   }
 
   private apply(event: IncrementalSnapshotEvent, sync: boolean) {
-    const { $iframe, $cursor, baseline, timer } = this;
+    const { $iframe, $cursor, baseline, scheduler } = this;
 
     const context: ReceiveContext = {
       $iframe,
       $cursor,
       baseline,
-      timer
+      scheduler
     };
     applyIncremental(event, context, sync);
   }
@@ -143,79 +144,101 @@ export class Player {
     }
   }
 
-  private getCastFn(event: RecordEventWithTime, sync = false) {
-    let castFn: Function | undefined;
+  private picked(event: RecordEventWithTime, sync = false) {
+    const handler = () => {
+      switch (event.type) {
+        case EventType.DOM_CONTENT_LOADED:
+        case EventType.LOADED:
+          break;
 
-    switch (event.type) {
-      case EventType.DOM_CONTENT_LOADED:
-      case EventType.LOADED: {
-        break;
-      }
-
-      case EventType.META: {
-        castFn = () => {
+        case EventType.META: {
           this.$iframe.width = `${event.width}px`;
           this.$iframe.height = `${event.height}px`;
-        };
-        break;
-      }
+          break;
+        }
 
-      case EventType.FULL_SNAPSHOT: {
-        castFn = () => {
+        case EventType.FULL_SNAPSHOT: {
           this.rebuild(event);
           const [top, left] = event.offset;
           this.$iframe.contentWindow?.scrollTo({ top, left });
-        };
-        break;
-      }
+          break;
+        }
 
-      case EventType.INCREMENTAL_SNAPSHOT: {
-        castFn = () => this.apply(event, sync);
-        break;
+        case EventType.INCREMENTAL_SNAPSHOT: {
+          this.apply(event, sync);
+          break;
+        }
       }
-    }
+    };
 
-    const wrappedCastFn = () => {
-      this.emitter.emit('cast', event);
-      castFn?.();
+    const wrapped = () => {
+      this.emitter.emit('picked', event);
+
+      handler();
 
       this.prev = event;
     };
 
-    return wrappedCastFn;
+    return wrapped;
   }
 
   public getMetaData(): PlayerMetaData {
+    throw 'TODO';
     const len = this.events.length;
-    const { 0: first, [len - 1]: last } = this.events;
 
-    return { totalTime: last.timestamp - first.timestamp };
+    const { 0: start, [len - 1]: end } = this.events;
+
+    if (!start || !end) {
+      return { totalTime: 0 };
+    }
+
+    return { totalTime: end.timestamp - start.timestamp };
   }
 
   public getCurrentTime(): number {
-    return this.timer.offset + this.getTimeOffset();
+    throw 'TODO';
+    return this.scheduler.offset + this.getTimeOffset();
   }
 
   public pause() {
-    this.timer.clear();
+    this.scheduler.clear();
     this.service.send({ type: 'pause' });
   }
 
   public play() {
-    this.timer.clear();
-    const actions: ActionWithDelay[] = [];
+    this.scheduler.clear();
 
     for (const event of this.events) {
       if (event.timestamp <= this.prev?.timestamp || event === this.prev) continue;
-      const exec = this.getCastFn(event);
-      actions.push({ exec, delay: this.getDelay(event) });
+
+      const baseline = this.prev?.timestamp || this.baseline;
+      this.scheduler.push({ exec: this.picked(event), delay: this.getDelay(event, baseline) });
     }
-    this.timer.concat(actions);
-    this.timer.start();
+    this.scheduler.start();
     this.service.send({ type: 'resume' });
   }
 
-  public seek(timeOffset = 0) {}
+  public seek(offset = 0) {
+    const events = this.events;
+    this.scheduler.clear();
+
+    const slice = events.findIndex(
+      event => event.type === EventType.FULL_SNAPSHOT && event.timestamp < this.baseline + offset
+    );
+
+    const baseline = this.baseline + offset;
+
+    for (let event of events.slice(slice)) {
+      const delay = this.getDelay(event, baseline);
+      const exec = this.picked(event);
+
+      if (delay <= 0) {
+        exec();
+        continue;
+      }
+      this.scheduler.push({ exec, delay });
+    }
+  }
 }
 
 export function createPlayer(events: RecordEventWithTime[], config: Partial<PlayerConfig> = {}) {

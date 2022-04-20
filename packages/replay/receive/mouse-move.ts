@@ -6,18 +6,19 @@ import { moveAndHover } from '../utils/hover';
 
 export const receiveToMouseMove: ReceiveHandler<SubscribeToMouseMoveArg> = (
   event,
-  context,
+  { $iframe, $cursor, scheduler, baseline },
   sync
 ) => {
-  const $doc = context.$iframe.contentDocument!;
+  const $doc = $iframe.contentDocument!;
+
   if (sync) {
     const [id, x, y] = event.ps.slice(event.ps.length - 4);
-    moveAndHover(x, y, id, context.$cursor, $doc);
+    moveAndHover(x, y, id, $cursor, $doc);
   } else {
     each(chunk(event.ps, 4), ([id, x, y, timestamp]) => {
-      context.timer.insert({
-        exec: () => moveAndHover(x, y, id, context.$cursor, $doc),
-        delay: timestamp - context.baseline
+      scheduler.push({
+        exec: () => moveAndHover(x, y, id, $cursor, $doc),
+        delay: timestamp - baseline
       });
     });
   }
