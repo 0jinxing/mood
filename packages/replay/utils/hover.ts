@@ -1,10 +1,11 @@
 import { mirror } from '@mood/snapshot';
+import { each } from '@mood/utils';
 
 export function hover($el: Element, $doc?: Document) {
-  $doc?.querySelectorAll('.\\:hover').forEach($hovered => {
-    $hovered.classList.remove(':hover');
-  });
+  each($doc?.querySelectorAll('.\\:hover') || [], $node => $node.classList.remove(':hover'));
+
   let $current: Element | null = $el;
+
   while ($current) {
     if ($current.classList) {
       $current.classList.add(':hover');

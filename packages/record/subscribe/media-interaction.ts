@@ -1,5 +1,5 @@
 import { mirror } from '@mood/snapshot';
-import { on } from '@mood/utils';
+import { each, on } from '@mood/utils';
 import { SourceType } from '../types';
 
 const actions = <const>['play', 'pause'];
@@ -21,8 +21,8 @@ export function subscribeToMediaInteraction(cb: SubscribeToMediaInteractionEmit)
       cb({ source: SourceType.MEDIA_INTERACTION, id: mirror.getId(target), action: act });
     }
   };
-  const handlers = actions.map(k => on(k, handler(k)));
-  return () => {
-    handlers.forEach(h => h());
-  };
+
+  const unsubscribes = actions.map(k => on(k, handler(k)));
+
+  return () => each(unsubscribes, u => u() && false);
 }

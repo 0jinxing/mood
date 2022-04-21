@@ -12,10 +12,10 @@ export function hookProp<T extends object>(
   key: NonFunctionKeys<T>,
   setter: (val: any) => void
 ) {
-  const original = Object.getOwnPropertyDescriptor(target, key);
+  const raw = Object.getOwnPropertyDescriptor(target, key);
 
   const set = function (val: unknown) {
-    original?.set?.call(this, val);
+    raw?.set?.call(this, val);
     setter.call(this, val);
   };
 
@@ -23,8 +23,8 @@ export function hookProp<T extends object>(
 }
 
 export function hookMethod<T extends object>(target: T, key: FunctionKeys<T>, hoc: Function) {
-  const original = Object.getOwnPropertyDescriptor(target, key);
-  const fn: Function = original?.value;
+  const raw = Object.getOwnPropertyDescriptor(target, key);
+  const fn: Function = raw?.value;
 
   if (typeof fn !== 'function' || typeof hoc !== 'function') {
     throw new Error('Failed to hook method');
@@ -36,5 +36,5 @@ export function hookMethod<T extends object>(target: T, key: FunctionKeys<T>, ho
     return result;
   };
 
-  return hook(target, key, { ...original, value });
+  return hook(target, key, { ...raw, value });
 }

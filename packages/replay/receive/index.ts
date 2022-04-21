@@ -9,13 +9,8 @@ import { receiveToViewportResize } from './viewport-resize';
 import { receiveToScroll } from './scroll';
 import { receiveToStyleSheet } from './style-sheet';
 import { receiveToSelection } from './selection';
-import { receiveToConsole } from './console';
 
-export function applyIncremental(
-  event: SubscribeEmitArg,
-  context: ReceiveContext,
-  sync: boolean
-) {
+export function applyIncremental(event: SubscribeEmitArg, context: ReceiveContext, sync: boolean) {
   const handlerMap: { [key in SourceType]: ReceiveHandler } = {
     [SourceType.MUTATION]: receiveToMutation,
     [SourceType.MOUSE_MOVE]: receiveToMouseMove,
@@ -26,8 +21,7 @@ export function applyIncremental(
     [SourceType.TOUCH_MOVE]: receiveToMouseMove,
     [SourceType.MEDIA_INTERACTION]: receiveToMediaInteraction,
     [SourceType.STYLE_SHEETRULE]: receiveToStyleSheet,
-    [SourceType.SELECTION]: receiveToSelection,
-    [SourceType.CONSOLE]: receiveToConsole
+    [SourceType.SELECTION]: receiveToSelection
   };
 
   handlerMap[event.source](event, context, sync);
@@ -42,4 +36,3 @@ export * from './viewport-resize';
 export * from './scroll';
 export * from './style-sheet';
 export * from './selection';
-export * from './console';

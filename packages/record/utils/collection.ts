@@ -3,12 +3,12 @@ import { each } from '@mood/utils';
 
 export function deepDelete(addsSet: Set<Node>, $node: Node) {
   addsSet.delete($node);
-  each($node.childNodes, childN => deepDelete(addsSet, childN), true);
-  // $node.childNodes.forEach(childN => deepDelete(addsSet, childN));
+  each($node.childNodes, $node => deepDelete(addsSet, $node));
 }
 
 export function isAncestorRemoved($target: Node): boolean {
   const id = mirror.getId($target);
+
   if (!mirror.has(id)) return true;
 
   if (!$target.parentNode) return true;
@@ -21,15 +21,20 @@ export function isAncestorRemoved($target: Node): boolean {
 
 export function isParentRemoved(removes: Array<{ pId: number; id: number }>, $node: Node): boolean {
   const { parentNode } = $node;
+
   if (!parentNode) return false;
-  const pId = mirror.getId(parentNode);
-  if (removes.some(r => r.id === pId)) return true;
+
+  if (removes.some(r => r.id === mirror.getId(parentNode))) return true;
+
   return isParentRemoved(removes, parentNode);
 }
 
 export function isAncestorInSet(set: Set<Node>, $node: Node): boolean {
   const { parentNode } = $node;
+
   if (!parentNode) return false;
+
   if (set.has(parentNode)) return true;
+
   return isAncestorInSet(set, parentNode);
 }

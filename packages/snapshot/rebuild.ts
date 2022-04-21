@@ -97,6 +97,7 @@ export function rebuild(adds: SNWithId[], $doc: Document) {
        */
     } else if (!$parent) {
       $doc.appendChild($el);
+      $doc.close();
     } else if ($parent && $next && $parent.contains($next)) {
       $parent.insertBefore($el, $next);
     } else {

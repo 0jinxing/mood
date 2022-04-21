@@ -1,5 +1,5 @@
 import { mirror } from '@mood/snapshot';
-import { on, throttle } from '@mood/utils';
+import { each, on, throttle } from '@mood/utils';
 import { SourceType } from '../types';
 
 export type MousePositions = number[];
@@ -27,6 +27,7 @@ export function subscribeToMouseMove(cb: SubscribeToMousemoveEmit) {
     throttleCb(event instanceof TouchEvent);
   }, 30);
 
-  const handlers = [on('mousemove', updatePosition), on('touchmove', updatePosition)];
-  return () => handlers.forEach(h => h());
+  const unsubscribes = [on('mousemove', updatePosition), on('touchmove', updatePosition)];
+
+  return () => each(unsubscribes, u => u() && false);
 }

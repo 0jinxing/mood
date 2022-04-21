@@ -1,5 +1,5 @@
 import { mirror } from '@mood/snapshot';
-import { on } from '@mood/utils';
+import { each, on } from '@mood/utils';
 import { SourceType } from '../types';
 
 const actions = <const>[
@@ -24,21 +24,14 @@ export type SubscribeToMouseInteractionArg = {
   y: number;
 };
 
-export type SubscribeToMouseInteractionEmit = (
-  arg: SubscribeToMouseInteractionArg
-) => void;
+export type SubscribeToMouseInteractionEmit = (arg: SubscribeToMouseInteractionArg) => void;
 
-export function subscribeToMouseInteraction(
-  cb: SubscribeToMouseInteractionEmit
-) {
-  const handlers: Function[] = [];
-
+export function subscribeToMouseInteraction(cb: SubscribeToMouseInteractionEmit) {
   const getHandler = (action: SubscribeToMouseInteraction) => {
     return (event: MouseEvent | TouchEvent) => {
       const id = mirror.getId(event.target as Node);
 
-      const { clientX, clientY } =
-        event instanceof TouchEvent ? event.changedTouches[0] : event;
+      const { clientX, clientY } = event instanceof TouchEvent ? event.changedTouches[0] : event;
 
       cb({
         source: SourceType.MOUSE_INTERACTION,
@@ -50,11 +43,10 @@ export function subscribeToMouseInteraction(
     };
   };
 
-  actions.forEach((action: SubscribeToMouseInteraction) => {
+  const unsubscribes = actions.map(action => {
     const handler = getHandler(action);
-    handlers.push(on(action, handler));
+    return on(action, handler);
   });
-  return () => {
-    handlers.forEach(h => h());
-  };
+
+  return () => each(unsubscribes, u => u() && false);
 }

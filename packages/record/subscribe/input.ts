@@ -54,10 +54,10 @@ export function subscribeToInput(cb: SubscribeToInputEmit) {
     if (inputType === 'radio' && name && value) {
       const selector = `input[type=radio][name=${name}]`;
 
-      const $$radio: NodeListOf<HTMLInputElement> = document.querySelectorAll(selector);
+      const $radioList: NodeListOf<HTMLInputElement> = document.querySelectorAll(selector);
 
       // toggle
-      each($$radio, $el => {
+      each($radioList, $el => {
         if (!$el.checked || $el === $target) return true;
         cbWithDedup($el as HTMLInputElement, false);
       });
@@ -83,7 +83,5 @@ export function subscribeToInput(cb: SubscribeToInputEmit) {
   );
   unsubscribes.push(...hookHandlers);
 
-  return () => {
-    unsubscribes.forEach(h => h());
-  };
+  return () => each(unsubscribes, u => u() && false);
 }

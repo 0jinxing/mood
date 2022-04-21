@@ -7,9 +7,9 @@ import { subscribeToMediaInteraction } from './media-interaction';
 import { subscribeToStyleSheet } from './style-sheet';
 import { subscribeToMutation } from './mutation';
 import { subscribeToSelection } from './selection';
-import { subscribeToConsole } from './console';
 
 import { EmitHandler } from '../types';
+import { each } from '@mood/utils';
 
 export function subscribe(emit: EmitHandler) {
   const unsubscribes = [
@@ -21,13 +21,10 @@ export function subscribe(emit: EmitHandler) {
     subscribeToInput,
     subscribeToMediaInteraction,
     subscribeToStyleSheet,
-    subscribeToSelection,
-    subscribeToConsole
+    subscribeToSelection
   ].map(o => o(emit));
 
-  return () => {
-    unsubscribes.forEach(u => u());
-  };
+  return () => each(unsubscribes, u => u() && false);
 }
 
 export * from './input';
@@ -39,4 +36,3 @@ export * from './scroll';
 export * from './style-sheet';
 export * from './viewport-resize';
 export * from './selection';
-export * from './console';

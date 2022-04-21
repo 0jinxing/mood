@@ -48,7 +48,7 @@ export function subscribeToMutation(cb: SubscribeToMutationEmit) {
         addedSet.add($node);
         removedSet.delete($node);
       }
-      each($node.childNodes, $childNode => genAdds($childNode), true);
+      each($node.childNodes, $child => genAdds($child));
     };
 
     mutations.forEach(({ type, target, oldValue, addedNodes, removedNodes, attributeName }) => {
@@ -125,15 +125,10 @@ export function subscribeToMutation(cb: SubscribeToMutationEmit) {
         return;
       }
 
-      const sn = serialize($node, document);
-
-      if (Array.isArray(sn)) {
-        sn.forEach(item => {
-          adds.push({ pId: pId, nId: nId, ...item });
-        });
-      } else if (sn) {
-        adds.push({ pId: pId, nId: nId, ...sn });
-      }
+      each(
+        serialize($node, document),
+        item => !!adds.push({ pId: pId, nId: nId, ...item }) && false
+      );
     };
 
     movedSet.forEach($node => pushAdd($node));

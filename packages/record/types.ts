@@ -1,6 +1,5 @@
 import { SNWithId } from '@mood/snapshot';
 import {
-  SubscribeToConsoleArg,
   SubscribeToInputArg,
   MediaInteractionArg,
   SubscribeToMouseInteractionArg,
@@ -31,8 +30,7 @@ export enum SourceType {
   TOUCH_MOVE,
   MEDIA_INTERACTION,
   STYLE_SHEETRULE,
-  SELECTION,
-  CONSOLE
+  SELECTION
 }
 
 export type SubscribeEmitArg =
@@ -44,8 +42,7 @@ export type SubscribeEmitArg =
   | SubscribeToInputArg
   | MediaInteractionArg
   | SubscribeToStyleSheetArg
-  | SubscribeToSelectionArg
-  | SubscribeToConsoleArg;
+  | SubscribeToSelectionArg;
 
 export type DomContentLoadedEvent = {
   type: EventType.DOM_CONTENT_LOADED;

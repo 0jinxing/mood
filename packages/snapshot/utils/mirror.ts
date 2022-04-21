@@ -28,7 +28,7 @@ class Mirror {
     this.pool[id] = undefined;
     node.__id = undefined;
 
-    each(node.childNodes, $childNode => this.remove($childNode), true);
+    each(node.childNodes, $child => this.remove($child));
   }
 
   has(id: number) {

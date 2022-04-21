@@ -24,34 +24,31 @@ function getCSSText(styleSheet: CSSStyleSheet): string {
 }
 
 function getCSSRuleText(rule: CSSRule): string {
-  return rule instanceof CSSImportRule
-    ? getCSSText(rule.styleSheet)
-    : rule.cssText;
+  return rule instanceof CSSImportRule ? getCSSText(rule.styleSheet) : rule.cssText;
 }
 
 function isSVGElement($el: Element): $el is SVGElement {
   return /SVG/i.test(getTagName($el)) || $el instanceof SVGElement;
 }
 
-export function serialize(
-  $node: Node,
-  $doc: Document
-): SNWithId | SNWithId[] | null {
+export function serialize($node: Node, $doc: Document): SNWithId[] {
   const id = mirror.getId($node) || genId();
   mirror.set(id, $node);
 
   if ($node instanceof Document) {
-    return { id, type: NodeType.DOC_NODE };
+    return [{ id, type: NodeType.DOC_NODE }];
   }
 
   if ($node instanceof DocumentType) {
-    return {
-      id,
-      type: NodeType.DOC_TYPE_NODE,
-      name: $node.name,
-      publicId: $node.publicId,
-      systemId: $node.systemId
-    };
+    return [
+      {
+        id,
+        type: NodeType.DOC_TYPE_NODE,
+        name: $node.name,
+        publicId: $node.publicId,
+        systemId: $node.systemId
+      }
+    ];
   }
 
   if ($node instanceof Element) {
@@ -103,27 +100,26 @@ export function serialize(
       }
     }
 
-    if (
-      $node instanceof HTMLTextAreaElement ||
-      $node instanceof HTMLSelectElement
-    ) {
+    if ($node instanceof HTMLTextAreaElement || $node instanceof HTMLSelectElement) {
       const value = $node.value;
       attrs.value = value;
     } else if ($node instanceof HTMLOptionElement) {
       attrs.selected = $node.selected;
     }
 
-    return {
-      id,
-      type: NodeType.ELE_NODE,
-      tagName: getTagName($node),
-      attrs: attrs,
-      svg: isSVGElement($node)
-    };
+    return [
+      {
+        id,
+        type: NodeType.ELE_NODE,
+        tagName: getTagName($node),
+        attrs: attrs,
+        svg: isSVGElement($node)
+      }
+    ];
   }
 
   if ($node instanceof CDATASection) {
-    return { id, type: NodeType.CDATA_NODE, textContent: '' };
+    return [{ id, type: NodeType.CDATA_NODE, textContent: '' }];
   }
 
   if ($node instanceof Text) {
@@ -133,43 +129,42 @@ export function serialize(
     if (style && textContent) {
       textContent = rStyle(textContent);
     }
-    return {
-      id,
-      type: NodeType.TEXT_NODE,
-      textContent: textContent || '',
-      style: style
-    };
+    return [
+      {
+        id,
+        type: NodeType.TEXT_NODE,
+        textContent: textContent || '',
+        style: style
+      }
+    ];
   }
 
   if ($node instanceof Comment) {
-    return {
-      id,
-      type: NodeType.COMMENT_NODE,
-      textContent: $node.textContent || ''
-    };
+    return [
+      {
+        id,
+        type: NodeType.COMMENT_NODE,
+        textContent: $node.textContent || ''
+      }
+    ];
   }
 
-  return null;
+  return [];
 }
 
 export function snapshot($doc: Document): SNWithId[] {
   const adds: SNWithId[] = [];
 
   const walk = ($node: Node) => {
-    const pId = $node.parentElement
-      ? mirror.getId($node.parentElement)
-      : undefined;
+    const pId = $node.parentElement ? mirror.getId($node.parentElement) : undefined;
 
     const nId = $node.nextSibling ? mirror.getId($node.nextSibling) : undefined;
 
     const result = serialize($node, $doc);
-    const list = Array.isArray(result) ? result : result ? [result] : [];
 
-    adds.push(...list.map(i => ({ pId: pId, nId: nId, ...i })));
+    adds.push(...result.map(i => ({ pId: pId, nId: nId, ...i })));
 
-    if (list.length === 0) return;
-
-    each($node.childNodes, walk, true);
+    result.length && each($node.childNodes, walk, true);
   };
 
   walk($doc);
