@@ -22,7 +22,7 @@ browserTest('snapshot', [
 
       await page.evaluate(getCode());
 
-      const [data] = await execExport<SNWithId[]>(page, 'snapshot(document)');
+      const data = await execExport<SNWithId[]>(page, 'snapshot(document)');
 
       const images = data.filter(
         item => item.type === NodeType.ELE_NODE && item.tagName === 'IMG'
@@ -45,7 +45,7 @@ browserTest('snapshot', [
       });
 
       await page.evaluate(getCode());
-      const [data] = await execExport<SNWithId[]>(page, 'snapshot(document)');
+      const data = await execExport<SNWithId[]>(page, 'snapshot(document)');
       const images = data.filter(
         item => item.type === NodeType.ELE_NODE && item.tagName === 'IMG'
       ) as EleNode[];

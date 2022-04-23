@@ -41,12 +41,8 @@ export function browserTest(
 }
 
 export function execExport<T>(page: Page, code: string) {
-  return new Promise<T[]>(resolve => {
-    page
-      .exposeFunction('__EXPORT', handler)
-      .then(() => page.evaluate(`__EXPORT(${code})`));
-    function handler(...data: any[]) {
-      resolve(data);
-    }
+  return new Promise<T>(async resolve => {
+    await page.exposeFunction('__EXPORT', resolve);
+    await page.evaluate(`__EXPORT(${code})`);
   });
 }
