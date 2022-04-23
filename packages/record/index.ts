@@ -104,7 +104,7 @@ export function record(options: RecordOptions) {
     );
   }
 
-  return () => each(unsubscribes, u => u() && false);
+  return () => each(unsubscribes, u => u());
 }
 
 export function addCustomEvent<T>(tag: string, payload: T) {

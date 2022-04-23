@@ -61,10 +61,6 @@ export function buildNode(node: SNWithId, $doc: Document): Node | null {
     return $doc.createCDATASection(node.textContent);
   }
 
-  if (node.type === NodeType.COMMENT_NODE) {
-    return $doc.createComment(node.textContent);
-  }
-
   return null;
 }
 

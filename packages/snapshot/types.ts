@@ -2,7 +2,6 @@ export enum NodeType {
   ELE_NODE,
   TEXT_NODE,
   CDATA_NODE,
-  COMMENT_NODE,
   DOC_NODE,
   DOC_TYPE_NODE,
   DOC_FRAGMENT_NODE
@@ -39,17 +38,6 @@ export type CDataNode = {
   textContent: '';
 };
 
-export type CommentNode = {
-  type: NodeType.COMMENT_NODE;
-  textContent: string;
-};
-
-export type SN =
-  | DocNode
-  | DocTypeNode
-  | EleNode
-  | TextNode
-  | CDataNode
-  | CommentNode;
+export type SN = DocNode | DocTypeNode | EleNode | TextNode | CDataNode;
 
 export type SNWithId = SN & { id: number; pId?: number; nId?: number };

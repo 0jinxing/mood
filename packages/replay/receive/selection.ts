@@ -24,7 +24,5 @@ export const receiveToSelection: ReceiveHandler<SubscribeToSelectionArg> = (even
   const selection = $doc.getSelection();
   selection?.removeAllRanges();
 
-  each(ranges, r => {
-    r && selection?.addRange(r);
-  });
+  each(ranges, r => r && selection?.addRange(r));
 };
