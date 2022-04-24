@@ -75,16 +75,18 @@ export function buildNodeWithSN(node: SNWithId, $doc: Document): Node | null {
 
   if (node.type === NodeType.DOC_NODE) {
     $el = $doc;
-    // Close before open to make sure document was closed
-    $doc.close();
-    $doc.open();
   }
+
   mirror.set(node.id, $el);
 
   return $el;
 }
 
 export function rebuild(adds: SNWithId[], $doc: Document) {
+  // Close before open to make sure document was closed
+  $doc.close();
+  $doc.open();
+
   adds.forEach(({ pId, nId, ...node }) => {
     const $el = buildNodeWithSN(node, $doc)!;
 
@@ -97,7 +99,6 @@ export function rebuild(adds: SNWithId[], $doc: Document) {
        */
     } else if (!$parent) {
       $doc.appendChild($el);
-      $doc.close();
     } else if ($parent && $next && $parent.contains($next)) {
       $parent.insertBefore($el, $next);
     } else {

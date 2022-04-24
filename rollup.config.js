@@ -1,3 +1,4 @@
+import fs from 'fs';
 import path from 'path';
 import typescript from '@rollup/plugin-typescript';
 import commonjs from '@rollup/plugin-commonjs';
@@ -13,7 +14,14 @@ const plugins = [
   terser()
 ];
 
-const packages = glob.sync('packages/*').map(p => {
+const packages = glob.sync('packages/*');
+
+for (let p of packages) {
+  const output = path.resolve(p, 'dist');
+  fs.existsSync(output) && fs.rmSync(output, { force: true, recursive: true });
+}
+
+export default packages.map(p => {
   return {
     input: path.resolve(`${p}/index.ts`),
     plugins,
@@ -30,5 +38,3 @@ const packages = glob.sync('packages/*').map(p => {
     ]
   };
 });
-
-export default packages;
