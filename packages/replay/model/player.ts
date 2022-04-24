@@ -9,7 +9,6 @@ import {
 } from '@mood/record';
 
 import { createScheduler, Scheduler } from './scheduler';
-import { createService } from './fsm';
 import { applyIncremental } from '../receive';
 import { ReceiveContext } from '../types';
 
@@ -48,8 +47,6 @@ export class Player {
 
   private config: PlayerConfig = defaultConfig;
 
-  service: ReturnType<typeof createService>;
-
   scheduler: Scheduler;
 
   emitter: Emitter<EmitterEvents>;
@@ -58,11 +55,7 @@ export class Player {
     this.scheduler = createScheduler();
 
     this.setConfig(config);
-
-    this.service = createService({ events, speed: this.config.speed });
     this.emitter = mitt();
-
-    this.service.start();
 
     this.setup();
   }
@@ -91,16 +84,13 @@ export class Player {
       const handler = this.picked(event, true);
       handler();
     }
+
+    this.emitter.emit('status', 'inited');
   }
 
   private setConfig(config: Partial<PlayerConfig>) {
     this.config = Object.assign({}, this.config, config);
     this.scheduler.speed = this.config.speed;
-  }
-
-  private getTimeOffset(): number {
-    throw 'TODO';
-    return this.baseline - this.events[0].timestamp;
   }
 
   private getDelay(event: RecordEventWithTime, baseline: number): number {
@@ -172,37 +162,37 @@ export class Player {
     };
 
     const wrapped = () => {
-      this.emitter.emit('picked', event);
-
       handler();
-
       this.prev = event;
+
+      this.emitter.emit('picked', event);
+      this.emitter.emit('duration', this.metaData.totalTime - this.currentTime);
+
+      const index = this.events.indexOf(event);
+
+      if (index !== this.events.length - 1) return;
+
+      this.emitter.emit('status', 'ended');
     };
 
     return wrapped;
   }
 
-  public getMetaData(): PlayerMetaData {
-    throw 'TODO';
-    const len = this.events.length;
+  get metaData(): PlayerMetaData {
+    const end = this.events.slice(-1)[0];
+    const totalTime = Math.max(end.timestamp - this.baseline, 0);
 
-    const { 0: start, [len - 1]: end } = this.events;
-
-    if (!start || !end) {
-      return { totalTime: 0 };
-    }
-
-    return { totalTime: end.timestamp - start.timestamp };
+    return { totalTime };
   }
 
-  public getCurrentTime(): number {
-    throw 'TODO';
-    return this.scheduler.offset + this.getTimeOffset();
+  get currentTime() {
+    if (!this.prev) return 0;
+    return this.prev?.timestamp - this.baseline;
   }
 
   public pause() {
     this.scheduler.clear();
-    this.service.send({ type: 'pause' });
+    this.emitter.emit('status', 'paused');
   }
 
   public play() {
@@ -215,7 +205,7 @@ export class Player {
       this.scheduler.push({ exec: this.picked(event), delay: this.getDelay(event, baseline) });
     }
     this.scheduler.start();
-    this.service.send({ type: 'resume' });
+    this.emitter.emit('status', 'playing');
   }
 
   public seek(offset = 0) {
