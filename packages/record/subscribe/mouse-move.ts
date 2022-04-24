@@ -29,5 +29,5 @@ export function subscribeToMouseMove(cb: SubscribeToMousemoveEmit) {
 
   const unsubscribes = [on('mousemove', updatePosition), on('touchmove', updatePosition)];
 
-  return () => each(unsubscribes, u => u() && false);
+  return () => each(unsubscribes, u => u());
 }

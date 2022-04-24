@@ -48,5 +48,5 @@ export function subscribeToMouseInteraction(cb: SubscribeToMouseInteractionEmit)
     return on(action, handler);
   });
 
-  return () => each(unsubscribes, u => u() && false);
+  return () => each(unsubscribes, u => u());
 }

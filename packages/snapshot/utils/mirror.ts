@@ -1,34 +1,34 @@
 import { each } from '@mood/utils';
 
-type WithId<T> = T & { __id?: number };
+type WithId<T> = T & { ['@@id']?: number };
 
 class Mirror {
   private readonly pool: Record<number, EventTarget | undefined> = {};
 
   set(id: number, $node: WithId<Node>) {
-    if ($node.__id === id) return;
+    if ($node['@@id'] === id) return;
 
     this.pool[id] = $node;
-    $node.__id = id;
+    $node['@@id'] = id;
   }
 
   getId<T extends WithId<EventTarget>>($target: T): number {
-    return $target.__id || 0;
+    return $target['@@id'] || 0;
   }
 
   getNode<T extends Node>(id: number) {
     return this.pool[id] as T | undefined;
   }
 
-  remove(node: WithId<Node>) {
-    const id = this.getId(node);
+  remove($node: WithId<Node>) {
+    const id = this.getId($node);
 
     if (!id) return;
 
     this.pool[id] = undefined;
-    node.__id = undefined;
+    $node['@@id'] = undefined;
 
-    each(node.childNodes, $child => this.remove($child));
+    each($node.childNodes, $child => this.remove($child));
   }
 
   has(id: number) {

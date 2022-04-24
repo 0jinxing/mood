@@ -24,5 +24,5 @@ export function subscribeToMediaInteraction(cb: SubscribeToMediaInteractionEmit)
 
   const unsubscribes = actions.map(k => on(k, handler(k)));
 
-  return () => each(unsubscribes, u => u() && false);
+  return () => each(unsubscribes, u => u());
 }

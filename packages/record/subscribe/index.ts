@@ -24,7 +24,7 @@ export function subscribe(emit: EmitHandler) {
     subscribeToSelection
   ].map(o => o(emit));
 
-  return () => each(unsubscribes, u => u() && false);
+  return () => each(unsubscribes, u => u());
 }
 
 export * from './input';

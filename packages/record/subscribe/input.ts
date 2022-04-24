@@ -49,19 +49,20 @@ export function subscribeToInput(cb: SubscribeToInputEmit) {
 
     cbWithDedup($target, value);
 
-    const inputType = $target.type;
-    const name = $target.name;
-    if (inputType === 'radio' && name && value) {
-      const selector = `input[type=radio][name=${name}]`;
+    // @TODO
+    // const inputType = $target.type;
+    // const name = $target.name;
+    // if (inputType === 'radio' && name && value) {
+    //   const selector = `input[type=radio][name=${name}]`;
 
-      const $radioList: NodeListOf<HTMLInputElement> = document.querySelectorAll(selector);
+    //   const $radioList: NodeListOf<HTMLInputElement> = document.querySelectorAll(selector);
 
-      // toggle
-      each($radioList, $el => {
-        if (!$el.checked || $el === $target) return true;
-        cbWithDedup($el as HTMLInputElement, false);
-      });
-    }
+    //   // toggle
+    //   each($radioList, $el => {
+    //     if (!$el.checked || $el === $target) return true;
+    //     cbWithDedup($el as HTMLInputElement, false);
+    //   });
+    // }
   };
 
   const unsubscribes = ['input', 'change'].map(eventName => {
@@ -83,5 +84,5 @@ export function subscribeToInput(cb: SubscribeToInputEmit) {
   );
   unsubscribes.push(...hookHandlers);
 
-  return () => each(unsubscribes, u => u() && false);
+  return () => each(unsubscribes, u => u());
 }

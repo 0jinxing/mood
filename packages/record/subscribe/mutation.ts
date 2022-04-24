@@ -125,10 +125,7 @@ export function subscribeToMutation(cb: SubscribeToMutationEmit) {
         return;
       }
 
-      each(
-        serialize($node, document),
-        item => !!adds.push({ pId: pId, nId: nId, ...item }) && false
-      );
+      each(serialize($node, document), item => adds.push({ pId, nId, ...item }));
     };
 
     movedSet.forEach($node => pushAdd($node));
