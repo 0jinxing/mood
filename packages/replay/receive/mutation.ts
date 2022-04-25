@@ -51,7 +51,7 @@ export const receiveToMutation: ReceiveHandler<SubscribeToMutationArg> = (event,
     const $target = mirror.getNode<Element>(mutation.id);
     if (!$target) return;
 
-    each(Object.entries(mutation.attrs), ([name, value]) => {
+    each(Object.entries(mutation.value), ([name, value]) => {
       if (value) $target.setAttribute(name, value + '');
       else $target.removeAttribute(name);
     });

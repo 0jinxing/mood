@@ -5,12 +5,10 @@ import { deepDelete, isAncestorRemoved, isAncestorInSet, isParentRemoved } from 
 import { each } from '@mood/utils';
 import { SourceType } from '../types';
 
-export type AttrCursor = { $el: Node; attrs: Attrs };
-
 export type AddedNodeMutation = SNWithId & { pId: number };
 export type RemovedNodeMutation = { id: number; pId: number };
 export type TextMutation = { id: number; value: string | null };
-export type AttrMutation = { id: number; attrs: Attrs };
+export type AttrMutation = { id: number; value: Attrs };
 
 export type SubscribeToMutationArg = {
   source: SourceType.MUTATION;
@@ -26,10 +24,11 @@ const genKey = (id: number, pId: number) => `${id}@${pId}`;
 
 export function subscribeToMutation(cb: SubscribeToMutationEmit) {
   const observer = new MutationObserver(mutations => {
-    const attrs: AttrCursor[] = [];
-    const texts: Array<{ value: string | null; $el: Node }> = [];
-    const removes: RemovedNodeMutation[] = [];
     const adds: AddedNodeMutation[] = [];
+    const removes: RemovedNodeMutation[] = [];
+
+    const attrs: AttrMutation[] = [];
+    const texts: TextMutation[] = [];
 
     const addedSet = new Set<Node>();
     const removedSet = new Set<Node>();
@@ -52,31 +51,8 @@ export function subscribeToMutation(cb: SubscribeToMutationEmit) {
     };
 
     mutations.forEach(({ type, target, oldValue, addedNodes, removedNodes, attributeName }) => {
-      // characterData
-      if (type === 'characterData') {
-        const value = target.textContent;
-
-        if (value === oldValue) return;
-
-        texts.push({ value, $el: target });
-      }
-      // attributes
-      else if (type === 'attributes') {
-        const attrName = attributeName || '';
-
-        const value = (target as HTMLElement).getAttribute(attrName);
-
-        if (oldValue === value) return;
-
-        let current = attrs.find(attr => attr.$el === target);
-        if (!current) {
-          current = { $el: target, attrs: {} };
-          attrs.push(current);
-        }
-        current.attrs[attrName] = rAttr(attrName, value || '');
-      }
       // childList
-      else if (type === 'childList') {
+      if (type === 'childList') {
         each(addedNodes, $node => genAdds($node, target));
 
         each(removedNodes, $node => {
@@ -110,6 +86,30 @@ export function subscribeToMutation(cb: SubscribeToMutationEmit) {
           }
           mirror.remove($node);
         });
+      }
+      // attributes
+      else if (type === 'attributes') {
+        const attrName = attributeName || '';
+
+        const value = (target as HTMLElement).getAttribute(attrName);
+
+        if (oldValue === value) return;
+
+        let current = attrs.find(attr => attr.id === mirror.getId(target));
+
+        if (!current) {
+          current = { id: mirror.getId(target), value: {} };
+          attrs.push(current);
+        }
+        current.value[attrName] = rAttr(attrName, value || '');
+      }
+      // characterData
+      else if (type === 'characterData') {
+        const value = target.textContent;
+
+        if (value === oldValue) return;
+
+        texts.push({ id: mirror.getId(target), value });
       }
     });
 
@@ -152,29 +152,10 @@ export function subscribeToMutation(cb: SubscribeToMutationEmit) {
       pushAdd(addQueue.shift()!);
     }
 
-    const arg: SubscribeToMutationArg = {
-      source: SourceType.MUTATION,
-
-      texts: texts
-        .map(text => ({
-          id: mirror.getId(text.$el),
-          value: text.value
-        }))
-        .filter(text => mirror.has(text.id)),
-
-      attrs: attrs.map(attr => ({
-        id: mirror.getId(attr.$el),
-        attrs: attr.attrs
-      })),
-
-      removes,
-      adds
-    };
-
-    if (!arg.texts.length && !arg.attrs.length && !arg.removes.length && !arg.adds.length) {
+    if (!texts.length && !attrs.length && !removes.length && !adds.length) {
       return;
     }
-    cb(arg);
+    cb({ source: SourceType.MUTATION, texts, attrs, removes, adds });
   });
 
   observer.observe(document, {
