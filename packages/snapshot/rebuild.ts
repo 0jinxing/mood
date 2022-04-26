@@ -9,21 +9,20 @@ export function hover(cssText: string): string {
 
 export function buildNode(node: SNWithId, $doc: Document): Node | null {
   if (node.type === NodeType.DOC_NODE) {
-    return $doc.implementation.createDocument(null, '', null);
-  }
-
-  if (node.type === NodeType.DOC_TYPE_NODE) {
-    const { name, publicId, systemId } = node;
-    return $doc.implementation.createDocumentType(name, publicId, systemId);
+    return $doc;
   }
 
   if (node.type === NodeType.ELE_NODE) {
-    const tagName = node.tagName;
+    const { attrs, svg, tagName } = node;
+    const html = /^html$/i.test(tagName);
 
-    const { attrs, svg } = node;
     const $el = svg
       ? $doc.createElementNS('http://www.w3.org/2000/svg', tagName)
+      : html
+      ? $doc.documentElement
       : $doc.createElement(tagName);
+
+    while ($el.firstChild && html) $el.removeChild($el.firstChild);
 
     for (const [key, attrVal] of Object.entries(attrs)) {
       if (typeof attrVal === 'boolean' && !attrVal) continue;
@@ -71,38 +70,22 @@ export function buildNode(node: SNWithId, $doc: Document): Node | null {
 export function buildNodeWithSN(node: SNWithId, $doc: Document): Node | null {
   let $el = buildNode(node, $doc);
 
-  if (!$el) return null;
-
-  if (node.type === NodeType.DOC_NODE) {
-    $el = $doc;
-  }
-
-  mirror.set(node.id, $el);
+  if ($el) mirror.set(node.id, $el);
 
   return $el;
 }
 
 export function rebuild(adds: SNWithId[], $doc: Document) {
-  // Close before open to make sure document was closed
-  $doc.close();
-  $doc.open();
-
   adds.forEach(({ pId, nId, ...node }) => {
-    const $el = buildNodeWithSN(node, $doc)!;
-
+    const $el = buildNodeWithSN(node, $doc);
     const $parent = pId ? mirror.getNode(pId) : undefined;
+
+    if (!$el || !$parent) return;
+
+    if ($el instanceof HTMLHtmlElement || $el instanceof Document) return;
+
     const $next = nId ? mirror.getNode(nId) : undefined;
 
-    if (node.type === NodeType.DOC_NODE || node.type === NodeType.DOC_TYPE_NODE) {
-      /**
-       * ignore
-       */
-    } else if (!$parent) {
-      $doc.appendChild($el);
-    } else if ($parent && $next && $parent.contains($next)) {
-      $parent.insertBefore($el, $next);
-    } else {
-      $parent.appendChild($el);
-    }
+    $next && $parent.contains($next) ? $parent.insertBefore($el, $next) : $parent.appendChild($el);
   });
 }
