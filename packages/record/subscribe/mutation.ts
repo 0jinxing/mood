@@ -1,14 +1,11 @@
 import { serialize, rAttr, mirror, Attrs, SNWithId } from '@mood/snapshot';
-
-import { deepDelete, isAncestorRemoved, isAncestorInSet, isParentRemoved } from '../utils';
-
 import { each } from '@mood/utils';
 import { SourceType } from '../types';
 
 export type AddedNodeMutation = SNWithId & { pId: number };
-export type RemovedNodeMutation = { id: number; pId: number };
+export type RemovedNodeMutation = { id: number };
 export type TextMutation = { id: number; value: string | null };
-export type AttrMutation = { id: number; value: Attrs };
+export type AttrMutation = { id: number; record: Attrs };
 
 export type SubscribeToMutationArg = {
   source: SourceType.MUTATION;
@@ -20,7 +17,10 @@ export type SubscribeToMutationArg = {
 
 export type SubscribeToMutationEmit = (arg: SubscribeToMutationArg) => void;
 
-const genKey = (id: number, pId: number) => `${id}@${pId}`;
+function deepDelete(set: Set<Node>, $node: Node) {
+  set.delete($node);
+  each($node.childNodes, $node => deepDelete(set, $node));
+}
 
 export function subscribeToMutation(cb: SubscribeToMutationEmit) {
   const observer = new MutationObserver(mutations => {
@@ -30,62 +30,31 @@ export function subscribeToMutation(cb: SubscribeToMutationEmit) {
     const attrs: AttrMutation[] = [];
     const texts: TextMutation[] = [];
 
-    const addedSet = new Set<Node>();
-    const removedSet = new Set<Node>();
-    const movedSet = new Set<Node>();
-    const movedMap = new Map<string, true>();
+    const added = new Set<Node>();
 
-    const genAdds = ($node: Node, $parent?: Node) => {
+    const visitAddedNodes = ($node: Node) => {
+      added.add($node);
+      each($node.childNodes, $child => visitAddedNodes($child));
+    };
+
+    const visitRemovedNodes = ($node: Node) => {
       const id = mirror.getId($node);
-      if (id) {
-        movedSet.add($node);
-        const pId = $parent ? mirror.getId($parent) : undefined;
-        if (pId) {
-          movedMap.set(genKey(id, pId), true);
-        }
-      } else {
-        addedSet.add($node);
-        removedSet.delete($node);
+
+      mirror.remove($node);
+
+      if (added.has($node)) {
+        deepDelete(added, $node);
+        return;
       }
-      each($node.childNodes, $child => genAdds($child));
+
+      removes.push({ id });
     };
 
     mutations.forEach(({ type, target, oldValue, addedNodes, removedNodes, attributeName }) => {
       // childList
       if (type === 'childList') {
-        each(addedNodes, $node => genAdds($node, target));
-
-        each(removedNodes, $node => {
-          const id = mirror.getId($node);
-          const pId = mirror.getId(target);
-
-          const movedKey = genKey(id, pId);
-
-          if (addedSet.has($node)) {
-            deepDelete(addedSet, $node);
-            removedSet.add($node);
-          } else if (addedSet.has(target) && !id) {
-            /**
-             * If target was newly added and removed child node was
-             * not serialized, it means the child node has been removed
-             * before callback fired, so we can ignore it because
-             * newly added node will be serialized without child nodes.
-             */
-          } else if (isAncestorRemoved(target)) {
-            /**
-             * If parent id was not in the mirror map any more, it
-             * means the parent node has already been removed. So
-             * the node is also removed which we do not need to track
-             * and replay.
-             */
-          } else if (movedSet.has($node) && movedMap.get(movedKey)) {
-            deepDelete(movedSet, $node);
-            movedMap.delete(movedKey);
-          } else {
-            removes.push({ pId, id });
-          }
-          mirror.remove($node);
-        });
+        each(addedNodes, visitAddedNodes);
+        each(removedNodes, visitRemovedNodes);
       }
       // attributes
       else if (type === 'attributes') {
@@ -98,10 +67,10 @@ export function subscribeToMutation(cb: SubscribeToMutationEmit) {
         let current = attrs.find(attr => attr.id === mirror.getId(target));
 
         if (!current) {
-          current = { id: mirror.getId(target), value: {} };
+          current = { id: mirror.getId(target), record: {} };
           attrs.push(current);
         }
-        current.value[attrName] = rAttr(attrName, value || '');
+        current.record[attrName] = rAttr(attrName, value || '');
       }
       // characterData
       else if (type === 'characterData') {
@@ -113,48 +82,36 @@ export function subscribeToMutation(cb: SubscribeToMutationEmit) {
       }
     });
 
-    const addQueue: Node[] = [];
+    const queue: Node[] = [];
 
-    const pushAdd = ($node: Node) => {
+    const pushQueue = ($node: Node) => {
       const pId = $node.parentNode ? mirror.getId($node.parentNode) : undefined;
 
       const nId = $node.nextSibling ? mirror.getId($node.nextSibling) : undefined;
 
       if (!pId || nId === 0) {
-        addQueue.push($node);
+        queue.push($node);
         return;
       }
 
       each(serialize($node, document), item => adds.push({ pId, nId, ...item }));
     };
 
-    movedSet.forEach($node => pushAdd($node));
+    added.forEach(pushQueue);
 
-    for (const $node of addedSet) {
-      if (!isAncestorInSet(removedSet, $node) && !isParentRemoved(removes, $node)) {
-        pushAdd($node);
-      } else if (isAncestorInSet(movedSet, $node)) {
-        pushAdd($node);
-      } else {
-        removedSet.add($node);
-      }
+    while (queue.length) {
+      /**
+       * If all nodes in queue could not find a serialized parent,
+       * it may be a bug or corner case. We need to escape the
+       * dead while loop at once.
+       */
+      if (queue.every(({ parentNode }) => parentNode && !mirror.getId(parentNode))) break;
+
+      pushQueue(queue.shift()!);
     }
 
-    while (addQueue.length) {
-      if (addQueue.every(({ parentNode }) => parentNode && !mirror.getId(parentNode))) {
-        /**
-         * If all nodes in queue could not find a serialized parent,
-         * it may be a bug or corner case. We need to escape the
-         * dead while loop at once.
-         */
-        break;
-      }
-      pushAdd(addQueue.shift()!);
-    }
+    if (!texts.length && !attrs.length && !removes.length && !adds.length) return;
 
-    if (!texts.length && !attrs.length && !removes.length && !adds.length) {
-      return;
-    }
     cb({ source: SourceType.MUTATION, texts, attrs, removes, adds });
   });
 
@@ -167,7 +124,5 @@ export function subscribeToMutation(cb: SubscribeToMutationEmit) {
     subtree: true
   });
 
-  return () => {
-    observer.disconnect();
-  };
+  return () => observer.disconnect();
 }

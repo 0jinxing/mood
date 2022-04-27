@@ -6,11 +6,10 @@ import { ReceiveHandler } from '../types';
 export const receiveToMutation: ReceiveHandler<SubscribeToMutationArg> = (event, context) => {
   each(event.removes, rm => {
     const $el = mirror.getNode(rm.id);
-    const $parent = mirror.getNode(rm.pId);
 
     if (!$el) return;
 
-    if ($parent) $parent.removeChild($el);
+    $el.parentNode?.removeChild($el);
 
     mirror.remove($el);
   });
@@ -51,7 +50,7 @@ export const receiveToMutation: ReceiveHandler<SubscribeToMutationArg> = (event,
     const $target = mirror.getNode<Element>(mutation.id);
     if (!$target) return;
 
-    each(Object.entries(mutation.value), ([name, value]) => {
+    each(Object.entries(mutation.record), ([name, value]) => {
       if (value) $target.setAttribute(name, value + '');
       else $target.removeAttribute(name);
     });
