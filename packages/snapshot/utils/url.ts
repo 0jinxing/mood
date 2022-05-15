@@ -1,7 +1,7 @@
 const URL_MATCH = /url\(["']?(.*?)["']?\)/gi;
 
 let $anchor: HTMLAnchorElement;
-export function rDoc(value: string) {
+export function rBase(value: string) {
   $anchor = $anchor || document.createElement('a');
   $anchor.href = value;
   return $anchor.href;
@@ -10,7 +10,7 @@ export function rDoc(value: string) {
 export function rStyle(cssText: string) {
   return cssText.replace(URL_MATCH, (origin: string, filePath: string) => {
     if (!filePath) return origin;
-    return `url(${rDoc(filePath)})`;
+    return `url(${rBase(filePath)})`;
   });
 }
 
@@ -21,14 +21,14 @@ export function rSrcset(value: string) {
     .split(',')
     .map(val => {
       const [url, size = ''] = val.trim().split(/\s+/);
-      return `${rDoc(url)} ${size}`.trim();
+      return `${rBase(url)} ${size}`.trim();
     })
     .join(', ');
 }
 
 const hMap: Record<string, undefined | ((v: string) => string)> = {
-  src: rDoc,
-  href: rDoc,
+  src: rBase,
+  href: rBase,
   srcset: rSrcset,
   style: rStyle
 };

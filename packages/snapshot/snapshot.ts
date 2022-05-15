@@ -1,15 +1,11 @@
 import { mirror, rAttr, rStyle } from './utils';
 import { NodeType, Attrs, SNWithId } from './types';
 import { reduce, each } from '@mood/utils';
+import { getNextSibling, isIgnoreNode } from './utils/ele';
 
 let id = 0;
 function genId(): number {
   return ++id;
-}
-
-function getTagName($el: Element) {
-  if ($el instanceof HTMLFormElement) return 'FORM';
-  return $el.tagName;
 }
 
 function getCSSText(styleSheet: CSSStyleSheet): string {
@@ -27,45 +23,46 @@ function getCSSRuleText(rule: CSSRule): string {
   return rule instanceof CSSImportRule ? getCSSText(rule.styleSheet) : rule.cssText;
 }
 
-function isSVGElement($el: Element): $el is SVGElement {
-  return /SVG/i.test(getTagName($el)) || $el instanceof SVGElement;
+function pickCssText(cssText: string) {
+  const match = cssText.match(/[^{}]+:hover([^{}]*{[^{}]+})/gi) || [];
+
+  return match.reduce((result, current) => {
+    return result;
+  }, '');
 }
 
 export function serialize($node: Node, $doc: Document): SNWithId[] {
+  if (isIgnoreNode($node)) return [];
+
   const id = mirror.getId($node) || genId();
+
   mirror.set(id, $node);
 
   if ($node instanceof Document) {
-    return [{ id, type: NodeType.DOC_NODE }];
+    return [{ id, type: NodeType.DOC_NODE, title: $node.title }];
   }
 
-  if ($node instanceof DocumentType) {
-    return [
-      {
-        id,
-        type: NodeType.DOC_TYPE_NODE,
-        name: $node.name,
-        publicId: $node.publicId,
-        systemId: $node.systemId
-      }
-    ];
+  if ($node instanceof Text) {
+    const style = $node.parentNode instanceof HTMLStyleElement;
+
+    const textContent =
+      style && $node.textContent ? rStyle($node.textContent) : $node.textContent || '';
+
+    return [{ id, type: NodeType.TEXT_NODE, textContent, style }];
   }
 
   if ($node instanceof Element) {
-    const attrs: Attrs = {};
-
-    each($node.attributes, ({ name, value }) => {
-      attrs[name] = rAttr(name, value);
-    });
+    const attrs: Attrs = reduce(
+      $node.attributes,
+      (prev, { name, value }) => {
+        if (/^on[a-zA-Z]+$/.test(name)) return prev;
+        return { ...prev, [name]: rAttr(name, value) };
+      },
+      {}
+    );
 
     if ($node instanceof HTMLLinkElement) {
-      let styleSheet: CSSStyleSheet | undefined;
-
-      each($doc.styleSheets, item => {
-        if (item.href !== $node.href) return;
-        styleSheet = item;
-        return true;
-      });
+      const styleSheet = Array.from($doc.styleSheets).find(i => i.href === $node.href);
 
       const cssText = styleSheet ? getCSSText(styleSheet) : '';
 
@@ -74,18 +71,8 @@ export function serialize($node: Node, $doc: Document): SNWithId[] {
         attrs.href = '';
 
         return [
-          {
-            id,
-            type: NodeType.ELE_NODE,
-            tagName: 'STYLE',
-            attrs: attrs
-          },
-          {
-            id: genId(),
-            pId: id,
-            type: NodeType.TEXT_NODE,
-            textContent: rStyle(cssText)
-          }
+          { id, type: NodeType.ELE_NODE, tagName: 'STYLE', attrs: attrs },
+          { id: genId(), pId: id, type: NodeType.TEXT_NODE, textContent: rStyle(cssText) }
         ];
       }
     }
@@ -93,60 +80,21 @@ export function serialize($node: Node, $doc: Document): SNWithId[] {
     if ($node instanceof HTMLInputElement) {
       const type = attrs.type;
       const value = $node.value;
-      if (type !== 'radio' && type !== 'checkbox') {
-        attrs.value = value;
-      } else {
-        attrs.checked = $node.checked;
-      }
+
+      if (type === 'radio' || type === 'checkbox') attrs.checked = $node.checked;
+      else attrs.value = value;
     }
 
     if ($node instanceof HTMLTextAreaElement || $node instanceof HTMLSelectElement) {
       const value = $node.value;
       attrs.value = value;
-    } else if ($node instanceof HTMLOptionElement) {
+    }
+
+    if ($node instanceof HTMLOptionElement) {
       attrs.selected = $node.selected;
     }
 
-    return [
-      {
-        id,
-        type: NodeType.ELE_NODE,
-        tagName: getTagName($node),
-        attrs: attrs,
-        svg: isSVGElement($node)
-      }
-    ];
-  }
-
-  if ($node instanceof CDATASection) {
-    return [{ id, type: NodeType.CDATA_NODE, textContent: '' }];
-  }
-
-  if ($node instanceof Text) {
-    const $parentNode = $node.parentNode;
-    let textContent = $node.textContent;
-    const style = $parentNode instanceof HTMLStyleElement;
-    if (style && textContent) {
-      textContent = rStyle(textContent);
-    }
-    return [
-      {
-        id,
-        type: NodeType.TEXT_NODE,
-        textContent: textContent || '',
-        style: style
-      }
-    ];
-  }
-
-  if ($node instanceof Comment) {
-    return [
-      {
-        id,
-        type: NodeType.COMMENT_NODE,
-        textContent: $node.textContent || ''
-      }
-    ];
+    return [{ id, type: NodeType.ELE_NODE, tagName: $node.tagName, attrs: attrs }];
   }
 
   return [];
@@ -158,11 +106,13 @@ export function snapshot($doc: Document): SNWithId[] {
   const walk = ($node: Node) => {
     const pId = $node.parentElement ? mirror.getId($node.parentElement) : undefined;
 
-    const nId = $node.nextSibling ? mirror.getId($node.nextSibling) : undefined;
+    const $nextSibling = getNextSibling($node);
+
+    const nId = $nextSibling ? mirror.getId($nextSibling) : undefined;
 
     const result = serialize($node, $doc);
 
-    adds.push(...result.map(i => ({ pId: pId, nId: nId, ...i })));
+    adds.push(...result.map(i => ({ pId, nId, ...i })));
 
     result.length && each($node.childNodes, walk, true);
   };

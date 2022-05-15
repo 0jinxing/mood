@@ -8,7 +8,7 @@ function getCode() {
   return fs.readFileSync(fullPath, 'utf-8');
 }
 
-bench('snapshot', { iterations: 1000 }, async b => {
+bench('snapshot', { iterations: 100 }, async b => {
   const browser = await launchBrowser();
 
   const page = await browser.newPage();

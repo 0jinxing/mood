@@ -1,4 +1,4 @@
-import { serialize, rAttr, mirror, Attrs, SNWithId } from '@mood/snapshot';
+import { serialize, rAttr, mirror, Attrs, SNWithId, getNextSibling } from '@mood/snapshot';
 import { each } from '@mood/utils';
 import { SourceType } from '../types';
 
@@ -26,14 +26,13 @@ export function subscribeToMutation(cb: SubscribeToMutationEmit) {
   const observer = new MutationObserver(mutations => {
     const adds: AddedNodeMutation[] = [];
     const removes: RemovedNodeMutation[] = [];
-
     const attrs: AttrMutation[] = [];
     const texts: TextMutation[] = [];
 
-    const added = new Set<Node>();
+    const set = new Set<Node>();
 
     const visitAddedNodes = ($node: Node) => {
-      added.add($node);
+      set.add($node);
       each($node.childNodes, $child => visitAddedNodes($child));
     };
 
@@ -42,15 +41,11 @@ export function subscribeToMutation(cb: SubscribeToMutationEmit) {
 
       mirror.remove($node);
 
-      if (added.has($node)) {
-        deepDelete(added, $node);
-        return;
-      }
-
-      removes.push({ id });
+      if (set.has($node)) deepDelete(set, $node);
+      else removes.push({ id });
     };
 
-    mutations.forEach(({ type, target, oldValue, addedNodes, removedNodes, attributeName }) => {
+    mutations.forEach(({ type, target, addedNodes, removedNodes, attributeName }) => {
       // childList
       if (type === 'childList') {
         each(addedNodes, visitAddedNodes);
@@ -60,9 +55,7 @@ export function subscribeToMutation(cb: SubscribeToMutationEmit) {
       else if (type === 'attributes') {
         const attrName = attributeName || '';
 
-        const value = (target as HTMLElement).getAttribute(attrName);
-
-        if (oldValue === value) return;
+        const value = (<HTMLElement>target).getAttribute(attrName);
 
         let current = attrs.find(attr => attr.id === mirror.getId(target));
 
@@ -76,8 +69,6 @@ export function subscribeToMutation(cb: SubscribeToMutationEmit) {
       else if (type === 'characterData') {
         const value = target.textContent;
 
-        if (value === oldValue) return;
-
         texts.push({ id: mirror.getId(target), value });
       }
     });
@@ -87,7 +78,8 @@ export function subscribeToMutation(cb: SubscribeToMutationEmit) {
     const pushQueue = ($node: Node) => {
       const pId = $node.parentNode ? mirror.getId($node.parentNode) : undefined;
 
-      const nId = $node.nextSibling ? mirror.getId($node.nextSibling) : undefined;
+      const nextSibling = getNextSibling($node);
+      const nId = nextSibling ? mirror.getId(nextSibling) : undefined;
 
       if (!pId || nId === 0) {
         queue.push($node);
@@ -97,7 +89,7 @@ export function subscribeToMutation(cb: SubscribeToMutationEmit) {
       each(serialize($node, document), item => adds.push({ pId, nId, ...item }));
     };
 
-    added.forEach(pushQueue);
+    set.forEach(pushQueue);
 
     while (queue.length) {
       /**
@@ -110,16 +102,14 @@ export function subscribeToMutation(cb: SubscribeToMutationEmit) {
       pushQueue(queue.shift()!);
     }
 
-    if (!texts.length && !attrs.length && !removes.length && !adds.length) return;
-
     cb({ source: SourceType.MUTATION, texts, attrs, removes, adds });
   });
 
   observer.observe(document, {
     attributes: true,
-    attributeOldValue: true,
+    attributeOldValue: false,
     characterData: true,
-    characterDataOldValue: true,
+    characterDataOldValue: false,
     childList: true,
     subtree: true
   });

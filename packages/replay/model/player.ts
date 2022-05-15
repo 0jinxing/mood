@@ -77,13 +77,7 @@ export class Player {
 
     this.config.root.appendChild(this.$container);
 
-    const index = this.events.findIndex(i => i.type === EventType.FULL_SNAPSHOT);
-    this.baseline = this.events[index].timestamp;
-
-    for (const event of this.events.slice(0, index + 1)) {
-      const handler = this.picked(event, true);
-      handler();
-    }
+    this.baseline = this.events[0]?.timestamp || 0;
 
     this.emitter.emit('status', 'inited');
   }
@@ -127,7 +121,7 @@ export class Player {
     const { documentElement, head } = contentDocument;
     documentElement.insertBefore($style, head);
 
-    const stylesRules = ['noscript { display: none !important; }'].concat(this.config.styleRules);
+    const stylesRules = this.config.styleRules;
 
     for (let ind = 0; ind < stylesRules.length && $style.sheet; ind++) {
       $style.sheet.insertRule(stylesRules[ind], ind);
