@@ -1,7 +1,7 @@
 import { SubscribeToMouseInteractionArg } from '@mood/record';
 import { mirror } from '@mood/snapshot';
 import { ReceiveHandler } from '../types';
-import { moveAndHover } from '../utils/hover';
+import { moveAndHover } from '../utils/pseudo';
 
 export const receiveToMouseInteraction: ReceiveHandler<SubscribeToMouseInteractionArg> = (
   event,

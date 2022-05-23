@@ -7,9 +7,7 @@ export function hover($el: Element, $doc?: Document) {
   let $current: Element | null = $el;
 
   while ($current) {
-    if ($current.classList) {
-      $current.classList.add(':hover');
-    }
+    if ($current.classList) $current.classList.add(':hover');
     $current = $current.parentElement;
   }
 }

@@ -1,5 +1,5 @@
 import { NonFunctionKeys } from 'utility-types';
-import { mirror } from '@mood/snapshot';
+import { mirror, isElement } from '@mood/snapshot';
 import { hookProp, on, each } from '@mood/utils';
 import { SourceType } from '../types';
 
@@ -13,28 +13,14 @@ export type SubscribeToInputArg = {
 
 export type SubscribeToInputEmit = (arg: SubscribeToInputArg) => void;
 
-const cache: WeakMap<EventTarget, SubscribeToInputValue> = new WeakMap();
+type InputElement = HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement;
 
-function isInputElement(
-  $el: HTMLElement | EventTarget | Node
-): $el is HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement {
-  return (
-    $el instanceof HTMLTextAreaElement ||
-    $el instanceof HTMLSelectElement ||
-    $el instanceof HTMLInputElement
-  );
+function isInputElement($el: EventTarget | Node): $el is InputElement {
+  return isElement($el, 'input') || isElement($el, 'textarea') || isElement($el, 'select');
 }
 
 export function subscribeToInput(cb: SubscribeToInputEmit) {
-  const cbWithDedup = (
-    $target: HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement,
-    value: SubscribeToInputValue
-  ) => {
-    const oldValue = cache.get($target);
-
-    if (oldValue && oldValue === value) return;
-
-    cache.set($target, value);
+  const cbWithDedup = ($target: InputElement, value: SubscribeToInputValue) => {
     const id = mirror.getId($target);
     cb({ source: SourceType.INPUT, value, id });
   };
@@ -44,25 +30,11 @@ export function subscribeToInput(cb: SubscribeToInputEmit) {
 
     if (!$target || !isInputElement($target)) return;
 
-    const value: SubscribeToInputValue =
-      $target instanceof HTMLInputElement ? $target.value || $target.checked : $target.value;
+    const value: SubscribeToInputValue = isElement($target, 'input')
+      ? $target.value || $target.checked
+      : $target.value;
 
     cbWithDedup($target, value);
-
-    // @TODO
-    const inputType = $target.type;
-    const name = $target.name;
-    if (inputType === 'radio' && name && value) {
-      const selector = `input[type=radio][name=${name}]`;
-
-      const $radioList: NodeListOf<HTMLInputElement> = document.querySelectorAll(selector);
-
-      // toggle
-      each($radioList, $el => {
-        if (!$el.checked || $el === $target) return true;
-        cbWithDedup($el as HTMLInputElement, false);
-      });
-    }
   };
 
   const unsubscribes = ['input', 'change'].map(eventName => {
@@ -77,11 +49,13 @@ export function subscribeToInput(cb: SubscribeToInputEmit) {
   ];
 
   type Properties<T extends object = any> = [prototype: T, key: NonFunctionKeys<T>];
+
   const hookHandlers = hookProperties.map(([prototype, key]: Properties) =>
     hookProp(prototype, key, function () {
       eventHandler({ target: this });
     })
   );
+
   unsubscribes.push(...hookHandlers);
 
   return () => each(unsubscribes, u => u());

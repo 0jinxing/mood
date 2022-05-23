@@ -1,4 +1,4 @@
-import { SNWithId, NodeType } from './types';
+import { SNWithId, NT } from './types';
 import { mirror } from './utils';
 
 export function hover(cssText: string): string {
@@ -6,9 +6,9 @@ export function hover(cssText: string): string {
 }
 
 export function buildNode(node: SNWithId, $doc: Document): Node | null {
-  if (node.type === NodeType.DOC_NODE) return $doc;
+  if (node.type === NT.DOC_NODE) return $doc;
 
-  if (node.type === NodeType.ELE_NODE) {
+  if (node.type === NT.ELE_NODE) {
     const { attrs, tagName } = node;
 
     const ns = attrs['xmlns'] as string;
@@ -39,7 +39,7 @@ export function buildNode(node: SNWithId, $doc: Document): Node | null {
     return $el;
   }
 
-  if (node.type === NodeType.TEXT_NODE) {
+  if (node.type === NT.TEXT_NODE) {
     const { style, textContent } = node;
     return $doc.createTextNode(style ? hover(textContent) : textContent);
   }
@@ -60,17 +60,20 @@ export function rebuild(adds: SNWithId[], $doc: Document) {
   $doc.open();
 
   adds.forEach(({ pId, nId, ...node }) => {
-    const $el = buildNodeWithSN(node, $doc);
+    const $node = buildNodeWithSN(node, $doc);
     const $parent = pId ? mirror.getNode(pId) : undefined;
 
-    if (!$el || node.type === NodeType.DOC_NODE) return;
+    if (!$node || node.type === NT.DOC_NODE) return;
 
     if (!$parent) {
-      $doc.appendChild($el);
+      $doc.appendChild($node);
       return;
     }
 
     const $next = nId ? mirror.getNode(nId) : undefined;
-    $next && $parent.contains($next) ? $parent.insertBefore($el, $next) : $parent.appendChild($el);
+
+    $next && $parent.contains($next)
+      ? $parent.insertBefore($node, $next)
+      : $parent.appendChild($node);
   });
 }

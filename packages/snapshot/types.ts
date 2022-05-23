@@ -1,4 +1,4 @@
-export enum NodeType {
+export enum NT {
   ELE_NODE,
   TEXT_NODE,
   DOC_NODE,
@@ -9,25 +9,25 @@ export enum NodeType {
 export type Attrs = { [key: string]: boolean | string };
 
 export type DocNode = {
-  type: NodeType.DOC_NODE;
+  type: NT.DOC_NODE;
   title: string;
 };
 
 export type DocTypeNode = {
-  type: NodeType.DOC_TYPE_NODE;
+  type: NT.DOC_TYPE_NODE;
   name: string;
   publicId: string;
   systemId: string;
 };
 
 export type EleNode = {
-  type: NodeType.ELE_NODE;
+  type: NT.ELE_NODE;
   tagName: string;
   attrs: Attrs;
 };
 
 export type TextNode = {
-  type: NodeType.TEXT_NODE;
+  type: NT.TEXT_NODE;
   textContent: string;
   style?: boolean;
 };

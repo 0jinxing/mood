@@ -2,8 +2,11 @@
   "name": "root",
   "private": true,
   "scripts": {
-    "lint": "eslint --fix --ext .js,.ts .",
+    "start": "rollup -c --watch",
     "build": "tsc --noEmit && rollup -c",
+    "lint": "eslint --fix --ext .js,.ts .",
+    "test": "pnpm run test --filter test",
+    "bench": "pnpm run bench --filter test",
     "prepare": "husky install"
   },
   "devDependencies": {

@@ -2,7 +2,7 @@ import { SubscribeToMouseMoveArg } from '@mood/record';
 import { each } from '@mood/utils';
 import { ReceiveHandler } from '../types';
 import { chunk } from '../utils/chunk';
-import { moveAndHover } from '../utils/hover';
+import { moveAndHover } from '../utils/pseudo';
 
 export const receiveToMouseMove: ReceiveHandler<SubscribeToMouseMoveArg> = (
   event,

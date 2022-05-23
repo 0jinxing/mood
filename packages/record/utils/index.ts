@@ -1,6 +1,3 @@
-export function queryViewport() {
-  const width = self.innerWidth;
-  const height = self.innerHeight;
-
-  return { width, height };
+export function viewport() {
+  return { width: self.innerWidth, height: self.innerHeight };
 }

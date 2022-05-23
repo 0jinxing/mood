@@ -13,11 +13,13 @@ export type SubscribeToMousemoveEmit = (arg: SubscribeToMouseMoveArg) => void;
 
 export function subscribeToMouseMove(cb: SubscribeToMousemoveEmit) {
   let ps: MousePositions = [];
+
   const throttleCb = throttle((touch: boolean) => {
     cb({ ps, source: touch ? SourceType.TOUCH_MOVE : SourceType.MOUSE_MOVE });
 
     ps = [];
   }, 500);
+
   const updatePosition = throttle<MouseEvent | TouchEvent>(event => {
     const { target } = event;
     const { clientX, clientY } = event instanceof TouchEvent ? event.changedTouches[0] : event;

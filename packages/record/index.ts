@@ -1,6 +1,6 @@
 import { snapshot } from '@mood/snapshot';
 import { subscribe } from './subscribe';
-import { queryViewport } from './utils';
+import { viewport } from './utils';
 import { RecordEvent, RecordEventWithTime, EmitHandler, EventType } from './types';
 import { each, on } from '@mood/utils';
 
@@ -57,7 +57,7 @@ export function record(options: RecordOptions) {
       {
         type: EventType.META,
         href: location.href,
-        ...queryViewport()
+        ...viewport()
       },
       checkout
     );

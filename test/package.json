@@ -5,10 +5,11 @@
   "license": "MIT",
   "scripts": {
     "bench": "ts-node bench/index.ts",
-    "test": "mocha -r ts-node/register **/*.test.ts",
+    "test": "mocha -r ts-node/register ./*.test.ts **/*.test.ts",
     "preinstall": "npx playwright install"
   },
   "dependencies": {
+    "@mood/record": "workspace:^0.0.1",
     "@mood/snapshot": "workspace:^0.0.1",
     "@playwright/test": "^1.21.1",
     "@stdlib/bench": "^0.0.12"

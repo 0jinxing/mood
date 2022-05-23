@@ -1,4 +1,4 @@
-import { serialize, rAttr, mirror, Attrs, SNWithId, getNextSibling } from '@mood/snapshot';
+import { serialize, rAttr, mirror, Attrs, SNWithId, next } from '@mood/snapshot';
 import { each } from '@mood/utils';
 import { SourceType } from '../types';
 
@@ -26,6 +26,7 @@ export function subscribeToMutation(cb: SubscribeToMutationEmit) {
   const observer = new MutationObserver(mutations => {
     const adds: AddedNodeMutation[] = [];
     const removes: RemovedNodeMutation[] = [];
+
     const attrs: AttrMutation[] = [];
     const texts: TextMutation[] = [];
 
@@ -77,9 +78,9 @@ export function subscribeToMutation(cb: SubscribeToMutationEmit) {
 
     const pushQueue = ($node: Node) => {
       const pId = $node.parentNode ? mirror.getId($node.parentNode) : undefined;
+      const $next = next($node);
 
-      const nextSibling = getNextSibling($node);
-      const nId = nextSibling ? mirror.getId(nextSibling) : undefined;
+      const nId = $next ? mirror.getId($next) : undefined;
 
       if (!pId || nId === 0) {
         queue.push($node);
