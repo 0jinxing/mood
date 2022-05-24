@@ -38,11 +38,17 @@ export function serialize($node: Node, $doc: Document): SNWithId[] {
     const cssText = pseudoToClass(styleSheet ? sheetToString(styleSheet) : '', ':hover');
 
     if (cssText) {
-      const styleElId = genId();
+      const derive = genId();
+
       return [
         { id, type: NT.ELE_NODE, tagName: $node.tagName, attrs: attrs($node) },
-        { id: styleElId, type: NT.ELE_NODE, tagName: 'STYLE', attrs: {} },
-        { id: genId(), pId: styleElId, type: NT.TEXT_NODE, textContent: rStyle(cssText) }
+        {
+          id: derive,
+          type: NT.ELE_NODE,
+          tagName: 'STYLE',
+          attrs: { [mirror.DERIVE_KEY]: String(id) }
+        },
+        { id: genId(), pId: derive, type: NT.TEXT_NODE, textContent: rStyle(cssText) }
       ];
     }
   }

@@ -1,7 +1,9 @@
 export function isElement<K extends keyof HTMLElementTagNameMap>(
-  $node: Node | EventTarget,
+  $node?: Node | ChildNode | EventTarget | null,
   tagName?: K
 ): $node is HTMLElementTagNameMap[K] {
+  if (!$node) return false;
+
   if ('nodeType' in $node && $node.nodeType === Node.ELEMENT_NODE) {
     const $el = <HTMLElement>$node;
     return !tagName || $el.tagName.toLowerCase() === tagName.toLowerCase();

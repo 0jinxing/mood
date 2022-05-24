@@ -29,14 +29,12 @@ export type SubscribeToMouseInteractionEmit = (arg: SubscribeToMouseInteractionA
 export function subscribeToMouseInteraction(cb: SubscribeToMouseInteractionEmit) {
   const getHandler = (action: SubscribeToMouseInteraction) => {
     return (event: MouseEvent | TouchEvent) => {
-      const id = mirror.getId(event.target as Node);
-
       const { clientX, clientY } = event instanceof TouchEvent ? event.changedTouches[0] : event;
 
       cb({
+        id: mirror.getId(event.target as Node),
         source: SourceType.MOUSE_INTERACTION,
         action,
-        id,
         x: clientX,
         y: clientY
       });

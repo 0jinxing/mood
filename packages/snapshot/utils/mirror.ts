@@ -5,6 +5,8 @@ type WithId<T> = T & { ['@@id']?: number };
 class Mirror {
   private readonly pool: Record<number, EventTarget | undefined> = {};
 
+  public readonly DERIVE_KEY = 'data-derive';
+
   set(id: number, $node: WithId<Node>) {
     if ($node['@@id'] === id) return;
 

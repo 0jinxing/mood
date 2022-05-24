@@ -21,8 +21,7 @@ function isInputElement($el: EventTarget | Node): $el is InputElement {
 
 export function subscribeToInput(cb: SubscribeToInputEmit) {
   const cbWithDedup = ($target: InputElement, value: SubscribeToInputValue) => {
-    const id = mirror.getId($target);
-    cb({ source: SourceType.INPUT, value, id });
+    cb({ source: SourceType.INPUT, value, id: mirror.getId($target) });
   };
 
   const eventHandler = (event: Pick<Event, 'target'>) => {

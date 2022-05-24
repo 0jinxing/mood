@@ -12,9 +12,9 @@ export function block($node: Node) {
 
   const comment = isComment($node);
 
-  const preload =
-    isElement($node, 'link') &&
-    ['preload', 'modulepreload'].includes($node.getAttribute('rel') || '');
+  const rels = ['preload', 'modulepreload', 'manifest'];
+
+  const preload = isElement($node, 'link') && rels.includes($node.getAttribute('rel') || '');
 
   return comment || script || noscript || preload || cdata;
 }

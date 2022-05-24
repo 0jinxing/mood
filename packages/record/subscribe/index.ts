@@ -8,8 +8,9 @@ import { subscribeToStyleSheet } from './style-sheet';
 import { subscribeToMutation } from './mutation';
 import { subscribeToSelection } from './selection';
 
-import { EmitHandler } from '../types';
 import { each } from '@mood/utils';
+
+import { EmitHandler } from '../types';
 
 export function subscribe(emit: EmitHandler) {
   const unsubscribes = [
