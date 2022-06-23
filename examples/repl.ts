@@ -4,7 +4,7 @@ import * as inquirer from 'inquirer';
 import { chromium } from '@playwright/test';
 
 function getCode(): string {
-  const bundlePath = path.resolve('../packages/record/dist', 'index.iife.js');
+  const bundlePath = path.resolve('packages/record/dist', 'index.iife.js');
   return fs.readFileSync(bundlePath, 'utf8');
 }
 
@@ -20,8 +20,7 @@ function getCode(): string {
       {
         type: 'input',
         name: 'url',
-        message:
-          'Enter the url you want to record, e.g https://react-redux.realworld.io: ',
+        message: 'Enter the url you want to record, e.g https://react-redux.realworld.io: ',
         default: 'https://react-redux.realworld.io'
       }
     ]);
@@ -70,9 +69,7 @@ function getCode(): string {
 
     await page.goto(url, { waitUntil: 'domcontentloaded' });
 
-    await page.exposeFunction('_replLog', (event: unknown) =>
-      events.push(event)
-    );
+    await page.exposeFunction('_replLog', (event: unknown) => events.push(event));
 
     await page.evaluate(`;${code}
       window.__IS_RECORDING__ = true
@@ -99,10 +96,7 @@ function getCode(): string {
     if (!fs.existsSync(tempFolder)) {
       fs.mkdirSync(tempFolder);
     }
-    const time = new Date()
-      .toISOString()
-      .replace(/[-|:]/g, '_')
-      .replace(/\..+/, '');
+    const time = new Date().toISOString().replace(/[-|:]/g, '_').replace(/\..+/, '');
     const fileName = `replay_${time}.html`;
     const content = `
       <!DOCTYPE html>
@@ -112,16 +106,13 @@ function getCode(): string {
           <meta name="viewport" content="width=device-width, initial-scale=1.0" />
           <meta http-equiv="X-UA-Compatible" content="ie=edge" />
           <title>Record @${time}</title>
-          <link rel="stylesheet" href="../../packages/replay/index.css" />
+          <link rel="stylesheet" href="../packages/replay/index.css" />
         </head>
         <body>
-          <script src="../../packages/replay/dist/index.iife.js"></script>
+          <script src="../packages/replay/dist/index.iife.js"></script>
           <script>
             /*<!--*/
-            const events = ${JSON.stringify(events).replace(
-              /<\/script>/g,
-              '<\\/script>'
-            )};
+            const events = ${JSON.stringify(events).replace(/<\/script>/g, '<\\/script>')};
             /*-->*/
             const replayer = createPlayer(events);
             replayer.play();
