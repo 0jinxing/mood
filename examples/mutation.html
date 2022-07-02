@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+    <style>
+      main {
+        max-width: 800px;
+        margin: 60px auto;
+      }
+      fieldset {
+        margin-bottom: 24px;
+        border: 2px dashed rgba(0, 0, 0, 0.8);
+        border-radius: 4px;
+        outline: none;
+        cursor: pointer;
+      }
+    </style>
+  </head>
+  <body>
+    <main>
+      <fieldset id="box1">
+        <legend>box1</legend>
+        添加节点
+      </fieldset>
+
+      <fieldset id="box2">
+        <legend>box2</legend>
+        添加节点
+      </fieldset>
+
+      <fieldset id="box3">
+        <legend>box3</legend>
+        删除节点
+        <div>
+          delete
+          <p>children</p>
+        </div>
+      </fieldset>
+
+      <fieldset id="box4">
+        <legend>box4</legend>
+        移动节点
+        <div id="c1">节点1</div>
+        <div id="c2">节点2</div>
+      </fieldset>
+    </main>
+
+    <script>
+      const box1 = document.querySelector('#box1');
+      const box2 = document.querySelector('#box2');
+      const box3 = document.querySelector('#box3');
+      const box4 = document.querySelector('#box4');
+
+      function createObserverLog(el) {
+        const observer = new MutationObserver(records => {
+          console.log(
+            records.map(r => ({ addedNodes: r.addedNodes, removedNodes: r.removedNodes }))
+          );
+        });
+        observer.observe(el, { childList: true, subtree: true });
+      }
+
+      createObserverLog(box1);
+      createObserverLog(box2);
+      createObserverLog(box3);
+      createObserverLog(box4);
+
+      box1.onclick = function () {
+        const el = document.createElement('p');
+        el.innerText = 'lorem text';
+
+        // step1
+        box1.appendChild(el);
+
+        // step2
+        const span = document.createElement('span');
+        span.innerText = 'span';
+        span.style.color = 'red';
+        span.style.padding = '0 .4em';
+        el.appendChild(span);
+      };
+
+      box2.onclick = function () {
+        const el = document.createElement('p');
+        el.innerText = 'lorem text';
+
+        // step1
+        const span = document.createElement('span');
+        span.innerText = 'span';
+        span.style.color = 'red';
+        span.style.padding = '0 .4em';
+        el.appendChild(span);
+
+        // step2
+        box2.appendChild(el);
+      };
+
+      box3.onclick = function () {
+        const container = box3.querySelector('div');
+        const children = container.querySelector('p');
+
+        children.remove();
+        container.remove();
+      };
+      box4.onclick = function () {
+        const c1 = box4.querySelector('#c1');
+        const c2 = box4.querySelector('#c2');
+        box4.insertBefore(c2, c1);
+      };
+    </script>
+  </body>
+</html>

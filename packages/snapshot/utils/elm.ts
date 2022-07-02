@@ -1,4 +1,4 @@
-import { rAttr } from './url';
+import { resolveAttrUrl } from './url';
 import { Attrs } from '../types';
 import { isCDATASection, isComment, isElement } from './is';
 
@@ -30,7 +30,7 @@ export function next($node: Node) {
 
 export function attrs($node: Element) {
   const attrs: Attrs = Array.from($node.attributes).reduce((prev, { name, value }) => {
-    return /^on[a-zA-Z]+$/.test(name) ? prev : { ...prev, [name]: rAttr(name, value) };
+    return /^on[a-zA-Z]+$/.test(name) ? prev : { ...prev, [name]: resolveAttrUrl(name, value) };
   }, {});
 
   if (isElement($node, 'input')) {

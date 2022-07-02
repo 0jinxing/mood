@@ -2,7 +2,7 @@ import {
   mirror,
   attrs,
   block,
-  rStyle,
+  resolveStyleUrl,
   next,
   isDocument,
   isElement,
@@ -25,7 +25,7 @@ export function serialize($node: Node, $doc: Document): SNWithId[] {
 
   if (isText($node)) {
     const style = isElement($node.parentElement, 'style');
-    const textContent = style ? rStyle($node.textContent || '') : $node.textContent || '';
+    const textContent = style ? resolveStyleUrl($node.textContent || '') : $node.textContent || '';
     return [{ id, type: NT.TEXT_NODE, textContent: textContent, style: style || undefined }];
   }
 
@@ -48,7 +48,13 @@ export function serialize($node: Node, $doc: Document): SNWithId[] {
           type: NT.ELE_NODE,
           tagName: 'STYLE'
         },
-        { id: genId(), pId: derive, type: NT.TEXT_NODE, textContent: rStyle(cssText), style: true }
+        {
+          id: genId(),
+          pId: derive,
+          type: NT.TEXT_NODE,
+          textContent: resolveStyleUrl(cssText),
+          style: true
+        }
       ];
     }
   }

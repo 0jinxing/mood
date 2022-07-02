@@ -1,4 +1,4 @@
-import { serialize, rAttr, mirror, Attrs, SNWithId, next } from '@mood/snapshot';
+import { serialize, resolveAttrUrl, mirror, Attrs, SNWithId, next } from '@mood/snapshot';
 import { SourceType } from '../types';
 
 export type AddedNodeMutation = SNWithId & { pId: number };
@@ -32,7 +32,10 @@ export function subscribeToMutation(cb: SubscribeToMutationEmit) {
 
     const visitAddedNodes = ($node: Node) => {
       set.add($node);
-      $node.childNodes.forEach($child => visitAddedNodes($child));
+
+      Array.from($node.childNodes)
+        .reverse()
+        .forEach($child => visitAddedNodes($child));
     };
 
     const visitRemovedNodes = ($node: Node) => {
@@ -64,7 +67,7 @@ export function subscribeToMutation(cb: SubscribeToMutationEmit) {
           attrs = attrs || [];
           attrs.push(current);
         }
-        current.record[name] = typeof value === 'string' ? rAttr(name, value) : null;
+        current.record[name] = typeof value === 'string' ? resolveAttrUrl(name, value) : null;
       } else if (type === 'characterData') {
         const value = target.textContent;
 
