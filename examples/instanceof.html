@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+  </head>
+  <body>
+    <p>iframe 👇</p>
+    <iframe src="" frameborder="0" style="border: 1px solid"></iframe>
+    <p>跨 iframe instanceof 🙅</p>
+    <script>
+      const iframe = document.querySelector('iframe');
+
+      const el = iframe.contentDocument.createElement('div');
+      console.log(el instanceof HTMLElement, el instanceof HTMLDivElement, el.__proto__);
+
+      const el2 = document.createElement('div');
+      console.log(el2 instanceof HTMLElement, el2 instanceof HTMLDivElement, el2.__proto__);
+
+      console.log(el.__proto__ === el2.__proto__);
+    </script>
+  </body>
+</html>
