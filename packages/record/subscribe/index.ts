@@ -7,9 +7,6 @@ import { subscribeToMediaInteraction } from './media-interaction';
 import { subscribeToStyleSheet } from './style-sheet';
 import { subscribeToMutation } from './mutation';
 import { subscribeToSelection } from './selection';
-
-import { each } from '@mood/utils';
-
 import { EmitHandler } from '../types';
 
 export function subscribe(emit: EmitHandler) {
@@ -25,7 +22,7 @@ export function subscribe(emit: EmitHandler) {
     subscribeToSelection
   ].map(o => o(emit));
 
-  return () => each(unsubscribes, u => u());
+  return () => unsubscribes.forEach(u => u());
 }
 
 export * from './input';

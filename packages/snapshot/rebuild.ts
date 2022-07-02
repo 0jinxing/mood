@@ -1,26 +1,19 @@
 import { SNWithId, NT } from './types';
-import { mirror } from './utils';
-
-export function hover(cssText: string): string {
-  return cssText.replace(/([^{}]+):hover([^{}]*{[^{}]+})/gi, '$1:hover$2 $1.\\:hover$2');
-}
+import { mirror, pseudoToClass } from './utils';
 
 export function buildNode(node: SNWithId, $doc: Document): Node | null {
   if (node.type === NT.DOC_NODE) return $doc;
 
   if (node.type === NT.ELE_NODE) {
-    const { attrs, tagName } = node;
+    const { attrs = {}, tagName, svg } = node;
 
-    const ns = attrs['xmlns'] as string;
-
-    const $el = ns ? $doc.createElementNS(ns, tagName) : $doc.createElement(tagName);
+    const $el = svg
+      ? $doc.createElementNS('http://www.w3.org/2000/svg', tagName)
+      : $doc.createElement(tagName);
 
     for (const [key, attrVal] of Object.entries(attrs)) {
-      if (typeof attrVal === 'boolean' && !attrVal) continue;
-
-      const value = attrVal === true ? '' : attrVal;
-
       const textarea = /textarea/i.test(tagName);
+      const value = attrVal!;
 
       if (textarea && key === 'value') {
         const $child = $doc.createTextNode(value);
@@ -31,6 +24,10 @@ export function buildNode(node: SNWithId, $doc: Document): Node | null {
       if (/iframe/i.test(tagName) && key === 'src') continue;
 
       try {
+        if (key === 'xlink:href' && svg) {
+          $el.setAttributeNS('http://www.w3.org/1999/xlink', key, value);
+          continue;
+        }
         $el.setAttribute(key, value);
       } catch {
         // skip invalid attribute
@@ -40,8 +37,10 @@ export function buildNode(node: SNWithId, $doc: Document): Node | null {
   }
 
   if (node.type === NT.TEXT_NODE) {
-    const { style, textContent } = node;
-    return $doc.createTextNode(style ? hover(textContent) : textContent);
+    const { textContent, style } = node;
+    return $doc.createTextNode(
+      style ? textContent + pseudoToClass(textContent, ':hover') : textContent
+    );
   }
 
   return null;

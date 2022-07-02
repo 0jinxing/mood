@@ -1,6 +1,5 @@
 import { SubscribeToSelectionArg } from '@mood/record';
 import { mirror } from '@mood/snapshot';
-import { each } from '@mood/utils';
 import { ReceiveHandler } from '../types';
 import { chunk } from '../utils/chunk';
 
@@ -24,5 +23,5 @@ export const receiveToSelection: ReceiveHandler<SubscribeToSelectionArg> = (even
   const selection = $doc.getSelection();
   selection?.removeAllRanges();
 
-  each(ranges, r => r && selection?.addRange(r));
+  ranges.forEach(r => r && selection?.addRange(r));
 };

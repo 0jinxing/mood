@@ -1,4 +1,3 @@
-import { reduce } from '@mood/utils';
 import { rAttr } from './url';
 import { Attrs } from '../types';
 import { isCDATASection, isComment, isElement } from './is';
@@ -30,24 +29,20 @@ export function next($node: Node) {
 }
 
 export function attrs($node: Element) {
-  const attrs: Attrs = reduce(
-    $node.attributes,
-    (prev, { name, value }) => {
-      return /^on[a-zA-Z]+$/.test(name) ? prev : { ...prev, [name]: rAttr(name, value) };
-    },
-    {}
-  );
+  const attrs: Attrs = Array.from($node.attributes).reduce((prev, { name, value }) => {
+    return /^on[a-zA-Z]+$/.test(name) ? prev : { ...prev, [name]: rAttr(name, value) };
+  }, {});
 
   if (isElement($node, 'input')) {
     const type = attrs.type;
     const value = $node.value;
-    if (type === 'radio' || type === 'checkbox') attrs.checked = $node.checked;
+    if (type === 'radio' || type === 'checkbox') attrs.checked = $node.checked ? '' : null;
     else attrs.value = value;
   } else if (isElement($node, 'textarea') || isElement($node, 'select')) {
     const value = $node.value;
     attrs.value = value;
   } else if (isElement($node, 'option')) {
-    attrs.selected = $node.selected;
+    attrs.selected = $node.selected ? '' : null;
   }
 
   return attrs;
@@ -59,13 +54,16 @@ export function sheetToString(styleSheet: CSSStyleSheet): string {
       const cssText = item instanceof CSSImportRule ? sheetToString(item.styleSheet) : item.cssText;
       return text + cssText;
     };
-    return reduce(styleSheet.cssRules, handler, '');
+    return Array.from(styleSheet.cssRules).reduce(handler, '');
   } catch {
     return '';
   }
 }
 
 export function pseudoToClass(cssText: string, pseudo: string) {
+  const comment = /\/\*.*?\*\//g;
+  cssText = cssText.replace(comment, '');
+
   const match: string[] = cssText.match(/[^{}]+{.*?}/gis) || [];
 
   const result = match
@@ -78,7 +76,7 @@ export function pseudoToClass(cssText: string, pseudo: string) {
       const filter = selector
         .split(',')
         .filter(s => s.includes(pseudo))
-        .map(s => s.replace(pseudo, '.' + pseudo));
+        .map(s => s.replace(pseudo, '.\\' + pseudo));
 
       if (!filter.length) return arr;
 

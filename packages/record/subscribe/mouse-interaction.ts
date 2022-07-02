@@ -1,5 +1,5 @@
 import { mirror } from '@mood/snapshot';
-import { each, on } from '@mood/utils';
+import { on } from '@mood/utils';
 import { SourceType } from '../types';
 
 const actions = <const>[
@@ -46,5 +46,5 @@ export function subscribeToMouseInteraction(cb: SubscribeToMouseInteractionEmit)
     return on(action, handler);
   });
 
-  return () => each(unsubscribes, u => u());
+  return () => unsubscribes.forEach(u => u());
 }

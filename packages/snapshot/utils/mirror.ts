@@ -1,11 +1,7 @@
-import { each } from '@mood/utils';
-
 type WithId<T> = T & { ['@@id']?: number };
 
 class Mirror {
   private readonly pool: Record<number, EventTarget | undefined> = {};
-
-  public readonly DERIVE_KEY = 'data-derive';
 
   set(id: number, $node: WithId<Node>) {
     if ($node['@@id'] === id) return;
@@ -30,7 +26,7 @@ class Mirror {
     this.pool[id] = undefined;
     $node['@@id'] = undefined;
 
-    each($node.childNodes, $child => this.remove($child));
+    $node.childNodes.forEach($child => this.remove($child));
   }
 
   has(id: number) {

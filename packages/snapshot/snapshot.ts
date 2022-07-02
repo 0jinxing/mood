@@ -1,4 +1,3 @@
-import { each } from '@mood/utils';
 import {
   mirror,
   attrs,
@@ -8,6 +7,7 @@ import {
   isDocument,
   isElement,
   isText,
+  isSVG,
   pseudoToClass,
   sheetToString
 } from './utils';
@@ -24,9 +24,9 @@ export function serialize($node: Node, $doc: Document): SNWithId[] {
   mirror.set(id, $node);
 
   if (isText($node)) {
-    const style = isElement($node, 'style');
+    const style = isElement($node.parentElement, 'style');
     const textContent = style ? rStyle($node.textContent || '') : $node.textContent || '';
-    return [{ id, type: NT.TEXT_NODE, textContent, style }];
+    return [{ id, type: NT.TEXT_NODE, textContent: textContent, style: style || undefined }];
   }
 
   if (isDocument($node)) {
@@ -43,18 +43,26 @@ export function serialize($node: Node, $doc: Document): SNWithId[] {
       return [
         { id, type: NT.ELE_NODE, tagName: $node.tagName, attrs: attrs($node) },
         {
+          pId: id,
           id: derive,
           type: NT.ELE_NODE,
-          tagName: 'STYLE',
-          attrs: { [mirror.DERIVE_KEY]: String(id) }
+          tagName: 'STYLE'
         },
-        { id: genId(), pId: derive, type: NT.TEXT_NODE, textContent: rStyle(cssText) }
+        { id: genId(), pId: derive, type: NT.TEXT_NODE, textContent: rStyle(cssText), style: true }
       ];
     }
   }
 
   if (isElement($node)) {
-    return [{ id, type: NT.ELE_NODE, tagName: $node.tagName, attrs: attrs($node) }];
+    return [
+      {
+        id,
+        type: NT.ELE_NODE,
+        tagName: $node.tagName,
+        attrs: attrs($node),
+        svg: isSVG($node) || undefined
+      }
+    ];
   }
 
   return [];
@@ -73,7 +81,7 @@ export function snapshot($doc: Document): SNWithId[] {
 
     adds.push(...result.map(i => ({ pId, nId, ...i })));
 
-    result.length && each($node.childNodes, walk, true);
+    result.length && Array.from($node.childNodes).reverse().forEach(walk);
   };
 
   walk($doc);

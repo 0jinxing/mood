@@ -26,3 +26,7 @@ export function isCDATASection($node: Node): $node is CDATASection {
 export function isText($node: Node): $node is Text {
   return $node.nodeType === Node.TEXT_NODE;
 }
+
+export function isSVG($node: Element): $node is SVGElement {
+  return Boolean($node.tagName === 'svg' || ($node as SVGElement).ownerSVGElement);
+}

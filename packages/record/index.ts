@@ -2,7 +2,7 @@ import { snapshot } from '@mood/snapshot';
 import { subscribe } from './subscribe';
 import { viewport } from './utils';
 import { RecordEvent, RecordEventWithTime, EmitHandler, EventType } from './types';
-import { each, on } from '@mood/utils';
+import { on } from '@mood/utils';
 
 export type RecordOptions = {
   emit: (e: RecordEventWithTime, checkout?: true) => void;
@@ -104,7 +104,7 @@ export function record(options: RecordOptions) {
     );
   }
 
-  return () => each(unsubscribes, u => u());
+  return () => unsubscribes.forEach(u => u());
 }
 
 export function addCustomEvent<T>(tag: string, payload: T) {

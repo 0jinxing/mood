@@ -1,5 +1,4 @@
 import { serialize, rAttr, mirror, Attrs, SNWithId, next } from '@mood/snapshot';
-import { each } from '@mood/utils';
 import { SourceType } from '../types';
 
 export type AddedNodeMutation = SNWithId & { pId: number };
@@ -9,32 +8,31 @@ export type AttrMutation = { id: number; record: Attrs };
 
 export type SubscribeToMutationArg = {
   source: SourceType.MUTATION;
-  texts: TextMutation[];
-  attrs: AttrMutation[];
-  removes: RemovedNodeMutation[];
-  adds: AddedNodeMutation[];
+  texts?: TextMutation[];
+  attrs?: AttrMutation[];
+  removes?: RemovedNodeMutation[];
+  adds?: AddedNodeMutation[];
 };
 
 export type SubscribeToMutationEmit = (arg: SubscribeToMutationArg) => void;
 
 function deepDelete(set: Set<Node>, $node: Node) {
   set.delete($node);
-  each($node.childNodes, $node => deepDelete(set, $node));
+  $node.childNodes.forEach($node => deepDelete(set, $node));
 }
 
 export function subscribeToMutation(cb: SubscribeToMutationEmit) {
   const observer = new MutationObserver(mutations => {
-    const adds: AddedNodeMutation[] = [];
-    const removes: RemovedNodeMutation[] = [];
-
-    const attrs: AttrMutation[] = [];
-    const texts: TextMutation[] = [];
+    let adds: AddedNodeMutation[] | undefined;
+    let removes: RemovedNodeMutation[] | undefined;
+    let attrs: AttrMutation[] | undefined;
+    let texts: TextMutation[] | undefined;
 
     const set = new Set<Node>();
 
     const visitAddedNodes = ($node: Node) => {
       set.add($node);
-      each($node.childNodes, $child => visitAddedNodes($child));
+      $node.childNodes.forEach($child => visitAddedNodes($child));
     };
 
     const visitRemovedNodes = ($node: Node) => {
@@ -42,34 +40,35 @@ export function subscribeToMutation(cb: SubscribeToMutationEmit) {
 
       mirror.remove($node);
 
-      if (set.has($node)) deepDelete(set, $node);
-      else removes.push({ id });
+      if (set.has($node)) {
+        deepDelete(set, $node);
+      } else {
+        removes = removes || [];
+        removes.push({ id });
+      }
     };
 
     mutations.forEach(({ type, target, addedNodes, removedNodes, attributeName }) => {
-      // childList
       if (type === 'childList') {
-        each(addedNodes, visitAddedNodes);
-        each(removedNodes, visitRemovedNodes);
-      }
-      // attributes
-      else if (type === 'attributes') {
-        const attrName = attributeName || '';
+        addedNodes.forEach(visitAddedNodes);
+        removedNodes.forEach(visitRemovedNodes);
+      } else if (type === 'attributes') {
+        const name = attributeName || '';
+        const value = (<HTMLElement>target).getAttribute(name);
 
-        const value = (<HTMLElement>target).getAttribute(attrName);
-
-        let current = attrs.find(attr => attr.id === mirror.getId(target));
+        let current = attrs?.find(attr => attr.id === mirror.getId(target));
 
         if (!current) {
           current = { id: mirror.getId(target), record: {} };
+
+          attrs = attrs || [];
           attrs.push(current);
         }
-        current.record[attrName] = rAttr(attrName, value || '');
-      }
-      // characterData
-      else if (type === 'characterData') {
+        current.record[name] = typeof value === 'string' ? rAttr(name, value) : null;
+      } else if (type === 'characterData') {
         const value = target.textContent;
 
+        texts = texts || [];
         texts.push({ id: mirror.getId(target), value });
       }
     });
@@ -87,7 +86,10 @@ export function subscribeToMutation(cb: SubscribeToMutationEmit) {
         return;
       }
 
-      each(serialize($node, document), item => adds.push({ pId, nId, ...item }));
+      serialize($node, document).forEach(item => {
+        adds = adds || [];
+        adds.push({ pId, nId, ...item });
+      });
     };
 
     set.forEach(pushQueue);
@@ -108,11 +110,12 @@ export function subscribeToMutation(cb: SubscribeToMutationEmit) {
 
   observer.observe(document, {
     attributes: true,
-    attributeOldValue: false,
     characterData: true,
-    characterDataOldValue: false,
     childList: true,
-    subtree: true
+    subtree: true,
+
+    characterDataOldValue: false,
+    attributeOldValue: false
   });
 
   return () => observer.disconnect();

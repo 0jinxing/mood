@@ -6,7 +6,7 @@ export enum NT {
   DOC_FRAGMENT_NODE
 }
 
-export type Attrs = { [key: string]: boolean | string };
+export type Attrs = { [key: string]: string | null };
 
 export type DocNode = {
   type: NT.DOC_NODE;
@@ -23,13 +23,14 @@ export type DocTypeNode = {
 export type EleNode = {
   type: NT.ELE_NODE;
   tagName: string;
-  attrs: Attrs;
+  attrs?: Attrs;
+  svg?: true;
 };
 
 export type TextNode = {
   type: NT.TEXT_NODE;
   textContent: string;
-  style?: boolean;
+  style?: true;
 };
 
 export type SN = DocNode | DocTypeNode | EleNode | TextNode;

@@ -4,7 +4,7 @@ import * as inquirer from 'inquirer';
 import { chromium } from '@playwright/test';
 
 function getCode(): string {
-  const bundlePath = path.resolve('packages/record/dist', 'index.iife.js');
+  const bundlePath = path.resolve(__dirname, '../packages/record/dist', 'index.iife.js');
   return fs.readFileSync(bundlePath, 'utf8');
 }
 
@@ -20,8 +20,8 @@ function getCode(): string {
       {
         type: 'input',
         name: 'url',
-        message: 'Enter the url you want to record, e.g https://react-redux.realworld.io: ',
-        default: 'https://react-redux.realworld.io'
+        message: 'Enter the url you want to record, e.g https://github.com/rrweb-io/rrweb: ',
+        default: 'https://github.com/rrweb-io/rrweb'
       }
     ]);
 

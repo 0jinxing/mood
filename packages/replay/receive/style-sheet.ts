@@ -1,6 +1,5 @@
 import { SubscribeToStyleSheetArg } from '@mood/record';
 import { mirror } from '@mood/snapshot';
-import { each } from '@mood/utils';
 import { ReceiveHandler } from '../types';
 
 export const receiveToStyleSheet: ReceiveHandler<SubscribeToStyleSheetArg> = event => {
@@ -13,11 +12,11 @@ export const receiveToStyleSheet: ReceiveHandler<SubscribeToStyleSheetArg> = eve
 
   const { adds, removes } = event;
 
-  removes && each(removes, ({ index }) => sheet.deleteRule(index));
+  removes && removes.forEach(({ index }) => sheet.deleteRule(index));
 
   if (!adds) return;
 
-  each(adds, ({ rule, index }) => {
+  adds.forEach(({ rule, index }) => {
     const insertIndex = index === undefined ? undefined : Math.min(index, sheet.cssRules.length);
     try {
       sheet.insertRule(rule, insertIndex);

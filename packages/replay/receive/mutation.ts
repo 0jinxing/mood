@@ -1,24 +1,17 @@
 import { AddedNodeMutation, SubscribeToMutationArg } from '@mood/record';
-import { buildNodeWithSN, isElement, mirror } from '@mood/snapshot';
-import { each } from '@mood/utils';
+import { buildNodeWithSN, mirror } from '@mood/snapshot';
 import { ReceiveHandler } from '../types';
 
 export const receiveToMutation: ReceiveHandler<SubscribeToMutationArg> = (event, context) => {
-  each(event.removes, rm => {
+  event.removes?.forEach(rm => {
     const $el = mirror.getNode(rm.id);
 
     if (!$el) return;
 
     const $parent = $el.parentNode;
-    const $next = $el.nextSibling;
 
     mirror.remove($el);
     $parent?.removeChild($el);
-
-    if (isElement($next) && $next.getAttribute(mirror.DERIVE_KEY) === String(rm.id)) {
-      mirror.remove($next);
-      $parent?.removeChild($next);
-    }
   });
 
   const $doc = context.$iframe.contentDocument!;
@@ -43,9 +36,9 @@ export const receiveToMutation: ReceiveHandler<SubscribeToMutationArg> = (event,
     }
   };
 
-  each(event.adds, append);
+  event.adds?.forEach(append);
 
-  each(event.texts, text => {
+  event.texts?.forEach(text => {
     const $target = mirror.getNode(text.id);
 
     if (!$target) return;
@@ -53,14 +46,14 @@ export const receiveToMutation: ReceiveHandler<SubscribeToMutationArg> = (event,
     $target.textContent = text.value;
   });
 
-  each(event.attrs, mutation => {
+  event.attrs?.forEach(mutation => {
     const $target = mirror.getNode<Element>(mutation.id);
 
     if (!$target) return;
 
-    each(Object.entries(mutation.record), ([name, value]) => {
-      if (value) $target.setAttribute(name, value + '');
-      else $target.removeAttribute(name);
+    Object.entries(mutation.record).forEach(([name, value]) => {
+      if (value === null) $target.removeAttribute(name);
+      else $target.setAttribute(name, value + '');
     });
   });
 };

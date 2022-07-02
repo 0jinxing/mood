@@ -29,7 +29,7 @@ browserTest('snapshot', [
       ) as EleNode[];
 
       expect(images.length).eq(3);
-      expect(images.map(item => item.attrs.src)).to.deep.eq([
+      expect(images.map(item => item.attrs?.src)).to.deep.eq([
         'http://127.0.0.1:3030/a/b/c/d/e/1.png',
         'http://127.0.0.1:3030/a/1.png',
         'http://127.0.0.1:3030/1.png'
@@ -50,7 +50,7 @@ browserTest('snapshot', [
         item => item.type === NT.ELE_NODE && item.tagName === 'IMG'
       ) as EleNode[];
 
-      expect(images.map(item => item.attrs.srcset)).to.deep.eq([
+      expect(images.map(item => item.attrs?.srcset)).to.deep.eq([
         '',
         'http://127.0.0.1:3030/1.png 1w, http://127.0.0.1:3030/a/b/c/1.png 2w, http://127.0.0.1:3030/a/c/d/e/1.png 2x'
       ]);

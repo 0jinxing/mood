@@ -1,6 +1,6 @@
 import { NonFunctionKeys } from 'utility-types';
 import { mirror, isElement } from '@mood/snapshot';
-import { hookProp, on, each } from '@mood/utils';
+import { hookProp, on } from '@mood/utils';
 import { SourceType } from '../types';
 
 export type SubscribeToInputValue = string | boolean;
@@ -57,5 +57,5 @@ export function subscribeToInput(cb: SubscribeToInputEmit) {
 
   unsubscribes.push(...hookHandlers);
 
-  return () => each(unsubscribes, u => u());
+  return () => unsubscribes.forEach(u => u());
 }
