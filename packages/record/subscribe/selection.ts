@@ -1,9 +1,9 @@
 import { mirror } from '@mood/snapshot';
 import { on } from '@mood/utils';
-import { SourceType } from '../types';
+import { SourceTypes } from '../types';
 
 export type SubscribeToSelectionArg = {
-  source: SourceType.SELECTION;
+  source: SourceTypes.SELECTION;
   ranges: number[];
 };
 
@@ -30,7 +30,7 @@ export function subscribeToSelection(cb: SubscribeToSelectionEmit) {
       ranges.push(mirror.getId(startContainer), startOffset, mirror.getId(endContainer), endOffset);
     }
 
-    cb({ source: SourceType.SELECTION, ranges });
+    cb({ source: SourceTypes.SELECTION, ranges });
   };
 
   return on('selectionchange', updateSelection);

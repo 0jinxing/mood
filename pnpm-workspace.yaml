@@ -1,6 +1,4 @@
 packages:
   - 'packages/**'
   - 'examples'
-  - 'extension'
-  - 'components'
   - 'test'

@@ -1,11 +1,11 @@
 import { mirror } from '@mood/snapshot';
 import { each, on, throttle } from '@mood/utils';
-import { SourceType } from '../types';
+import { SourceTypes } from '../types';
 
 export type MousePositions = number[];
 
 export type SubscribeToMouseMoveArg = {
-  source: SourceType.MOUSE_MOVE | SourceType.TOUCH_MOVE;
+  source: SourceTypes.MOUSE_MOVE | SourceTypes.TOUCH_MOVE;
   ps: MousePositions;
 };
 
@@ -14,7 +14,7 @@ export type SubscribeToMousemoveEmit = (arg: SubscribeToMouseMoveArg) => void;
 export function subscribeToMouseMove(cb: SubscribeToMousemoveEmit) {
   let ps: MousePositions = [];
   const throttleCb = throttle((touch: boolean) => {
-    cb({ ps, source: touch ? SourceType.TOUCH_MOVE : SourceType.MOUSE_MOVE });
+    cb({ ps, source: touch ? SourceTypes.TOUCH_MOVE : SourceTypes.MOUSE_MOVE });
 
     ps = [];
   }, 500);

@@ -1,13 +1,13 @@
 import { mirror } from '@mood/snapshot';
 import { each, on } from '@mood/utils';
-import { SourceType } from '../types';
+import { SourceTypes } from '../types';
 
 const actions = <const>['play', 'pause'];
 
 export type SubscribeToMediaInteraction = typeof actions[number];
 
 export type MediaInteractionArg = {
-  source: SourceType.MEDIA_INTERACTION;
+  source: SourceTypes.MEDIA_INTERACTION;
   action: SubscribeToMediaInteraction;
   id: number;
 };
@@ -18,7 +18,7 @@ export function subscribeToMediaInteraction(cb: SubscribeToMediaInteractionEmit)
   const handler = (act: SubscribeToMediaInteraction) => (event: Event) => {
     const { target } = event;
     if (target) {
-      cb({ source: SourceType.MEDIA_INTERACTION, id: mirror.getId(target), action: act });
+      cb({ source: SourceTypes.MEDIA_INTERACTION, id: mirror.getId(target), action: act });
     }
   };
 

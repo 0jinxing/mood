@@ -1,4 +1,4 @@
-import { SNWithId, NodeType } from './types';
+import { SNWithId, NodeTypes } from './types';
 import { mirror } from './utils';
 
 const HOVER_MATCH = /([^{}]+):hover([^{}]*{[^{}]+})/gi;
@@ -8,16 +8,16 @@ export function hover(cssText: string): string {
 }
 
 export function buildNode(node: SNWithId, $doc: Document): Node | null {
-  if (node.type === NodeType.DOC_NODE) {
+  if (node.type === NodeTypes.DOC_NODE) {
     return $doc.implementation.createDocument(null, '', null);
   }
 
-  if (node.type === NodeType.DOC_TYPE_NODE) {
+  if (node.type === NodeTypes.DOC_TYPE_NODE) {
     const { name, publicId, systemId } = node;
     return $doc.implementation.createDocumentType(name, publicId, systemId);
   }
 
-  if (node.type === NodeType.ELE_NODE) {
+  if (node.type === NodeTypes.ELE_NODE) {
     const tagName = node.tagName;
 
     const { attrs, svg } = node;
@@ -52,12 +52,12 @@ export function buildNode(node: SNWithId, $doc: Document): Node | null {
     return $el;
   }
 
-  if (node.type === NodeType.TEXT_NODE) {
+  if (node.type === NodeTypes.TEXT_NODE) {
     const { style, textContent } = node;
     return $doc.createTextNode(style ? hover(textContent) : textContent);
   }
 
-  if (node.type === NodeType.CDATA_NODE) {
+  if (node.type === NodeTypes.CDATA_NODE) {
     return $doc.createCDATASection(node.textContent);
   }
 
@@ -69,7 +69,7 @@ export function buildNodeWithSN(node: SNWithId, $doc: Document): Node | null {
 
   if (!$el) return null;
 
-  if (node.type === NodeType.DOC_NODE) {
+  if (node.type === NodeTypes.DOC_NODE) {
     $el = $doc;
     // Close before open to make sure document was closed
     $doc.close();
@@ -87,7 +87,7 @@ export function rebuild(adds: SNWithId[], $doc: Document) {
     const $parent = pId ? mirror.getNode(pId) : undefined;
     const $next = nId ? mirror.getNode(nId) : undefined;
 
-    if (node.type === NodeType.DOC_NODE || node.type === NodeType.DOC_TYPE_NODE) {
+    if (node.type === NodeTypes.DOC_NODE || node.type === NodeTypes.DOC_TYPE_NODE) {
       /**
        * ignore
        */

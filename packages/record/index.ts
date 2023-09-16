@@ -1,7 +1,7 @@
 import { snapshot } from '@mood/snapshot';
 import { subscribe } from './subscribe';
 import { queryViewport } from './utils';
-import { RecordEvent, RecordEventWithTime, EmitHandler, EventType } from './types';
+import { RecordEvent, RecordEventWithTime, EmitHandler, EventTypes } from './types';
 import { each, on } from '@mood/utils';
 
 export type RecordOptions = {
@@ -27,12 +27,12 @@ export function record(options: RecordOptions) {
   wrappedEmit = (event: RecordEventWithTime, checkout?: true) => {
     emit(event, checkout);
 
-    if (event.type === EventType.FULL_SNAPSHOT) {
+    if (event.type === EventTypes.FULL_SNAPSHOT) {
       lastFullSnapshotEvent = event;
       incrementalSnapshotCount = 0;
     }
 
-    if (event.type === EventType.INCREMENTAL_SNAPSHOT) {
+    if (event.type === EventTypes.INCREMENTAL_SNAPSHOT) {
       incrementalSnapshotCount += 1;
       const exceedCount = checkoutEveryNth && incrementalSnapshotCount >= checkoutEveryNth;
       const exceedTime =
@@ -49,13 +49,13 @@ export function record(options: RecordOptions) {
   };
 
   const incEmitWithTime: EmitHandler = data => {
-    wrappedEmitWithTime({ type: EventType.INCREMENTAL_SNAPSHOT, ...data });
+    wrappedEmitWithTime({ type: EventTypes.INCREMENTAL_SNAPSHOT, ...data });
   };
 
   const takeFullSnapshot = (checkout?: true) => {
     wrappedEmitWithTime(
       {
-        type: EventType.META,
+        type: EventTypes.META,
         href: location.href,
         ...queryViewport()
       },
@@ -71,7 +71,7 @@ export function record(options: RecordOptions) {
     const left = document.documentElement.scrollLeft || 0;
 
     wrappedEmitWithTime({
-      type: EventType.FULL_SNAPSHOT,
+      type: EventTypes.FULL_SNAPSHOT,
       adds,
       offset: [top, left]
     });
@@ -80,7 +80,7 @@ export function record(options: RecordOptions) {
   const unsubscribes: Function[] = [];
   unsubscribes.push(
     on('DOMContentLoaded', () => {
-      wrappedEmitWithTime({ type: EventType.DOM_CONTENT_LOADED });
+      wrappedEmitWithTime({ type: EventTypes.DOM_CONTENT_LOADED });
     })
   );
 
@@ -96,7 +96,7 @@ export function record(options: RecordOptions) {
       on(
         'load',
         () => {
-          wrappedEmitWithTime({ type: EventType.LOADED });
+          wrappedEmitWithTime({ type: EventTypes.LOADED });
           initial();
         },
         window
@@ -111,7 +111,7 @@ export function addCustomEvent<T>(tag: string, payload: T) {
   if (!wrappedEmitWithTime) {
     throw new Error('please add custom event after start recording');
   }
-  wrappedEmitWithTime({ type: EventType.CUSTOM, tag, payload });
+  wrappedEmitWithTime({ type: EventTypes.CUSTOM, tag, payload });
 }
 
 export * from './types';

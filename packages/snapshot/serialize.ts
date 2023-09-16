@@ -1,5 +1,5 @@
 import { mirror, rAttr, rStyle } from './utils';
-import { NodeType, Attrs, SNWithId } from './types';
+import { NodeTypes, Attrs, SNWithId } from './types';
 import { reduce } from '@mood/utils';
 
 let cursor = 0;
@@ -33,16 +33,16 @@ export function serialize($node: Node, $doc: Document): SNWithId[] {
   mirror.set(id, $node);
 
   if ($node instanceof Document) {
-    return [{ id, type: NodeType.DOC_NODE }];
+    return [{ id, type: NodeTypes.DOC_NODE }];
   }
 
   if ($node instanceof DocumentType) {
     const { name, publicId, systemId } = $node;
-    return [{ id, type: NodeType.DOC_TYPE_NODE, name, publicId, systemId }];
+    return [{ id, type: NodeTypes.DOC_TYPE_NODE, name, publicId, systemId }];
   }
 
   if ($node instanceof CDATASection) {
-    return [{ id, type: NodeType.CDATA_NODE, textContent: '' }];
+    return [{ id, type: NodeTypes.CDATA_NODE, textContent: '' }];
   }
 
   if ($node instanceof Text) {
@@ -51,7 +51,7 @@ export function serialize($node: Node, $doc: Document): SNWithId[] {
     let textContent = $node.textContent || '';
     textContent = style ? rStyle(textContent) : textContent;
 
-    return [{ id, type: NodeType.TEXT_NODE, textContent, style }];
+    return [{ id, type: NodeTypes.TEXT_NODE, textContent, style }];
   }
 
   if (!isHTMLElement($node) || $node instanceof HTMLScriptElement) {
@@ -71,8 +71,8 @@ export function serialize($node: Node, $doc: Document): SNWithId[] {
 
     if (cssText) {
       return [
-        { id, type: NodeType.ELE_NODE, tagName: 'STYLE', attrs },
-        { id: genId(), pId: id, type: NodeType.TEXT_NODE, textContent: rStyle(cssText) }
+        { id, type: NodeTypes.ELE_NODE, tagName: 'STYLE', attrs },
+        { id: genId(), pId: id, type: NodeTypes.TEXT_NODE, textContent: rStyle(cssText) }
       ];
     }
   }
@@ -96,5 +96,7 @@ export function serialize($node: Node, $doc: Document): SNWithId[] {
     attrs.selected = $node.selected;
   }
 
-  return [{ id, type: NodeType.ELE_NODE, tagName: $node.tagName, attrs, svg: isSVGElement($node) }];
+  return [
+    { id, type: NodeTypes.ELE_NODE, tagName: $node.tagName, attrs, svg: isSVGElement($node) }
+  ];
 }

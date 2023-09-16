@@ -1,5 +1,5 @@
 {
-  "include": ["packages", "tracing"],
+  "include": ["packages"],
   "compilerOptions": {
     "module": "ESNext",
     "target": "ES5",

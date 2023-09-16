@@ -3,8 +3,8 @@ import { rebuild } from '@mood/snapshot';
 import {
   RecordEventWithTime,
   FullSnapshotEvent,
-  SourceType,
-  EventType,
+  SourceTypes,
+  EventTypes,
   IncrementalSnapshotEvent
 } from '@mood/record';
 
@@ -77,7 +77,7 @@ export class Player {
 
     this.config.root.appendChild(this.$container);
 
-    const index = this.events.findIndex(i => i.type === EventType.FULL_SNAPSHOT);
+    const index = this.events.findIndex(i => i.type === EventTypes.FULL_SNAPSHOT);
     this.baseline = this.events[index].timestamp;
 
     for (const event of this.events.slice(0, index + 1)) {
@@ -94,11 +94,11 @@ export class Player {
   }
 
   private getDelay(event: RecordEventWithTime, baseline: number): number {
-    if (event.type !== EventType.INCREMENTAL_SNAPSHOT) {
+    if (event.type !== EventTypes.INCREMENTAL_SNAPSHOT) {
       return event.timestamp - baseline;
     }
 
-    if (event.source === SourceType.MOUSE_MOVE || event.source === SourceType.TOUCH_MOVE) {
+    if (event.source === SourceTypes.MOUSE_MOVE || event.source === SourceTypes.TOUCH_MOVE) {
       const [, , , timestamp] = event.ps;
       return timestamp - baseline;
     }
@@ -137,24 +137,24 @@ export class Player {
   private picked(event: RecordEventWithTime, sync = false) {
     const handler = () => {
       switch (event.type) {
-        case EventType.DOM_CONTENT_LOADED:
-        case EventType.LOADED:
+        case EventTypes.DOM_CONTENT_LOADED:
+        case EventTypes.LOADED:
           break;
 
-        case EventType.META: {
+        case EventTypes.META: {
           this.$iframe.width = `${event.width}px`;
           this.$iframe.height = `${event.height}px`;
           break;
         }
 
-        case EventType.FULL_SNAPSHOT: {
+        case EventTypes.FULL_SNAPSHOT: {
           this.rebuild(event);
           const [top, left] = event.offset;
           this.$iframe.contentWindow?.scrollTo({ top, left });
           break;
         }
 
-        case EventType.INCREMENTAL_SNAPSHOT: {
+        case EventTypes.INCREMENTAL_SNAPSHOT: {
           this.apply(event, sync);
           break;
         }
@@ -213,7 +213,7 @@ export class Player {
     this.scheduler.clear();
 
     const slice = events.findIndex(
-      event => event.type === EventType.FULL_SNAPSHOT && event.timestamp < this.baseline + offset
+      event => event.type === EventTypes.FULL_SNAPSHOT && event.timestamp < this.baseline + offset
     );
 
     const baseline = this.baseline + offset;

@@ -1,6 +1,6 @@
 import { mirror } from '@mood/snapshot';
 import { each, on } from '@mood/utils';
-import { SourceType } from '../types';
+import { SourceTypes } from '../types';
 
 const actions = <const>[
   'mouseup',
@@ -17,7 +17,7 @@ const actions = <const>[
 export type SubscribeToMouseInteraction = typeof actions[number];
 
 export type SubscribeToMouseInteractionArg = {
-  source: SourceType.MOUSE_INTERACTION;
+  source: SourceTypes.MOUSE_INTERACTION;
   action: SubscribeToMouseInteraction;
   id: number;
   x: number;
@@ -34,7 +34,7 @@ export function subscribeToMouseInteraction(cb: SubscribeToMouseInteractionEmit)
       const { clientX, clientY } = event instanceof TouchEvent ? event.changedTouches[0] : event;
 
       cb({
-        source: SourceType.MOUSE_INTERACTION,
+        source: SourceTypes.MOUSE_INTERACTION,
         action,
         id,
         x: clientX,

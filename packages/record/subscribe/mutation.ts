@@ -3,7 +3,7 @@ import { serialize, rAttr, mirror, Attrs, SNWithId } from '@mood/snapshot';
 import { deepDelete, isAncestorRemoved, isAncestorInSet, isParentRemoved } from '../utils';
 
 import { each } from '@mood/utils';
-import { SourceType } from '../types';
+import { SourceTypes } from '../types';
 
 export type AttrCursor = { $el: Node; attrs: Attrs };
 
@@ -13,7 +13,7 @@ export type TextMutation = { id: number; value: string | null };
 export type AttrMutation = { id: number; attrs: Attrs };
 
 export type SubscribeToMutationArg = {
-  source: SourceType.MUTATION;
+  source: SourceTypes.MUTATION;
   texts: TextMutation[];
   attrs: AttrMutation[];
   removes: RemovedNodeMutation[];
@@ -153,7 +153,7 @@ export function subscribeToMutation(cb: SubscribeToMutationEmit) {
     }
 
     const arg: SubscribeToMutationArg = {
-      source: SourceType.MUTATION,
+      source: SourceTypes.MUTATION,
 
       texts: texts
         .map(text => ({

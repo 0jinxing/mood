@@ -1,12 +1,12 @@
 import { NonFunctionKeys } from 'utility-types';
 import { mirror } from '@mood/snapshot';
 import { hookProp, on, each } from '@mood/utils';
-import { SourceType } from '../types';
+import { SourceTypes } from '../types';
 
 export type SubscribeToInputValue = string | boolean;
 
 export type SubscribeToInputArg = {
-  source: SourceType.INPUT;
+  source: SourceTypes.INPUT;
   id: number;
   value: SubscribeToInputValue;
 };
@@ -36,7 +36,7 @@ export function subscribeToInput(cb: SubscribeToInputEmit) {
 
     cache.set($target, value);
     const id = mirror.getId($target);
-    cb({ source: SourceType.INPUT, value, id });
+    cb({ source: SourceTypes.INPUT, value, id });
   };
 
   const eventHandler = (event: Pick<Event, 'target'>) => {

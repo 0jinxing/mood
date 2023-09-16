@@ -11,7 +11,7 @@ import {
   SubscribeToViewportResizeArg
 } from './subscribe';
 
-export enum EventType {
+export enum EventTypes {
   META,
   LOADED,
   DOM_CONTENT_LOADED,
@@ -20,7 +20,7 @@ export enum EventType {
   CUSTOM
 }
 
-export enum SourceType {
+export enum SourceTypes {
   MUTATION,
   MOUSE_MOVE,
   MOUSE_INTERACTION,
@@ -45,32 +45,32 @@ export type SubscribeEmitArg =
   | SubscribeToSelectionArg;
 
 export type DomContentLoadedEvent = {
-  type: EventType.DOM_CONTENT_LOADED;
+  type: EventTypes.DOM_CONTENT_LOADED;
 };
 
 export type LoadedEvent = {
-  type: EventType.LOADED;
+  type: EventTypes.LOADED;
 };
 
 export type FullSnapshotEvent = {
-  type: EventType.FULL_SNAPSHOT;
+  type: EventTypes.FULL_SNAPSHOT;
   adds: SNWithId[];
   offset: [top: number, left: number];
 };
 
 export type IncrementalSnapshotEvent = {
-  type: EventType.INCREMENTAL_SNAPSHOT;
+  type: EventTypes.INCREMENTAL_SNAPSHOT;
 } & SubscribeEmitArg;
 
 export type MetaEvent = {
-  type: EventType.META;
+  type: EventTypes.META;
   href: string;
   width: number;
   height: number;
 };
 
 export type CustomEvent<T = unknown> = {
-  type: EventType.CUSTOM;
+  type: EventTypes.CUSTOM;
   tag: string;
   payload: T;
 };
