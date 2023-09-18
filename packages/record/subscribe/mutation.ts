@@ -24,7 +24,7 @@ export type SubscribeToMutationEmit = (arg: SubscribeToMutationArg) => void;
 
 const genKey = (id: number, pId: number) => `${id}@${pId}`;
 
-export function subscribeToMutation(cb: SubscribeToMutationEmit) {
+export function subscribeToMutation(cb: SubscribeToMutationEmit, doc = document) {
   const observer = new MutationObserver(mutations => {
     const attrs: AttrCursor[] = [];
     const texts: Array<{ value: string | null; $el: Node }> = [];
@@ -177,7 +177,7 @@ export function subscribeToMutation(cb: SubscribeToMutationEmit) {
     cb(arg);
   });
 
-  observer.observe(document, {
+  observer.observe(doc, {
     attributes: true,
     attributeOldValue: true,
     characterData: true,

@@ -2,7 +2,7 @@ import { each } from '@mood/utils';
 
 type WithId<T> = T & { ['@@id']?: number };
 
-class Mirror {
+export class Mirror {
   private readonly pool: Record<number, EventTarget | undefined> = {};
 
   set(id: number, $node: WithId<Node>) {

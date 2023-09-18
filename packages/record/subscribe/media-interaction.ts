@@ -14,7 +14,7 @@ export type MediaInteractionArg = {
 
 export type SubscribeToMediaInteractionEmit = (arg: MediaInteractionArg) => void;
 
-export function subscribeToMediaInteraction(cb: SubscribeToMediaInteractionEmit) {
+export function subscribeToMediaInteraction(cb: SubscribeToMediaInteractionEmit, doc?: Document) {
   const handler = (act: SubscribeToMediaInteraction) => (event: Event) => {
     const { target } = event;
     if (target) {
@@ -22,7 +22,7 @@ export function subscribeToMediaInteraction(cb: SubscribeToMediaInteractionEmit)
     }
   };
 
-  const unsubscribes = actions.map(k => on(k, handler(k)));
+  const unsubscribes = actions.map(k => on(k, handler(k), doc));
 
   return () => each(unsubscribes, u => u());
 }

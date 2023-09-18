@@ -12,7 +12,7 @@ export type SubscribeToScrollArg = {
 export type SubscribeToScrollEmit = (arg: SubscribeToScrollArg) => void;
 
 export function subscribeToScroll(cb: SubscribeToScrollEmit) {
-  const updatePosition = throttle<UIEvent>(({ target }) => {
+  const throttleCb = throttle<UIEvent>(({ target }) => {
     if (!target) return;
 
     const id = mirror.getId(target);
@@ -21,5 +21,5 @@ export function subscribeToScroll(cb: SubscribeToScrollEmit) {
 
     cb({ id, source: SourceTypes.SCROLL, x: $scroll.scrollLeft, y: $scroll.scrollTop });
   }, 100);
-  return on('scroll', updatePosition);
+  return on('scroll', throttleCb);
 }

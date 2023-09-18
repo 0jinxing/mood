@@ -25,7 +25,7 @@ function isInputElement(
   );
 }
 
-export function subscribeToInput(cb: SubscribeToInputEmit) {
+export function subscribeToInput(cb: SubscribeToInputEmit, doc?: Document) {
   const cbWithDedup = (
     $target: HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement,
     value: SubscribeToInputValue
@@ -66,7 +66,7 @@ export function subscribeToInput(cb: SubscribeToInputEmit) {
   };
 
   const unsubscribes = ['input', 'change'].map(eventName => {
-    return on(eventName, eventHandler);
+    return on(eventName, eventHandler, doc);
   });
 
   const hookProperties: Array<[HTMLElement, string]> = [
