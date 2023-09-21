@@ -13,6 +13,7 @@
   "dependencies": {
     "@mood/record": "workspace:0.0.1",
     "@mood/snapshot": "workspace:^",
+    "@mood/utils": "workspace:^",
     "nanoid": "^5.0.1",
     "peerjs": "^1.5.0",
     "xstate": "^4.38.2"

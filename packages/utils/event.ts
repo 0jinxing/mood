@@ -1,7 +1,7 @@
 export function on(
   type: string,
   fn: EventListenerOrEventListenerObject,
-  $target: Document | Window = document
+  $target: Document | Window | HTMLElement = document
 ): Function {
   const options = { capture: true, passive: true };
   $target.addEventListener(type, fn, options);

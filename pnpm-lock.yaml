@@ -207,6 +207,9 @@ importers:
       '@mood/snapshot':
         specifier: workspace:^
         version: link:../snapshot
+      '@mood/utils':
+        specifier: workspace:^
+        version: link:../utils
       nanoid:
         specifier: ^5.0.1
         version: 5.0.1

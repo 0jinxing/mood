@@ -373,3 +373,11 @@ export const eventMap = {
     defaultInit: { bubbles: false, cancelable: false }
   }
 } as const;
+
+export type EventTypeMap<T extends keyof typeof eventMap> = {
+  [k in T]: typeof eventMap[T]['EventType'];
+}[T];
+
+export type EventTypeInstanceMap<T extends keyof typeof eventMap> = {
+  [k in EventTypeMap<T>]: InstanceType<typeof window[k]>;
+}[EventTypeMap<T>];
