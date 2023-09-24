@@ -15,5 +15,5 @@ export function subscribeToViewportResize(cb: SubscribeToViewportResizeEmit) {
 
   const updateDimension = throttle(() => cb({ source, ...queryViewport() }), 200);
 
-  return on('resize', updateDimension, window);
+  return on(window, 'resize', updateDimension);
 }

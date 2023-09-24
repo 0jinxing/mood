@@ -79,7 +79,7 @@ export function record(options: RecordOptions) {
 
   const unsubscribes: Function[] = [];
   unsubscribes.push(
-    on('DOMContentLoaded', () => {
+    on(document, 'DOMContentLoaded', () => {
       wrappedEmitWithTime({ type: EventTypes.DOM_CONTENT_LOADED });
     })
   );
@@ -93,14 +93,10 @@ export function record(options: RecordOptions) {
     initial();
   } else {
     unsubscribes.push(
-      on(
-        'load',
-        () => {
-          wrappedEmitWithTime({ type: EventTypes.LOADED });
-          initial();
-        },
-        window
-      )
+      on(window, 'load', () => {
+        wrappedEmitWithTime({ type: EventTypes.LOADED });
+        initial();
+      })
     );
   }
 

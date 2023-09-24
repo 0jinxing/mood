@@ -45,7 +45,7 @@ export function subscribeToMouseInteraction(cb: SubscribeToMouseInteractionEmit)
 
   const unsubscribes = actions.map(action => {
     const handler = getHandler(action);
-    return on(action, handler);
+    return on(document, action, handler);
   });
 
   return () => each(unsubscribes, u => u());

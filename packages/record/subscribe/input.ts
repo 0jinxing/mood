@@ -66,7 +66,7 @@ export function subscribeToInput(cb: SubscribeToInputEmit, doc?: Document) {
   };
 
   const unsubscribes = ['input', 'change'].map(eventName => {
-    return on(eventName, eventHandler, doc);
+    return on(doc || document, eventName, eventHandler);
   });
 
   const hookProperties: Array<[HTMLElement, string]> = [

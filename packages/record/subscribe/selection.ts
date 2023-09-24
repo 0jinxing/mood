@@ -33,5 +33,5 @@ export function subscribeToSelection(cb: SubscribeToSelectionEmit) {
     cb({ source: SourceTypes.SELECTION, ranges });
   };
 
-  return on('selectionchange', updateSelection);
+  return on(document, 'selectionchange', updateSelection);
 }

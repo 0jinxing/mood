@@ -22,7 +22,7 @@ export function subscribeToMediaInteraction(cb: SubscribeToMediaInteractionEmit,
     }
   };
 
-  const unsubscribes = actions.map(k => on(k, handler(k), doc));
+  const unsubscribes = actions.map(k => on(doc || document, k, handler(k)));
 
   return () => each(unsubscribes, u => u());
 }

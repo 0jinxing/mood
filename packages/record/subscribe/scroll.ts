@@ -21,5 +21,5 @@ export function subscribeToScroll(cb: SubscribeToScrollEmit) {
 
     cb({ id, source: SourceTypes.SCROLL, x: $scroll.scrollLeft, y: $scroll.scrollTop });
   }, 100);
-  return on('scroll', throttleCb);
+  return on(document, 'scroll', throttleCb);
 }
