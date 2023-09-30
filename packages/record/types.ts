@@ -1,7 +1,7 @@
 import { SNWithId } from '@mood/snapshot';
 import {
   SubscribeToInputArg,
-  MediaInteractionArg,
+  SubscribeToMediaInteractionArg,
   SubscribeToMouseInteractionArg,
   SubscribeToMouseMoveArg,
   SubscribeToMutationArg,
@@ -9,7 +9,7 @@ import {
   SubscribeToSelectionArg,
   SubscribeToStyleSheetArg,
   SubscribeToViewportResizeArg
-} from './subscribe';
+} from './observers';
 
 export enum EventTypes {
   META,
@@ -40,7 +40,7 @@ export type SubscribeEmitArg =
   | SubscribeToScrollArg
   | SubscribeToViewportResizeArg
   | SubscribeToInputArg
-  | MediaInteractionArg
+  | SubscribeToMediaInteractionArg
   | SubscribeToStyleSheetArg
   | SubscribeToSelectionArg;
 

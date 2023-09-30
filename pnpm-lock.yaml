@@ -150,6 +150,9 @@ importers:
       '@mood/record':
         specifier: workspace:0.0.1
         version: link:../record
+      '@mood/replay':
+        specifier: workspace:^
+        version: link:../replay
       '@mood/snapshot':
         specifier: workspace:^
         version: link:../snapshot

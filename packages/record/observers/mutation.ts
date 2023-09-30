@@ -116,11 +116,10 @@ export function subscribeToMutation(cb: SubscribeToMutationEmit, doc = document)
     const addQueue: Node[] = [];
 
     const pushAdd = ($node: Node) => {
-      const pId = $node.parentNode ? mirror.getId($node.parentNode) : undefined;
+      const pId = mirror.getId($node.parentNode);
+      const nId = mirror.getId($node.nextSibling);
 
-      const nId = $node.nextSibling ? mirror.getId($node.nextSibling) : undefined;
-
-      if (!pId || nId === 0) {
+      if (!pId || ($node.nextSibling && !nId)) {
         addQueue.push($node);
         return;
       }

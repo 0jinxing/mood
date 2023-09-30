@@ -1,8 +1,8 @@
-import { MediaInteractionArg } from '@mood/record';
+import { SubscribeToMediaInteractionArg } from '@mood/record';
 import { mirror } from '@mood/snapshot';
 import { ReceiveHandler } from '../types';
 
-export const receiveToMediaInteraction: ReceiveHandler<MediaInteractionArg> = event => {
+export const receiveToMediaInteraction: ReceiveHandler<SubscribeToMediaInteractionArg> = event => {
   const $target = mirror.getNode<HTMLMediaElement>(event.id);
 
   if (!$target) return;

@@ -1,5 +1,5 @@
 import {
-  MediaInteractionArg,
+  SubscribeToMediaInteractionArg,
   SubscribeToInputArg,
   SubscribeToMouseInteractionArg,
   SubscribeToMouseMoveArg,
@@ -9,18 +9,21 @@ import {
   subscribeToMediaInteraction
 } from '@mood/record';
 import { Mirror } from '@mood/snapshot';
+import { SubscribeToDndArg, subscribeToDragAndDrop } from './dnd';
 
 export type DispatchEmitArg =
   | SubscribeToMouseMoveArg
   | SubscribeToMouseInteractionArg
   | SubscribeToScrollArg
   | SubscribeToInputArg
-  | MediaInteractionArg
-  | SubscribeToSelectionArg;
+  | SubscribeToMediaInteractionArg
+  | SubscribeToSelectionArg
+  | SubscribeToDndArg;
 
 export type DispatchHandler = (arg: DispatchEmitArg) => void;
 
 export const onDispatch = (mirror: Mirror, doc: Document, cb: DispatchHandler) => {
   subscribeToInput(cb, doc);
   subscribeToMediaInteraction(cb, doc);
+  subscribeToDragAndDrop(cb, doc);
 };

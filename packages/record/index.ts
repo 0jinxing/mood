@@ -1,12 +1,12 @@
 import { snapshot } from '@mood/snapshot';
-import { subscribe } from './subscribe';
+import { subscribe } from './observers';
 import { queryViewport } from './utils';
 import { RecordEvent, RecordEventWithTime, EmitHandler, EventTypes } from './types';
 import { each, on } from '@mood/utils';
 
 export type RecordOptions = {
   emit: (e: RecordEventWithTime, checkout?: true) => void;
-  subscribes?: (emit: EmitHandler) => () => void;
+  customHandler?: (emit: EmitHandler) => () => void;
   checkoutEveryNth?: number;
   checkoutEveryNms?: number;
 };
@@ -19,7 +19,7 @@ let wrappedEmit: (e: RecordEventWithTime, checkout?: true) => void;
 let wrappedEmitWithTime: (e: RecordEvent, checkout?: true) => void;
 
 export function record(options: RecordOptions) {
-  const { emit, checkoutEveryNms, checkoutEveryNth } = options;
+  const { emit, customHandler, checkoutEveryNms, checkoutEveryNth } = options;
 
   let lastFullSnapshotEvent: RecordEventWithTime;
   let incrementalSnapshotCount = 0;
@@ -78,6 +78,7 @@ export function record(options: RecordOptions) {
   };
 
   const unsubscribes: Function[] = [];
+
   unsubscribes.push(
     on(document, 'DOMContentLoaded', () => {
       wrappedEmitWithTime({ type: EventTypes.DOM_CONTENT_LOADED });
@@ -87,6 +88,7 @@ export function record(options: RecordOptions) {
   const initial = () => {
     takeFullSnapshot();
     unsubscribes.push(subscribe(incEmitWithTime));
+    customHandler && unsubscribes.push(customHandler(incEmitWithTime));
   };
 
   if (document.readyState === 'interactive' || document.readyState === 'complete') {
@@ -111,5 +113,5 @@ export function addCustomEvent<T>(tag: string, payload: T) {
 }
 
 export * from './types';
-export * from './subscribe';
+export * from './observers';
 export * from './utils';

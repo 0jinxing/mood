@@ -12,8 +12,8 @@ export class Mirror {
     $node['@@id'] = id;
   }
 
-  getId<T extends WithId<EventTarget>>($target: T): number {
-    return $target['@@id'] || 0;
+  getId<T extends WithId<EventTarget>>($target: T | null): number {
+    return $target?.['@@id'] || 0;
   }
 
   getNode<T extends Node>(id: number) {

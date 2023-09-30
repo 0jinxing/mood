@@ -7,10 +7,11 @@ function genId(): number {
   return ++cursor;
 }
 
-function getCSSText(styleSheet: CSSStyleSheet): string {
+function getCSSText(styleSheet: CSSStyleSheet | null): string {
   try {
+    if (!styleSheet?.cssRules) return '';
     const handler = (text: string, item: CSSRule) => text + getCSSRuleText(item);
-    return reduce(styleSheet.cssRules, handler, '');
+    return reduce(styleSheet?.cssRules, handler, '');
   } catch {
     return '';
   }

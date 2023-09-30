@@ -6,13 +6,13 @@ const actions = <const>['play', 'pause'];
 
 export type SubscribeToMediaInteraction = typeof actions[number];
 
-export type MediaInteractionArg = {
+export type SubscribeToMediaInteractionArg = {
   source: SourceTypes.MEDIA_INTERACTION;
   action: SubscribeToMediaInteraction;
   id: number;
 };
 
-export type SubscribeToMediaInteractionEmit = (arg: MediaInteractionArg) => void;
+export type SubscribeToMediaInteractionEmit = (arg: SubscribeToMediaInteractionArg) => void;
 
 export function subscribeToMediaInteraction(cb: SubscribeToMediaInteractionEmit, doc?: Document) {
   const handler = (act: SubscribeToMediaInteraction) => (event: Event) => {

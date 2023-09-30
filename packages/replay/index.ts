@@ -1,3 +1,4 @@
 export * from './model';
 export * from './utils';
-export * from './receive';
+export * from './actors';
+export * from './types';

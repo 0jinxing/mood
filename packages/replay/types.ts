@@ -8,8 +8,4 @@ export type ReceiveContext = {
   scheduler: Scheduler;
 };
 
-export type ReceiveHandler<T extends SubscribeEmitArg = SubscribeEmitArg> = (
-  event: T,
-  context: ReceiveContext,
-  sync: boolean
-) => void;
+export type ReceiveHandler<T> = (event: T, context: ReceiveContext, sync: boolean) => void;

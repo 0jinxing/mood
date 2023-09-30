@@ -11,7 +11,7 @@ import { receiveToStyleSheet } from './style-sheet';
 import { receiveToSelection } from './selection';
 
 export function applyIncremental(event: SubscribeEmitArg, context: ReceiveContext, sync: boolean) {
-  const handlerMap: { [key in SourceTypes]: ReceiveHandler } = {
+  const handlerMap: { [key in SourceTypes]?: ReceiveHandler<unknown> } = {
     [SourceTypes.MUTATION]: receiveToMutation,
     [SourceTypes.MOUSE_MOVE]: receiveToMouseMove,
     [SourceTypes.MOUSE_INTERACTION]: receiveToMouseInteraction,
@@ -24,7 +24,7 @@ export function applyIncremental(event: SubscribeEmitArg, context: ReceiveContex
     [SourceTypes.SELECTION]: receiveToSelection
   };
 
-  handlerMap[event.source](event, context, sync);
+  handlerMap[event.source]?.(event, context, sync);
 }
 
 export * from './input';

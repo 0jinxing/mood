@@ -12,6 +12,7 @@
   "license": "ISC",
   "dependencies": {
     "@mood/record": "workspace:0.0.1",
+    "@mood/replay": "workspace:^",
     "@mood/snapshot": "workspace:^",
     "@mood/utils": "workspace:^",
     "nanoid": "^5.0.1",

@@ -9,13 +9,14 @@ import {
 } from '@mood/record';
 
 import { createScheduler, Scheduler } from './scheduler';
-import { applyIncremental } from '../receive';
+import { applyIncremental } from '../actors';
 import { ReceiveContext } from '../types';
 
 export type PlayerConfig = {
   speed: number;
   root: HTMLElement | Element;
   styleRules: string[];
+  customApplyIncremental?: typeof applyIncremental;
 };
 
 export type PlayerMetaData = {
@@ -116,6 +117,7 @@ export class Player {
       scheduler
     };
     applyIncremental(event, context, sync);
+    this.config.customApplyIncremental?.(event, context, sync);
   }
 
   private rebuild(event: RecordEventWithTime & FullSnapshotEvent) {
