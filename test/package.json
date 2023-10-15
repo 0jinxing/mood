@@ -10,7 +10,7 @@
   },
   "dependencies": {
     "@mood/snapshot": "workspace:^0.0.1",
-    "@playwright/test": "^1.21.1",
+    "@playwright/test": "^1.38.1",
     "@stdlib/bench": "^0.0.12"
   },
   "devDependencies": {
