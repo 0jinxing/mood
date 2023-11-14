@@ -1,5 +1,5 @@
 import Peer, { DataConnection, PeerOptions } from 'peerjs';
-import { Messager } from './types';
+import { Messager, MessagerEvent, MessagerEventHandler, MessagerEventTypes } from './types';
 
 export type PeerMessagerOptions = {
   id: string;
@@ -10,39 +10,66 @@ export class PeerMessager implements Messager {
   peer: Peer;
   connection: DataConnection;
 
+  ready$$: Promise<void>;
+
   constructor(private options: PeerMessagerOptions) {
     this.peer = new Peer(this.uid, options);
-    this.connection = this.peer.connect(this.targetUid);
+    this.connection = this.peer.connect(this.target);
+
+    this.ready$$ = new Promise((resolve, reject) => {
+      this.connection.once('open', resolve);
+      this.connection.once('error', reject);
+    });
   }
 
   get uid(): string {
     return this.options.role + '-' + this.options.id;
   }
 
-  get targetUid(): string {
+  get target(): string {
     if (this.options.role === 'embed') {
       return 'client-' + this.options.id;
     }
     return 'embed-' + this.options.id;
   }
 
-  async send(data: unknown) {
-    if (!this.connection.open) {
-      await new Promise<0>((resolve, reject) => {
-        this.connection.once('open', () => resolve(0));
-        this.connection.once('error', reject);
-      });
-    }
+  async send(data: MessagerEvent) {
+    if (!this.connection.open) await this.ready$$;
 
     this.connection.send(data);
   }
 
-  on(event: string, handler: (...args: unknown[]) => void): () => unknown {
-    throw new Error('Method not implemented.');
+  handlers = new Map<MessagerEventTypes, MessagerEventHandler[]>();
+
+  on<E extends MessagerEventTypes>(e: E, handler: MessagerEventHandler<E>) {
+    const store = this.handlers.get(e) || [];
+
+    if (!store.includes(handler)) {
+      store.push(handler);
+    }
+
+    this.handlers.set(e, store);
+
+    return () => {
+      store.splice(store.indexOf(handler), 1);
+      this.handlers.set(e, store);
+    };
   }
 
-  off(event: string, handler?: ((...args: unknown[]) => void) | undefined): void {
-    throw new Error('Method not implemented.');
+  off<E extends MessagerEventTypes>(e: E, handler?: MessagerEventHandler<E>): void {
+    const store = this.handlers.get(e) || [];
+
+    if (handler) {
+      store.splice(store.indexOf(handler), 1);
+      this.handlers.set(e, store);
+    } else {
+      this.handlers.set(e, []);
+    }
+  }
+
+  dispose(): void {
+    this.connection.close();
+    this.peer.disconnect();
   }
 }
 

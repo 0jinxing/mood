@@ -22,24 +22,24 @@ export type SubscribeToDndArg = {
 
 export type SubscribeToDndEmit = (arg: SubscribeToDndArg) => void;
 
-export function subscribeToDragAndDrop(cb: SubscribeToDndEmit, doc?: Document) {
-  const listenerMap = {
-    dragstart: DragAndDropAction.DragStart,
-    drag: DragAndDropAction.Drag,
-    dragenter: DragAndDropAction.DragEnter,
-    dragleave: DragAndDropAction.DragLeave,
-    dragover: DragAndDropAction.DragOver,
-    drop: DragAndDropAction.Drop,
-    dragend: DragAndDropAction.DragEnd
-  } as const;
+const DND_LISTENER_MAP = {
+  dragstart: DragAndDropAction.DragStart,
+  drag: DragAndDropAction.Drag,
+  dragenter: DragAndDropAction.DragEnter,
+  dragleave: DragAndDropAction.DragLeave,
+  dragover: DragAndDropAction.DragOver,
+  drop: DragAndDropAction.Drop,
+  dragend: DragAndDropAction.DragEnd
+} as const;
 
-  const keys = Object.keys(listenerMap) as Array<keyof typeof listenerMap>;
+export function subscribeToDragAndDrop(cb: SubscribeToDndEmit, doc?: Document) {
+  const keys = Object.keys(DND_LISTENER_MAP) as Array<keyof typeof DND_LISTENER_MAP>;
 
   keys.map(key => {
     on(doc || document, key, ev => {
       cb({
         source: DispatchType.DragAndDrop,
-        action: listenerMap[key],
+        action: DND_LISTENER_MAP[key],
         id: mirror.getId(ev.target),
         x: ev.clientX,
         y: ev.clientY

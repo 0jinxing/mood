@@ -5,6 +5,5 @@ import { createEvent } from '../../utils/event';
 
 export const receiveToDnd: ReceiveHandler<SubscribeToDndArg> = (ev, context) => {
   const node = mirror.getNode(ev.id);
-
   createEvent(node || context.$iframe.ownerDocument, 'drag');
 };

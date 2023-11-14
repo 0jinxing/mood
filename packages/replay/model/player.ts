@@ -9,12 +9,13 @@ import {
 } from '@mood/record';
 
 import { createScheduler, Scheduler } from './scheduler';
-import { applyIncremental } from '../actors';
+import { applyIncremental } from '../actions';
 import { ReceiveContext } from '../types';
 
 export type PlayerConfig = {
   speed: number;
   root: HTMLElement | Element;
+  live?: boolean;
   styleRules: string[];
   customApplyIncremental?: typeof applyIncremental;
 };
@@ -230,6 +231,10 @@ export class Player {
       }
       this.scheduler.push({ exec, delay });
     }
+  }
+
+  public pushEvent(event: RecordEventWithTime) {
+    // TODO: handle event
   }
 }
 

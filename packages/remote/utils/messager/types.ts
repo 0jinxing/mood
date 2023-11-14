@@ -5,6 +5,7 @@ export enum MessagerEventTypes {
   MIRROR_READY,
   START,
   STOP,
+
   SEND_CHUNK,
   ACK_CHUNK,
   REQUEST_CONTROL
@@ -31,11 +32,20 @@ export type RequestControlEvent = {
   uid: string;
 };
 
-export type MessagerEvent = SendChunkEvent | AckChunkEvent | RequestControlEvent;
+type PayloadEvent = SendChunkEvent | AckChunkEvent | RequestControlEvent;
+type WithoutPayloadEvent = Exclude<MessagerEventTypes, PayloadEvent['event']>;
+
+export type MessagerEvent = PayloadEvent | { event: WithoutPayloadEvent };
+
+export type MessagerEventHandler<E extends MessagerEventTypes = any> = (
+  payload: Extract<MessagerEvent, { event: E }> extends { payload: infer P } ? P : never
+) => void;
 
 export interface Messager {
-  send(data: unknown): Promise<void>;
+  send(data: MessagerEvent): Promise<void>;
 
-  on(event: string, handler: (...args: unknown[]) => void): () => unknown;
-  off(event: string, handler?: (...args: unknown[]) => void): void;
+  on<E extends MessagerEventTypes>(event: E, handler: MessagerEventHandler<E>): () => void;
+  off<E extends MessagerEventTypes>(event: E, handler?: MessagerEventHandler<E>): void;
+
+  dispose(): void;
 }

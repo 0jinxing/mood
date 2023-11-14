@@ -1,4 +1,4 @@
 export * from './model';
 export * from './utils';
-export * from './actors';
+export * from './actions';
 export * from './types';
