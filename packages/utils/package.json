@@ -4,6 +4,9 @@
   "module": "dist/index.es.js",
   "version": "0.0.1",
   "license": "MIT",
+  "scripts": {
+    "types": "tsc --emitDeclarationOnly"
+  },
   "dependencies": {
     "utility-types": "^3.10.0"
   }

@@ -5,8 +5,7 @@
   "main": "dist/index.js",
   "module": "dist/index.es.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "publish": "npm publish --access public"
+    "types": "tsc --emitDeclarationOnly"
   },
   "keywords": [],
   "author": "",

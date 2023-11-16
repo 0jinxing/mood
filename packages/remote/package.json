@@ -4,8 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "build": "echo \"shadow build\"",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "types": "tsc --emitDeclarationOnly"
   },
   "keywords": [],
   "author": "",
