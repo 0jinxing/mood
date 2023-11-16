@@ -3,24 +3,25 @@
   "private": true,
   "version": "1.0.0",
   "license": "MIT",
+  "type": "module",
   "scripts": {
-    "bench": "ts-node bench/index.ts",
-    "test": "mocha -r ts-node/register **/*.test.ts",
+    "bench": "NODE_OPTIONS=\"--experimental-loader ts-node/esm --no-warnings\" node ./bench/index.ts",
+    "test": "NODE_OPTIONS=\"--experimental-loader ts-node/esm --no-warnings\" mocha **/*.test.ts",
     "preinstall": "npx playwright install"
   },
   "dependencies": {
-    "@mood/snapshot": "workspace:^0.0.1",
-    "@playwright/test": "^1.38.1",
-    "@stdlib/bench": "^0.0.12"
+    "@mood/snapshot": "workspace:^",
+    "@playwright/test": "^1.39.0",
+    "@stdlib/bench": "^0.2.0"
   },
   "devDependencies": {
-    "@types/chai": "^4.3.1",
-    "@types/mocha": "^9.1.1",
-    "@types/node": "^17.0.25",
-    "chai": "^4.3.6",
-    "jest-snapshot": "^27.5.1",
-    "mocha": "^9.2.2",
-    "ts-node": "^10.7.0",
-    "typescript": "^4.6.3"
+    "@types/chai": "^4.3.10",
+    "@types/mocha": "^10.0.4",
+    "@types/node": "^20.9.0",
+    "chai": "^4.3.10",
+    "jest-snapshot": "^29.7.0",
+    "mocha": "^10.2.0",
+    "ts-node": "^10.9.1",
+    "typescript": "^5.2.2"
   }
 }

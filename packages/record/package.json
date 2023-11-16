@@ -12,8 +12,8 @@
   "author": "",
   "license": "MIT",
   "dependencies": {
-    "@mood/snapshot": "0.0.1",
-    "@mood/utils": "workspace:^0.0.1",
+    "@mood/snapshot": "workspace:^",
+    "@mood/utils": "workspace:^",
     "utility-types": "^3.10.0"
   },
   "devDependencies": {

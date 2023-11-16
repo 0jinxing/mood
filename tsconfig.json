@@ -1,3 +1,25 @@
 {
-  "extends": "./tsconfig.base.json"
+  "compilerOptions": {
+    "module": "ESNext",
+    "target": "ES5",
+    "lib": [
+      "ES2018",
+      "DOM"
+    ],
+    "moduleResolution": "Node",
+    "noImplicitAny": true,
+    "strictNullChecks": true,
+    "downlevelIteration": true,
+    "removeComments": true,
+    "preserveConstEnums": true,
+    "sourceMap": true,
+    "allowSyntheticDefaultImports": true,
+    "skipLibCheck": true,
+    "declaration": true,
+    "esModuleInterop": true,
+  },
+  "ts-node": {
+    "experimentalSpecifierResolution": "node",
+  },
+  "compileOnSave": false
 }

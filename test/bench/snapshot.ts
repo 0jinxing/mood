@@ -1,6 +1,6 @@
 import * as fs from 'fs';
 import * as path from 'path';
-import * as bench from '@stdlib/bench';
+import bench from '@stdlib/bench';
 import { launchBrowser } from '../utils/browser';
 
 function getCode() {

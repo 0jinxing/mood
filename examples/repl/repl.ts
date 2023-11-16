@@ -1,6 +1,6 @@
-import * as fs from 'fs';
-import * as path from 'path';
-import * as inquirer from 'inquirer';
+import fs from 'fs';
+import path from 'path';
+import inquirer from 'inquirer';
 import { chromium } from '@playwright/test';
 
 function getCode(): string {
@@ -73,7 +73,7 @@ function getCode(): string {
 
     await page.evaluate(`;${code}
       window.__IS_RECORDING__ = true
-      record({
+      $$mood.record({
         emit: event => window._replLog(event)
       });
      `);
@@ -83,7 +83,7 @@ function getCode(): string {
       if (!isRecording) {
         await page.evaluate(`;${code}
           window.__IS_RECORDING__ = true
-          record({
+          $$mood.record({
             emit: event => window._replLog(event)
           });
         `);
@@ -106,7 +106,7 @@ function getCode(): string {
           <meta name="viewport" content="width=device-width, initial-scale=1.0" />
           <meta http-equiv="X-UA-Compatible" content="ie=edge" />
           <title>Record @${time}</title>
-          <link rel="stylesheet" href="../../../packages/replay/index.css" />
+          <link rel="stylesheet" href="../../../packages/replay/styles/index.css" />
         </head>
         <body>
           <script src="../../../packages/replay/dist/index.iife.js"></script>
@@ -114,7 +114,7 @@ function getCode(): string {
             /*<!--*/
             const events = ${JSON.stringify(events).replace(/<\/script>/g, '<\\/script>')};
             /*-->*/
-            const replayer = createPlayer(events);
+            const replayer = $$mood.createPlayer(events);
             replayer.play();
           </script>
         </body>

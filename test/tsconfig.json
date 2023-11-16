@@ -1,8 +1,26 @@
 {
-  "extends": "../tsconfig.base.json",
   "compilerOptions": {
-    "target": "es2016",
-    "module": "commonjs"
+    "module": "ESNext",
+    "target": "ES5",
+    "lib": [
+      "ES2018",
+      "DOM"
+    ],
+    "moduleResolution": "Node",
+    "noImplicitAny": true,
+    "strictNullChecks": true,
+    "downlevelIteration": true,
+    "removeComments": true,
+    "preserveConstEnums": true,
+    "sourceMap": true,
+    "allowSyntheticDefaultImports": true,
+    "skipLibCheck": true,
+    "declaration": true,
+    "esModuleInterop": true,
   },
-  "include": [".", "node_modules/@types/mocha"]
+  "compileOnSave": false,
+  "include": [
+    ".",
+    "node_modules/@types/mocha"
+  ]
 }
