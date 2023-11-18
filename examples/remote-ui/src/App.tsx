@@ -4,7 +4,7 @@ function App() {
   return (
     <div>
       <div>
-        <Link to="/client">client</Link>
+        <Link to="/mirror">mirror</Link>
       </div>
       <div>
         <Link to="/embed">embed</Link>

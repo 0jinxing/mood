@@ -1,7 +1,9 @@
 {
   "name": "@mood/remote",
   "version": "1.0.0",
-  "main": "index.js",
+  "main": "./dist/index.js",
+  "module": "./dist/index.esm.js",
+  "types": "./dist/index.d.ts",
   "type": "module",
   "scripts": {
     "types": "tsc --emitDeclarationOnly"
@@ -14,6 +16,7 @@
     "@mood/replay": "workspace:^",
     "@mood/snapshot": "workspace:^",
     "@mood/utils": "workspace:^",
+    "@xstate/inspect": "^0.8.0",
     "nanoid": "^5.0.3",
     "peerjs": "^1.5.1",
     "xstate": "^4.38.3"

@@ -1,6 +1,5 @@
 import esbuild from 'esbuild';
 import path from 'path';
-import os from 'os';
 import pkgs from './pkgs';
 
 const formats = ['esm', 'cjs', 'iife'] as const;

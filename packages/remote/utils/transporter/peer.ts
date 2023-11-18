@@ -1,18 +1,23 @@
 import Peer, { DataConnection, PeerOptions } from 'peerjs';
-import { Messager, MessagerEvent, MessagerEventHandler, MessagerEventTypes } from './types';
+import {
+  Transporter,
+  TransporterEvent,
+  TransporterEventHandler,
+  TransporterEventTypes
+} from './types';
 
-export type PeerMessagerOptions = {
+export type PeerTransporterOptions = {
   id: string;
   role: 'client' | 'embed';
 } & Exclude<PeerOptions, 'id' | 'role'>;
 
-export class PeerMessager implements Messager {
+export class PeerTransporter implements Transporter {
   peer: Peer;
   connection: DataConnection;
 
   ready$$: Promise<void>;
 
-  constructor(private options: PeerMessagerOptions) {
+  constructor(private options: PeerTransporterOptions) {
     this.peer = new Peer(this.uid, options);
     this.connection = this.peer.connect(this.target);
 
@@ -33,15 +38,15 @@ export class PeerMessager implements Messager {
     return 'embed-' + this.options.id;
   }
 
-  async send(data: MessagerEvent) {
+  async send(data: TransporterEvent) {
     if (!this.connection.open) await this.ready$$;
 
     this.connection.send(data);
   }
 
-  handlers = new Map<MessagerEventTypes, MessagerEventHandler[]>();
+  handlers = new Map<TransporterEventTypes, TransporterEventHandler[]>();
 
-  on<E extends MessagerEventTypes>(e: E, handler: MessagerEventHandler<E>) {
+  on<E extends TransporterEventTypes>(e: E, handler: TransporterEventHandler<E>) {
     const store = this.handlers.get(e) || [];
 
     if (!store.includes(handler)) {
@@ -56,7 +61,7 @@ export class PeerMessager implements Messager {
     };
   }
 
-  off<E extends MessagerEventTypes>(e: E, handler?: MessagerEventHandler<E>): void {
+  off<E extends TransporterEventTypes>(e: E, handler?: TransporterEventHandler<E>): void {
     const store = this.handlers.get(e) || [];
 
     if (handler) {
@@ -73,6 +78,6 @@ export class PeerMessager implements Messager {
   }
 }
 
-export const createPeerMessager = (options: PeerMessagerOptions) => {
-  return new PeerMessager(options);
+export const createPeerTransporter = (options: PeerTransporterOptions) => {
+  return new PeerTransporter(options);
 };

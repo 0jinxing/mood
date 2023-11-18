@@ -43,8 +43,6 @@ export class Player {
 
   private $cursor: HTMLElement;
 
-  private baseline = 0;
-
   private prev: RecordEventWithTime;
 
   private config: PlayerConfig = defaultConfig;
@@ -53,7 +51,10 @@ export class Player {
 
   emitter: Emitter<EmitterEvents>;
 
-  constructor(private events: RecordEventWithTime[], config: Partial<PlayerConfig> = {}) {
+  constructor(
+    private events: RecordEventWithTime[],
+    config: Partial<PlayerConfig> = {}
+  ) {
     this.scheduler = createScheduler();
 
     this.setConfig(config);
@@ -80,7 +81,6 @@ export class Player {
     this.config.root.appendChild(this.$container);
 
     const index = this.events.findIndex(i => i.type === EventTypes.FULL_SNAPSHOT);
-    this.baseline = this.events[index].timestamp;
 
     for (const event of this.events.slice(0, index + 1)) {
       const handler = this.picked(event, true);
@@ -181,6 +181,12 @@ export class Player {
     return wrapped;
   }
 
+  get baseline(): number {
+    return (
+      this.events[this.events.findIndex(i => i.type === EventTypes.FULL_SNAPSHOT)]?.timestamp || 0
+    );
+  }
+
   get metaData(): PlayerMetaData {
     const end = this.events.slice(-1)[0];
     const totalTime = Math.max(end.timestamp - this.baseline, 0);
@@ -200,6 +206,7 @@ export class Player {
 
   public play() {
     this.scheduler.clear();
+    console.log('current events', this.events);
 
     for (const event of this.events) {
       if (event.timestamp <= this.prev?.timestamp || event === this.prev) continue;
@@ -235,6 +242,7 @@ export class Player {
 
   public pushEvent(event: RecordEventWithTime) {
     // TODO: handle event
+    this.events.push(event);
   }
 }
 

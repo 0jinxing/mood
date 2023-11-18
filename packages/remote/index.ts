@@ -1,2 +1,3 @@
-export * from './client';
+export * from './mirror';
 export * from './embed';
+export * from './utils';

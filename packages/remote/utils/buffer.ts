@@ -1,4 +1,4 @@
-import { Chunk } from './messager/types';
+import { Chunk } from './transporter/types';
 
 export const DEFAULT_TIMEOUT = 500;
 
@@ -37,17 +37,18 @@ export class EmbedBuffer<D> extends CursorBuffer<D> {
     super();
   }
 
-  private timeoutAndRetry() {
+  private retry() {
     requestAnimationFrame(() => {
       for (const key in this.model) {
         const record = this.model[key];
         const now = performance.now();
+
         if (now - record.timestamp > (this.options.timeout || DEFAULT_TIMEOUT)) {
           this.options.onTimeout?.(record);
           record.timestamp = now;
         }
       }
-      this.timeoutAndRetry();
+      this.retry();
     });
   }
 }

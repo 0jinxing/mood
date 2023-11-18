@@ -1,5 +1,5 @@
 import { ReceiveHandler } from '@mood/replay';
-import { SubscribeToDndArg } from '../../client/observers/dnd';
+import { SubscribeToDndArg } from '../../mirror/observers/dnd';
 import { mirror } from '@mood/snapshot';
 import { createEvent } from '../../utils/event';
 

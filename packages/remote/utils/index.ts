@@ -1,3 +1,3 @@
 export * from './buffer';
-export * from './messager';
+export * from './transporter';
 export * from './uuid';

@@ -2,8 +2,9 @@
   "name": "@mood/replay",
   "version": "0.0.1",
   "description": "",
-  "main": "dist/index.js",
-  "module": "dist/index.es.js",
+  "main": "./dist/index.js",
+  "module": "./dist/index.esm.js",
+  "types": "./dist/index.d.ts",
   "scripts": {
     "types": "tsc --emitDeclarationOnly"
   },

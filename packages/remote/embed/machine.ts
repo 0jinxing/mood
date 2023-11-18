@@ -1,58 +1,62 @@
 import { assign, createMachine, interpret } from 'xstate';
-import { EmbedBuffer, Messager, MessagerEventTypes } from '../utils';
+import { EmbedBuffer, Transporter, TransporterEventTypes } from '../utils';
 import { RecordEventWithTime, record } from '@mood/record';
+import { inspect } from '@xstate/inspect';
 
 export enum EmbedSignal {
-  START = 'START',
+  READY = 'READY',
   CONNECT = 'CONNECT',
   STOP = 'STOP'
 }
 
 export enum EmbedStatus {
   IDLE = 'IDLE',
-  READY = 'READY',
+  CONNECTION = 'CONNECTION',
   CONNECTED = 'CONNECTED'
 }
 
 export type EmbedContext = {
-  messager: Messager;
-  dispose?: Partial<Record<string, undefined | (() => void)>>;
+  transporter: Transporter;
+  dispose?: Partial<Record<string, () => void>>;
 };
 
 export const createEmbedService = (context: EmbedContext) => {
-  const messager = context.messager;
+  const transporter = context.transporter;
 
   const buffer = new EmbedBuffer<RecordEventWithTime>({
     onTimeout(data) {
-      messager.send({ event: MessagerEventTypes.SEND_CHUNK, payload: data });
+      transporter.send({ event: TransporterEventTypes.SEND_CHUNK, chunk: data });
     }
   });
+
+  const { IDLE, CONNECTION, CONNECTED } = EmbedStatus;
+  const { READY, CONNECT, STOP } = EmbedSignal;
 
   const service = interpret(
     createMachine(
       {
         context,
-        initial: 'idle',
+        initial: IDLE,
         states: {
-          [EmbedStatus.IDLE]: {
+          [IDLE]: {
             on: {
-              [EmbedSignal.START]: {
-                target: EmbedStatus.READY,
-                actions: [EmbedSignal.START]
+              [READY]: {
+                target: CONNECTION,
+                actions: [READY]
               }
             }
           },
-          [EmbedStatus.READY]: {
+          [CONNECTION]: {
             on: {
-              [EmbedSignal.CONNECT]: {
-                target: EmbedStatus.CONNECTED,
-                actions: [EmbedSignal.CONNECT]
+              [CONNECT]: {
+                target: CONNECTED,
+                actions: [CONNECT]
               }
             }
           },
-          [EmbedStatus.CONNECTED]: {
+          [CONNECTED]: {
             on: {
-              [EmbedSignal.STOP]: { target: EmbedStatus.IDLE, actions: [EmbedSignal.STOP] }
+              [STOP]: { target: IDLE, actions: [STOP] }
             }
           }
         }
@@ -60,31 +64,45 @@ export const createEmbedService = (context: EmbedContext) => {
 
       {
         actions: {
-          [EmbedSignal.START]() {},
+          [READY]() {
+            console.log('embed ready');
+            const off = transporter.on(TransporterEventTypes.MIRROR_READY, () => {
+              transporter.send({ event: TransporterEventTypes.SOURCE_READY });
+              service.send(EmbedSignal.CONNECT);
+              off();
+            });
+          },
 
-          [EmbedSignal.CONNECT]: assign(({ messager, dispose }) => {
+          [CONNECT]: assign(({ transporter, dispose }) => {
             dispose?.['connect']?.();
+            console.log('start record');
 
-            const stop = record({
+            const stopRecord = record({
               emit(e) {
                 const id = buffer.add(e);
-                messager.send({ event: MessagerEventTypes.SEND_CHUNK, payload: buffer.model[id] });
+                transporter.send({
+                  event: TransporterEventTypes.SEND_CHUNK,
+                  chunk: buffer.model[id]
+                });
               }
             });
-            return { messager, dispose: { ...dispose, connect: stop } };
+            return { transporter, dispose: { ...dispose, connect: stopRecord } };
           }),
 
-          [EmbedSignal.STOP]({ messager, dispose }) {
+          [STOP]({ transporter, dispose }) {
             dispose?.['connect']?.();
-            messager.dispose();
+            transporter.dispose();
             buffer.reset();
           }
         }
       }
-    )
+    ),
+    { devTools: true }
   );
 
-  messager.on(MessagerEventTypes.ACK_CHUNK, chunk => {});
+  transporter.on(TransporterEventTypes.ACK_CHUNK, e => buffer.delete(e.id));
+
+  inspect();
 
   return service;
 };

@@ -2,9 +2,9 @@
   "name": "@mood/record",
   "version": "0.0.1",
   "description": "",
-  "main": "dist/index.js",
-  "module": "dist/index.es.js",
-  "types": "dist/index.d.ts",
+  "main": "./dist/index.js",
+  "module": "./dist/index.esm.js",
+  "types": "./dist/index.d.ts",
   "scripts": {
     "types": "tsc --emitDeclarationOnly"
   },

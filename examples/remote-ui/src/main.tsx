@@ -1,7 +1,6 @@
-import React from 'react';
 import ReactDOM from 'react-dom/client';
 import { RouterProvider, createBrowserRouter } from 'react-router-dom';
-import ClientPage from './routes/Client';
+import MirrorPage from './routes/Mirror';
 import EmbedPage from './routes/Embed';
 import App from './App';
 
@@ -11,8 +10,8 @@ const router = createBrowserRouter([
     element: <App />
   },
   {
-    path: '/client',
-    element: <ClientPage />
+    path: '/mirror',
+    element: <MirrorPage />
   },
   {
     path: '/embed',
@@ -20,8 +19,4 @@ const router = createBrowserRouter([
   }
 ]);
 
-ReactDOM.createRoot(document.getElementById('root')!).render(
-  <React.StrictMode>
-    <RouterProvider router={router} />
-  </React.StrictMode>
-);
+ReactDOM.createRoot(document.getElementById('root')!).render(<RouterProvider router={router} />);
