@@ -62,6 +62,12 @@ export class ClientBuffer<D> extends CursorBuffer<D> {
     super();
   }
 
+  add(data: D): number {
+    super.add(data);
+    this.apply(this.model[this.cursor]);
+    return this.cursor;
+  }
+
   /**
    * 考虑 chunk 乱序 或者 chunk 丢失的情况
    * TODOS:
@@ -69,7 +75,7 @@ export class ClientBuffer<D> extends CursorBuffer<D> {
    * 如果需要，怎么保证 chunk 的顺序？（无效丢失，让 对方 重发）
    */
   apply(chunk: Chunk<D>) {
-    if (chunk.id <= this.cursor) return;
+    if (chunk.id < this.cursor) return;
     this.model[chunk.id] = chunk;
     this.emit();
   }
@@ -77,7 +83,7 @@ export class ClientBuffer<D> extends CursorBuffer<D> {
   private emit() {
     const records = Object.values(this.model);
     let index = 0;
-    while (index < records.length && this.cursor === records[index].id - 1) {
+    while (index < records.length && this.cursor === records[index].id) {
       this.options.onEmit(records[index]);
       this.delete(records[index].id);
 

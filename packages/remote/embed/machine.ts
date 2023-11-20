@@ -97,6 +97,8 @@ export const createEmbedService = (context: EmbedContext) => {
     { devTools: true }
   );
 
+  service.start();
+
   transporter.on(TransporterEventTypes.ACK_CHUNK, e => buffer.delete(e.id));
 
   inspect();

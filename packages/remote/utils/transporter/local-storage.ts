@@ -20,6 +20,7 @@ export class LocalStorageTransporter implements Transporter {
     if (e.key !== this.storageKey || !e.newValue) return;
 
     const msg = JSON.parse(e.newValue) as TransporterEvent;
+
     this.handlers.get(msg.event)?.forEach(h => h(msg));
   }
 

@@ -4,10 +4,14 @@ function App() {
   return (
     <div>
       <div>
-        <Link to="/mirror">mirror</Link>
+        <Link to="/mirror" target="_blank">
+          mirror
+        </Link>
       </div>
       <div>
-        <Link to="/embed">embed</Link>
+        <Link to="/embed" target="_blank">
+          embed
+        </Link>
       </div>
     </div>
   );

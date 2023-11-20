@@ -27,11 +27,13 @@ export type MirrorContext = {
 const { IDLE, CONNECTED, STOPPED } = MirrorStatus;
 const { READY, STOP, RESET } = MirrorSignal;
 
-export const createMirrorService = (context: MirrorContext) => {
+export const createMirrorService = (context: Exclude<MirrorContext, 'player'>) => {
+  const player: Player = new Player([], { speed: 1, ...context.playerConfig, live: true });
+
   const service = interpret(
     createMachine(
       {
-        context,
+        context: { ...context, player },
         initial: IDLE,
         states: {
           [IDLE]: {
@@ -57,8 +59,6 @@ export const createMirrorService = (context: MirrorContext) => {
     { devTools: true }
   );
 
-  const player: Player = new Player([], { speed: 1, ...context.playerConfig, live: true });
-
   const buffer = new ClientBuffer<RecordEventWithTime>({
     onEmit(chunk) {
       player.pushEvent(chunk.data);
@@ -67,8 +67,12 @@ export const createMirrorService = (context: MirrorContext) => {
 
   context.transporter.on(TransporterEventTypes.SOURCE_READY, () => {
     service.send(READY);
-    context.transporter.on(TransporterEventTypes.SEND_CHUNK, e => buffer.add(e.chunk.data));
+    context.transporter.on(TransporterEventTypes.SEND_CHUNK, e => {
+      buffer.add(e.chunk.data);
+    });
   });
+
+  service.start();
 
   inspect();
 
