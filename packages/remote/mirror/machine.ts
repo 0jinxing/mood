@@ -47,7 +47,9 @@ export const createMirrorService = (context: MirrorContext) => {
       },
       {
         actions: {
-          [READY]() {},
+          [READY]() {
+            context.transporter.send({ event: TransporterEventTypes.MIRROR_READY });
+          },
           [STOP]() {}
         }
       }

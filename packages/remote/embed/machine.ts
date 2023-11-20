@@ -65,7 +65,6 @@ export const createEmbedService = (context: EmbedContext) => {
       {
         actions: {
           [READY]() {
-            console.log('embed ready');
             const off = transporter.on(TransporterEventTypes.MIRROR_READY, () => {
               transporter.send({ event: TransporterEventTypes.SOURCE_READY });
               service.send(EmbedSignal.CONNECT);
@@ -75,8 +74,6 @@ export const createEmbedService = (context: EmbedContext) => {
 
           [CONNECT]: assign(({ transporter, dispose }) => {
             dispose?.['connect']?.();
-            console.log('start record');
-
             const stopRecord = record({
               emit(e) {
                 const id = buffer.add(e);

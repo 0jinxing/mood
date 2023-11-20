@@ -206,7 +206,6 @@ export class Player {
 
   public play() {
     this.scheduler.clear();
-    console.log('current events', this.events);
 
     for (const event of this.events) {
       if (event.timestamp <= this.prev?.timestamp || event === this.prev) continue;

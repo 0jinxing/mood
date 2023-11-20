@@ -1,7 +1,6 @@
 import {
   MirrorSignal,
   Transporter,
-  TransporterEventTypes,
   createLocalStorageTransporter,
   createMirrorService
 } from '@mood/remote';
@@ -23,7 +22,6 @@ const MirrorPage: FC = () => {
 
   const handleStart = () => {
     service.current?.send(MirrorSignal.READY);
-    transporter.current.send({ event: TransporterEventTypes.MIRROR_READY });
   };
 
   const handlePlay = () => {
