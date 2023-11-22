@@ -2,28 +2,21 @@ import { Chunk } from './transporter/types';
 
 export const DEFAULT_TIMEOUT = 500;
 
-export class CursorBuffer<D> {
+export abstract class ChunkBuffer<D> {
+  protected rafId: ReturnType<typeof requestAnimationFrame> = 0;
+
   cursor = 0;
   model: Record<string, Chunk<D>> = {};
 
-  add(data: D) {
-    this.cursor++;
-
-    this.model[this.cursor] = {
-      id: this.cursor,
-      timestamp: performance.now(),
-      data
-    };
-    return this.cursor;
-  }
+  abstract add(data: D | Chunk<D>): number;
 
   delete(id: number) {
     delete this.model[id];
   }
 
   reset() {
-    this.model = {};
-    this.cursor = 0;
+    cancelAnimationFrame(this.rafId);
+    Object.assign(this, { model: {}, cursor: 0, rafId: 0 });
   }
 }
 
@@ -32,12 +25,24 @@ export type EmbedBufferOptions<D> = {
   onTimeout?: (data: Chunk<D>) => void;
 };
 
-export class EmbedBuffer<D> extends CursorBuffer<D> {
+export class EmbedBuffer<D> extends ChunkBuffer<D> {
   constructor(private options: EmbedBufferOptions<D>) {
     super();
   }
 
-  private retry() {
+  add(data: D): number {
+    this.model[this.cursor] = { id: this.cursor, timestamp: performance.now(), data };
+    this.cursor++;
+    this.rafTimeout();
+
+    return this.cursor;
+  }
+
+  private rafTimeout() {
+    cancelAnimationFrame(this.rafId);
+
+    if (Object.values(this.model).length === 0) return;
+
     requestAnimationFrame(() => {
       for (const key in this.model) {
         const record = this.model[key];
@@ -48,47 +53,36 @@ export class EmbedBuffer<D> extends CursorBuffer<D> {
           record.timestamp = now;
         }
       }
-      this.retry();
+      this.rafTimeout();
     });
   }
 }
 
-export type ClientBufferOptions<D> = {
+export type MirrorBufferOptions<D> = {
   onEmit: (data: Chunk<D>) => void;
 };
 
-export class ClientBuffer<D> extends CursorBuffer<D> {
-  constructor(private options: ClientBufferOptions<D>) {
+export class MirrorBuffer<D> extends ChunkBuffer<D> {
+  constructor(private options: MirrorBufferOptions<D>) {
     super();
   }
 
-  add(data: D): number {
-    super.add(data);
-    this.apply(this.model[this.cursor]);
+  add(chunk: Chunk<D>) {
+    if (chunk.id > this.cursor) {
+      this.model[chunk.id] = chunk;
+    }
+
+    this.rafEmit();
     return this.cursor;
   }
 
-  /**
-   * 考虑 chunk 乱序 或者 chunk 丢失的情况
-   * TODOS:
-   * 是否需要保证 chunk 的顺序？
-   * 如果需要，怎么保证 chunk 的顺序？（无效丢失，让 对方 重发）
-   */
-  apply(chunk: Chunk<D>) {
-    if (chunk.id < this.cursor) return;
-    this.model[chunk.id] = chunk;
-    this.emit();
-  }
-
-  private emit() {
-    const records = Object.values(this.model);
-    let index = 0;
-    while (index < records.length && this.cursor === records[index].id) {
-      this.options.onEmit(records[index]);
-      this.delete(records[index].id);
-
+  private rafEmit() {
+    cancelAnimationFrame(this.rafId);
+    if (this.model[this.cursor]) {
+      this.options.onEmit(this.model[this.cursor]);
+      this.delete(this.cursor);
       this.cursor++;
-      index++;
+      this.rafEmit();
     }
   }
 }

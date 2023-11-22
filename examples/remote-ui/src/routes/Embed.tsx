@@ -7,6 +7,7 @@ const EmbedPage: FC = () => {
 
   useEffect(() => {
     embed.current = createEmbedService({ transporter: createLocalStorageTransporter() });
+    embed.current.start();
   }, []);
 
   const handleStart = () => {

@@ -18,6 +18,7 @@ const MirrorPage: FC = () => {
         root: container
       }
     });
+    service.current.start();
   };
 
   const handleStart = () => {

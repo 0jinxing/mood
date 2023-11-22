@@ -83,7 +83,7 @@ export class Player {
     const index = this.events.findIndex(i => i.type === EventTypes.FULL_SNAPSHOT);
 
     for (const event of this.events.slice(0, index + 1)) {
-      const handler = this.picked(event, true);
+      const handler = this.pickHandler(event, true);
       handler();
     }
 
@@ -137,7 +137,7 @@ export class Player {
     }
   }
 
-  private picked(event: RecordEventWithTime, sync = false) {
+  private pickHandler(event: RecordEventWithTime, sync = false) {
     const handler = () => {
       switch (event.type) {
         case EventTypes.DOM_CONTENT_LOADED:
@@ -211,7 +211,7 @@ export class Player {
       if (event.timestamp <= this.prev?.timestamp || event === this.prev) continue;
 
       const baseline = this.prev?.timestamp || this.baseline;
-      this.scheduler.push({ exec: this.picked(event), delay: this.getDelay(event, baseline) });
+      this.scheduler.push({ exec: this.pickHandler(event), delay: this.getDelay(event, baseline) });
     }
     this.scheduler.start();
     this.emitter.emit('status', 'playing');
@@ -229,7 +229,7 @@ export class Player {
 
     for (let event of events.slice(slice)) {
       const delay = this.getDelay(event, baseline);
-      const exec = this.picked(event);
+      const exec = this.pickHandler(event);
 
       if (delay <= 0) {
         exec();

@@ -1,7 +1,6 @@
-import { assign, createMachine, interpret } from 'xstate';
+import { assign, createMachine, interpret } from '@xstate/fsm';
 import { EmbedBuffer, Transporter, TransporterEventTypes } from '../utils';
 import { RecordEventWithTime, record } from '@mood/record';
-import { inspect } from '@xstate/inspect';
 
 export enum EmbedSignal {
   READY = 'READY',
@@ -29,34 +28,31 @@ export const createEmbedService = (context: EmbedContext) => {
     }
   });
 
-  const { IDLE, CONNECTION, CONNECTED } = EmbedStatus;
-  const { READY, CONNECT, STOP } = EmbedSignal;
-
   const service = interpret(
     createMachine(
       {
         context,
-        initial: IDLE,
+        initial: EmbedStatus.IDLE,
         states: {
-          [IDLE]: {
+          [EmbedStatus.IDLE]: {
             on: {
-              [READY]: {
-                target: CONNECTION,
-                actions: [READY]
+              [EmbedSignal.READY]: {
+                target: EmbedStatus.CONNECTION,
+                actions: [EmbedSignal.READY]
               }
             }
           },
-          [CONNECTION]: {
+          [EmbedStatus.CONNECTION]: {
             on: {
-              [CONNECT]: {
-                target: CONNECTED,
-                actions: [CONNECT]
+              [EmbedSignal.CONNECT]: {
+                target: EmbedStatus.CONNECTED,
+                actions: [EmbedSignal.CONNECT]
               }
             }
           },
-          [CONNECTED]: {
+          [EmbedStatus.CONNECTED]: {
             on: {
-              [STOP]: { target: IDLE, actions: [STOP] }
+              [EmbedSignal.STOP]: { target: EmbedStatus.IDLE, actions: [EmbedSignal.STOP] }
             }
           }
         }
@@ -64,44 +60,43 @@ export const createEmbedService = (context: EmbedContext) => {
 
       {
         actions: {
-          [READY]() {
-            const off = transporter.on(TransporterEventTypes.MIRROR_READY, () => {
+          [EmbedSignal.READY]: assign(({ transporter, dispose }) => {
+            dispose?.[EmbedSignal.READY]?.();
+            const removeListener = transporter.on(TransporterEventTypes.MIRROR_READY, () => {
               transporter.send({ event: TransporterEventTypes.SOURCE_READY });
               service.send(EmbedSignal.CONNECT);
-              off();
+              removeListener();
             });
-          },
 
-          [CONNECT]: assign(({ transporter, dispose }) => {
-            dispose?.['connect']?.();
-            const stopRecord = record({
-              emit(e) {
-                const id = buffer.add(e);
-                transporter.send({
-                  event: TransporterEventTypes.SEND_CHUNK,
-                  chunk: buffer.model[id]
-                });
-              }
-            });
-            return { transporter, dispose: { ...dispose, connect: stopRecord } };
+            return {
+              transporter,
+              dispose: { ...dispose, [EmbedSignal.READY]: removeListener }
+            };
           }),
 
-          [STOP]({ transporter, dispose }) {
-            dispose?.['connect']?.();
+          [EmbedSignal.CONNECT]: assign(({ transporter, dispose }) => {
+            dispose?.[EmbedSignal.CONNECT]?.();
+            const stopRecord = record({
+              emit(e) {
+                const chunk = buffer.model[buffer.add(e) - 1];
+                transporter.send({ event: TransporterEventTypes.SEND_CHUNK, chunk });
+              }
+            });
+            return { transporter, dispose: { ...dispose, [EmbedSignal.CONNECT]: stopRecord } };
+          }),
+
+          [EmbedSignal.STOP]({ transporter, dispose }) {
+            dispose?.[EmbedSignal.READY]?.();
+            dispose?.[EmbedSignal.CONNECT]?.();
             transporter.dispose();
             buffer.reset();
           }
         }
       }
-    ),
-    { devTools: true }
+    )
   );
 
-  service.start();
-
   transporter.on(TransporterEventTypes.ACK_CHUNK, e => buffer.delete(e.id));
-
-  inspect();
 
   return service;
 };

@@ -1,8 +1,7 @@
-import { createMachine, interpret } from 'xstate';
-import { ClientBuffer, Transporter, TransporterEventTypes, PeerTransporter } from '../utils';
+import { assign, createMachine, interpret } from '@xstate/fsm';
+import { MirrorBuffer, Transporter, TransporterEventTypes, PeerTransporter } from '../utils';
 import { RecordEventWithTime } from '@mood/record';
 import { Player, PlayerConfig } from '@mood/replay';
-import { inspect } from '@xstate/inspect';
 
 export enum MirrorSignal {
   READY = 'READY',
@@ -24,57 +23,65 @@ export type MirrorContext = {
   playerConfig?: Partial<PlayerConfig>;
 };
 
-const { IDLE, CONNECTED, STOPPED } = MirrorStatus;
-const { READY, STOP, RESET } = MirrorSignal;
-
 export const createMirrorService = (context: Exclude<MirrorContext, 'player'>) => {
   const player: Player = new Player([], { speed: 1, ...context.playerConfig, live: true });
 
-  const service = interpret(
-    createMachine(
-      {
-        context: { ...context, player },
-        initial: IDLE,
-        states: {
-          [IDLE]: {
-            on: { [READY]: { target: CONNECTED, actions: [READY] } }
-          },
-
-          [CONNECTED]: {
-            on: { [STOP]: { target: STOPPED, actions: [STOP] } }
-          },
-
-          [STOPPED]: { on: { [RESET]: { target: IDLE } } }
-        }
-      },
-      {
-        actions: {
-          [READY]() {
-            context.transporter.send({ event: TransporterEventTypes.MIRROR_READY });
-          },
-          [STOP]() {}
-        }
-      }
-    ),
-    { devTools: true }
-  );
-
-  const buffer = new ClientBuffer<RecordEventWithTime>({
+  const buffer = new MirrorBuffer<RecordEventWithTime>({
     onEmit(chunk) {
       player.pushEvent(chunk.data);
     }
   });
 
-  context.transporter.on(TransporterEventTypes.SOURCE_READY, () => {
-    service.send(READY);
-    context.transporter.on(TransporterEventTypes.SEND_CHUNK, e => {
-      buffer.add(e.chunk.data);
-    });
-  });
+  const service = interpret(
+    createMachine(
+      {
+        context: { ...context, player },
+        initial: MirrorStatus.IDLE,
+        states: {
+          [MirrorStatus.IDLE]: {
+            on: {
+              [MirrorSignal.READY]: {
+                target: MirrorStatus.CONNECTED,
+                actions: [MirrorSignal.READY]
+              }
+            }
+          },
 
-  service.start();
+          [MirrorStatus.CONNECTED]: {
+            on: {
+              [MirrorSignal.STOP]: { target: MirrorStatus.STOPPED, actions: [MirrorSignal.STOP] }
+            }
+          },
 
-  inspect();
+          [MirrorStatus.STOPPED]: { on: { [MirrorSignal.RESET]: { target: MirrorStatus.IDLE } } }
+        }
+      },
+      {
+        actions: {
+          [MirrorSignal.READY]: assign(context => {
+            context.transporter.send({ event: TransporterEventTypes.MIRROR_READY });
+
+            const removeListener = context.transporter.on(
+              TransporterEventTypes.SOURCE_READY,
+              () => {
+                removeListener();
+                service.send(MirrorSignal.READY);
+                context.transporter.on(TransporterEventTypes.SEND_CHUNK, e => {
+                  buffer.add(e.chunk);
+                });
+              }
+            );
+
+            return {
+              ...context,
+              dispose: { ...context.dispose, [MirrorSignal.READY]: removeListener }
+            };
+          }),
+          [MirrorSignal.STOP]() {}
+        }
+      }
+    )
+  );
 
   return service;
 };

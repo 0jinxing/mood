@@ -16,9 +16,8 @@
     "@mood/replay": "workspace:^",
     "@mood/snapshot": "workspace:^",
     "@mood/utils": "workspace:^",
-    "@xstate/inspect": "^0.8.0",
+    "@xstate/fsm": "^2.1.0",
     "nanoid": "^5.0.3",
-    "peerjs": "^1.5.1",
-    "xstate": "^4.38.3"
+    "peerjs": "^1.5.1"
   }
 }
