@@ -1,4 +1,3 @@
-import mitt, { Emitter } from 'mitt';
 import { rebuild } from '@mood/snapshot';
 import {
   RecordEventWithTime,
@@ -24,12 +23,6 @@ export type PlayerMetaData = {
   totalTime: number;
 };
 
-type EmitterEvents = {
-  duration: number;
-  status: 'inited' | 'playing' | 'paused' | 'ended';
-  picked: RecordEventWithTime;
-};
-
 const defaultConfig: PlayerConfig = {
   speed: 1,
   root: document.body,
@@ -49,8 +42,6 @@ export class Player {
 
   scheduler: Scheduler;
 
-  emitter: Emitter<EmitterEvents>;
-
   constructor(
     private events: RecordEventWithTime[],
     config: Partial<PlayerConfig> = {}
@@ -58,7 +49,6 @@ export class Player {
     this.scheduler = createScheduler();
 
     this.setConfig(config);
-    this.emitter = mitt();
 
     this.setup();
   }
@@ -82,12 +72,11 @@ export class Player {
 
     const index = this.events.findIndex(i => i.type === EventTypes.FULL_SNAPSHOT);
 
+    // apply meta event
     for (const event of this.events.slice(0, index + 1)) {
       const handler = this.pickHandler(event, true);
       handler();
     }
-
-    this.emitter.emit('status', 'inited');
   }
 
   private setConfig(config: Partial<PlayerConfig>) {
@@ -168,14 +157,9 @@ export class Player {
       handler();
       this.prev = event;
 
-      this.emitter.emit('picked', event);
-      this.emitter.emit('duration', this.metaData.totalTime - this.currentTime);
-
       const index = this.events.indexOf(event);
 
       if (index !== this.events.length - 1) return;
-
-      this.emitter.emit('status', 'ended');
     };
 
     return wrapped;
@@ -201,20 +185,18 @@ export class Player {
 
   public pause() {
     this.scheduler.clear();
-    this.emitter.emit('status', 'paused');
   }
 
   public play() {
     this.scheduler.clear();
 
     for (const event of this.events) {
-      if (event.timestamp <= this.prev?.timestamp || event === this.prev) continue;
+      if (event.timestamp < this.prev?.timestamp || event === this.prev) continue;
 
       const baseline = this.prev?.timestamp || this.baseline;
       this.scheduler.push({ exec: this.pickHandler(event), delay: this.getDelay(event, baseline) });
     }
     this.scheduler.start();
-    this.emitter.emit('status', 'playing');
   }
 
   public seek(offset = 0) {
