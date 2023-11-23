@@ -70,10 +70,11 @@ export class Player {
 
     this.config.root.appendChild(this.$container);
 
-    const index = this.events.findIndex(i => i.type === EventTypes.FULL_SNAPSHOT);
-
     // apply meta event
-    for (const event of this.events.slice(0, index + 1)) {
+    for (const event of this.events.slice(
+      0,
+      this.events.findIndex(i => i.type === EventTypes.FULL_SNAPSHOT) + 1
+    )) {
       const handler = this.pickHandler(event, true);
       handler();
     }
@@ -203,9 +204,15 @@ export class Player {
     const events = this.events;
     this.scheduler.clear();
 
-    const slice = events.findIndex(
-      event => event.type === EventTypes.FULL_SNAPSHOT && event.timestamp < this.baseline + offset
-    );
+    const slice =
+      events.length -
+      events
+        .reverse()
+        .findIndex(
+          event =>
+            event.type === EventTypes.FULL_SNAPSHOT && event.timestamp < this.baseline + offset
+        ) -
+      1;
 
     const baseline = this.baseline + offset;
 
@@ -224,6 +231,10 @@ export class Player {
   public pushEvent(event: RecordEventWithTime) {
     // TODO: handle event
     this.events.push(event);
+    this.scheduler.push({
+      exec: this.pickHandler(event),
+      delay: this.getDelay(event, this.prev?.timestamp || this.baseline)
+    });
   }
 }
 

@@ -14,7 +14,6 @@ export class Scheduler {
   ) {}
 
   public push(...list: ActionWithDelay[]) {
-    // TODO 插入性能优化
     this.queue.push(...list);
     this.queue.sort((a1, a2) => a1.delay - a2.delay);
 
@@ -24,12 +23,12 @@ export class Scheduler {
   }
 
   public start() {
-    const { queue, speed } = this;
-
     this.offset = 0;
     let prevTimestamp = performance.now();
 
     const frameRequest = (time: number) => {
+      const { queue, speed } = this;
+
       this.offset += (time - prevTimestamp) * speed;
       prevTimestamp = time;
 

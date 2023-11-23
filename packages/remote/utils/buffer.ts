@@ -43,7 +43,7 @@ export class EmbedBuffer<D> extends ChunkBuffer<D> {
 
     if (Object.values(this.model).length === 0) return;
 
-    requestAnimationFrame(() => {
+    this.rafId = requestAnimationFrame(() => {
       for (const key in this.model) {
         const record = this.model[key];
         const now = performance.now();
@@ -68,7 +68,7 @@ export class MirrorBuffer<D> extends ChunkBuffer<D> {
   }
 
   add(chunk: Chunk<D>) {
-    if (chunk.id > this.cursor) {
+    if (chunk.id >= this.cursor) {
       this.model[chunk.id] = chunk;
     }
 

@@ -66,8 +66,15 @@ export const createMirrorService = (context: Exclude<MirrorContext, 'player'>) =
               () => {
                 removeListener();
                 service.send(MirrorSignal.READY);
+                player.play();
                 context.transporter.on(TransporterEventTypes.SEND_CHUNK, e => {
                   buffer.add(e.chunk);
+                  if (buffer.cursor > e.chunk.id) {
+                    context.transporter.send({
+                      event: TransporterEventTypes.ACK_CHUNK,
+                      id: e.chunk.id
+                    });
+                  }
                 });
               }
             );

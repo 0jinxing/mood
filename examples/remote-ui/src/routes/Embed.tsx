@@ -27,7 +27,6 @@ const EmbedPage: FC = () => {
       <input></input>
       <input type="checkbox" />
       <br />
-      <iframe data-xstate width="100%" height="400px" />
     </div>
   );
 };
