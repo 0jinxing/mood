@@ -1,5 +1,5 @@
 {
-  "name": "@moods/example-repl",
+  "name": "@moods/repl",
   "private": true,
   "type": "module",
   "scripts": {
