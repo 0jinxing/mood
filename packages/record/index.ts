@@ -9,6 +9,7 @@ export type RecordOptions = {
   customHandler?: (emit: EmitHandler) => () => void;
   checkoutEveryNth?: number;
   checkoutEveryNms?: number;
+  doc?: Document;
 };
 
 function withTimestamp(e: RecordEvent): RecordEventWithTime {
@@ -19,7 +20,7 @@ let wrappedEmit: (e: RecordEventWithTime, checkout?: true) => void;
 let wrappedEmitWithTime: (e: RecordEvent, checkout?: true) => void;
 
 export function record(options: RecordOptions) {
-  const { emit, customHandler, checkoutEveryNms, checkoutEveryNth } = options;
+  const { emit, customHandler, checkoutEveryNms, checkoutEveryNth, doc = document } = options;
 
   let lastFullSnapshotEvent: RecordEventWithTime;
   let incrementalSnapshotCount = 0;
@@ -61,14 +62,14 @@ export function record(options: RecordOptions) {
       },
       checkout
     );
-    const adds = snapshot(document);
+    const adds = snapshot(doc);
 
     if (!adds) {
       throw new Error('Failed to snapshot the document');
     }
 
-    const top = document.documentElement.scrollTop || 0;
-    const left = document.documentElement.scrollLeft || 0;
+    const top = doc.documentElement.scrollTop || 0;
+    const left = doc.documentElement.scrollLeft || 0;
 
     wrappedEmitWithTime({
       type: EventTypes.FULL_SNAPSHOT,
@@ -80,7 +81,7 @@ export function record(options: RecordOptions) {
   const unsubscribes: Function[] = [];
 
   unsubscribes.push(
-    on(document, 'DOMContentLoaded', () => {
+    on(doc, 'DOMContentLoaded', () => {
       wrappedEmitWithTime({ type: EventTypes.DOM_CONTENT_LOADED });
     })
   );
@@ -91,7 +92,7 @@ export function record(options: RecordOptions) {
     customHandler && unsubscribes.push(customHandler(incEmitWithTime));
   };
 
-  if (document.readyState === 'interactive' || document.readyState === 'complete') {
+  if (doc.readyState === 'interactive' || doc.readyState === 'complete') {
     initial();
   } else {
     unsubscribes.push(

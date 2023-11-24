@@ -17,6 +17,7 @@ export enum EmbedStatus {
 export type EmbedContext = {
   transporter: Transporter;
   dispose?: Partial<Record<string, () => void>>;
+  doc?: Document;
 };
 
 export const createEmbedService = (context: EmbedContext) => {

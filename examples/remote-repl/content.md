@@ -1,0 +1,1 @@
+inject -> ready -> connect -> disconnect <-----------------------------
