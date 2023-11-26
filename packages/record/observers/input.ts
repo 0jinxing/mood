@@ -44,6 +44,7 @@ export function subscribeToInput(cb: SubscribeToInputEmit, doc?: Document) {
 
     if (!$target || !isInputElement($target)) return;
 
+    // @TODO <radio> <checkbox> <empty text>
     const value: SubscribeToInputValue =
       $target instanceof HTMLInputElement ? $target.value || $target.checked : $target.value;
 

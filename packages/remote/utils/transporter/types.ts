@@ -1,14 +1,13 @@
 import { RecordEventWithTime } from '@mood/record';
 
 export enum TransporterEventTypes {
-  SOURCE_READY = 'SOURCE_READY',
-  MIRROR_READY = 'MIRROR_READY',
-  START = 'START',
-  STOP = 'STOP',
+  REQUEST_CONNECTION = 'REQUEST_CONNECTION',
 
-  SEND_CHUNK = 'SEND_CHUNK',
-  ACK_CHUNK = 'ACK_CHUNK',
-  REQUEST_CONTROL = 'REQUEST_CONTROL'
+  CONNECTION_ACCEPT = 'CONNECTION_ACCEPT',
+  CONNECTION_REJECTED = 'CONNECTION_REJECTED',
+
+  SEND = 'SEND',
+  ACK = 'ACK'
 }
 
 export type Chunk<D> = {
@@ -17,17 +16,27 @@ export type Chunk<D> = {
   data: D;
 };
 
-export type SendChunkEvent = {
-  event: TransporterEventTypes.SEND_CHUNK;
-  chunk: Chunk<RecordEventWithTime>;
-};
-
-export type AckChunkEvent = {
-  event: TransporterEventTypes.ACK_CHUNK;
+export type RequestConnectionEvent = {
+  event: TransporterEventTypes.REQUEST_CONNECTION;
   id: number;
 };
 
-type PayloadEvent = SendChunkEvent | AckChunkEvent;
+export type ConnectionAcceptEvent = {
+  event: TransporterEventTypes.CONNECTION_ACCEPT;
+  id: number;
+};
+
+export type SendEvent = {
+  event: TransporterEventTypes.SEND;
+  payload: Chunk<RecordEventWithTime> | Array<Chunk<RecordEventWithTime>>;
+};
+
+export type AckEvent = {
+  event: TransporterEventTypes.ACK;
+  ids: Array<number>;
+};
+
+type PayloadEvent = RequestConnectionEvent | ConnectionAcceptEvent | SendEvent | AckEvent;
 
 export type TransporterEvent =
   | PayloadEvent
@@ -40,8 +49,8 @@ export type TransporterEventHandler<E extends TransporterEventTypes = any> = (
 export interface Transporter {
   send(data: TransporterEvent): Promise<void>;
 
-  on<E extends TransporterEventTypes>(event: E, handler: TransporterEventHandler<E>): () => void;
-  off<E extends TransporterEventTypes>(event: E, handler?: TransporterEventHandler<E>): void;
+  on<E extends TransporterEventTypes>(event: E, handler: TransporterEventHandler<E>): () => unknown;
+  off<E extends TransporterEventTypes>(event: E, handler?: TransporterEventHandler<E>): unknown;
 
-  dispose(): void;
+  dispose(): unknown;
 }

@@ -14,13 +14,9 @@ import { ReceiveContext } from '../types';
 export type PlayerConfig = {
   speed: number;
   root: HTMLElement | Element;
-  live?: boolean;
   styleRules: string[];
+  live?: boolean;
   customApplyIncremental?: typeof applyIncremental;
-};
-
-export type PlayerMetaData = {
-  totalTime: number;
 };
 
 const defaultConfig: PlayerConfig = {
@@ -120,10 +116,10 @@ export class Player {
     const { documentElement, head } = contentDocument;
     documentElement.insertBefore($style, head);
 
-    const stylesRules = ['noscript { display: none !important; }'].concat(this.config.styleRules);
+    const styleRules = ['noscript { display: none !important; }'].concat(this.config.styleRules);
 
-    for (let ind = 0; ind < stylesRules.length && $style.sheet; ind++) {
-      $style.sheet.insertRule(stylesRules[ind], ind);
+    for (let i = 0; i < styleRules.length && $style.sheet; i++) {
+      $style.sheet.insertRule(styleRules[i], i);
     }
   }
 
@@ -172,7 +168,7 @@ export class Player {
     );
   }
 
-  get metaData(): PlayerMetaData {
+  get metaData() {
     const end = this.events.slice(-1)[0];
     const totalTime = Math.max(end.timestamp - this.baseline, 0);
 

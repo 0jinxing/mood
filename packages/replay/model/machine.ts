@@ -10,7 +10,8 @@ export const createPlayerMachine = (context: PlayerMachineContext) => {
       context,
       initial: 'idle',
       states: {
-        idle: {}
+        idle: {},
+        playing: {}
       }
     })
   );

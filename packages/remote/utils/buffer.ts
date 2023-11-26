@@ -8,8 +8,6 @@ export abstract class ChunkBuffer<D> {
   cursor = 0;
   model: Record<string, Chunk<D>> = {};
 
-  abstract add(data: D | Chunk<D>): number;
-
   delete(id: number) {
     delete this.model[id];
   }
@@ -22,7 +20,7 @@ export abstract class ChunkBuffer<D> {
 
 export type EmbedBufferOptions<D> = {
   timeout?: number;
-  onTimeout?: (data: Chunk<D>) => void;
+  onTimeout?: (data: Chunk<D>[]) => void;
 };
 
 export class EmbedBuffer<D> extends ChunkBuffer<D> {
@@ -41,19 +39,29 @@ export class EmbedBuffer<D> extends ChunkBuffer<D> {
   private rafTimeout() {
     cancelAnimationFrame(this.rafId);
 
-    if (Object.values(this.model).length === 0) return;
-
     this.rafId = requestAnimationFrame(() => {
-      for (const key in this.model) {
-        const record = this.model[key];
-        const now = performance.now();
+      const sortKeys = Object.keys(this.model).sort((a, b) => Number(a) - Number(b));
+      const now = performance.now();
 
-        if (now - record.timestamp > (this.options.timeout || DEFAULT_TIMEOUT)) {
-          this.options.onTimeout?.(record);
-          record.timestamp = now;
+      const sort: Chunk<D>[] = [];
+      const timeout = this.options.timeout || DEFAULT_TIMEOUT;
+
+      sortKeys.forEach(key => {
+        const item = this.model[key];
+
+        if (now - item.timestamp >= timeout) {
+          sort.push(item);
+          item.timestamp = now;
         }
+      });
+
+      if (sortKeys.length > sort.length) {
+        this.rafTimeout();
       }
-      this.rafTimeout();
+
+      if (sort.length) {
+        this.options.onTimeout?.(sort);
+      }
     });
   }
 }
@@ -67,10 +75,12 @@ export class MirrorBuffer<D> extends ChunkBuffer<D> {
     super();
   }
 
-  add(chunk: Chunk<D>) {
-    if (chunk.id >= this.cursor) {
-      this.model[chunk.id] = chunk;
-    }
+  add(sort: Chunk<D>[]) {
+    sort.forEach(item => {
+      if (item.id >= this.cursor) {
+        this.model[item.id] = item;
+      }
+    });
 
     this.rafEmit();
     return this.cursor;

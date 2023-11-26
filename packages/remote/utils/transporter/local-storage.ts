@@ -19,9 +19,9 @@ export class LocalStorageTransporter implements Transporter {
   private storageListener(e: StorageEvent) {
     if (e.key !== this.storageKey || !e.newValue) return;
 
-    const msg = JSON.parse(e.newValue) as TransporterEvent;
+    const data = JSON.parse(e.newValue) as TransporterEvent;
 
-    this.handlers.get(msg.event)?.forEach(h => h(msg));
+    this.handlers.get(data.event)?.forEach(h => h(data));
   }
 
   send(data: TransporterEvent): Promise<void> {

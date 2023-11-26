@@ -25,7 +25,7 @@ export const createEmbedService = (context: EmbedContext) => {
 
   const buffer = new EmbedBuffer<RecordEventWithTime>({
     onTimeout(data) {
-      transporter.send({ event: TransporterEventTypes.SEND_CHUNK, chunk: data });
+      transporter.send({ event: TransporterEventTypes.SEND, payload: data });
     }
   });
 
@@ -63,11 +63,21 @@ export const createEmbedService = (context: EmbedContext) => {
         actions: {
           [EmbedSignal.READY]: assign(({ transporter, dispose }) => {
             dispose?.[EmbedSignal.READY]?.();
-            const removeListener = transporter.on(TransporterEventTypes.MIRROR_READY, () => {
-              transporter.send({ event: TransporterEventTypes.SOURCE_READY });
-              service.send(EmbedSignal.CONNECT);
-              removeListener();
-            });
+            const removeListener = transporter.on(
+              TransporterEventTypes.REQUEST_CONNECTION,
+              ({ id }) => {
+                if (buffer.model[id] || buffer.cursor <= id) {
+                  transporter.send({
+                    event: TransporterEventTypes.CONNECTION_ACCEPT,
+                    id: buffer.cursor
+                  });
+                  service.send(EmbedSignal.CONNECT);
+                } else {
+                  transporter.send({ event: TransporterEventTypes.CONNECTION_REJECTED });
+                }
+                removeListener();
+              }
+            );
 
             return {
               transporter,
@@ -80,7 +90,7 @@ export const createEmbedService = (context: EmbedContext) => {
             const stopRecord = record({
               emit(e) {
                 const chunk = buffer.model[buffer.add(e) - 1];
-                transporter.send({ event: TransporterEventTypes.SEND_CHUNK, chunk });
+                transporter.send({ event: TransporterEventTypes.SEND, payload: chunk });
               }
             });
             return { transporter, dispose: { ...dispose, [EmbedSignal.CONNECT]: stopRecord } };
@@ -89,6 +99,7 @@ export const createEmbedService = (context: EmbedContext) => {
           [EmbedSignal.STOP]({ transporter, dispose }) {
             dispose?.[EmbedSignal.READY]?.();
             dispose?.[EmbedSignal.CONNECT]?.();
+
             transporter.dispose();
             buffer.reset();
           }
@@ -97,7 +108,9 @@ export const createEmbedService = (context: EmbedContext) => {
     )
   );
 
-  transporter.on(TransporterEventTypes.ACK_CHUNK, e => buffer.delete(e.id));
+  transporter.on(TransporterEventTypes.ACK, ({ ids }) => {
+    ids.forEach(id => buffer.delete(id));
+  });
 
   return service;
 };

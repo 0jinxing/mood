@@ -32,7 +32,9 @@ export class Scheduler {
       this.offset += (time - prevTimestamp) * speed;
       prevTimestamp = time;
 
-      while (this.offset >= queue[0]?.delay) queue.shift()?.exec();
+      while (this.offset >= queue[0]?.delay) {
+        queue.shift()?.exec();
+      }
 
       if (queue.length > 0) {
         this.raf = requestAnimationFrame(frameRequest);

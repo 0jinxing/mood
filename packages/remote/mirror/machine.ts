@@ -59,20 +59,29 @@ export const createMirrorService = (context: Exclude<MirrorContext, 'player'>) =
       {
         actions: {
           [MirrorSignal.READY]: assign(context => {
-            context.transporter.send({ event: TransporterEventTypes.MIRROR_READY });
+            context.transporter.send({
+              event: TransporterEventTypes.REQUEST_CONNECTION,
+              id: buffer.cursor
+            });
 
             const removeListener = context.transporter.on(
-              TransporterEventTypes.SOURCE_READY,
+              TransporterEventTypes.CONNECTION_ACCEPT,
               () => {
                 removeListener();
                 service.send(MirrorSignal.READY);
                 player.play();
-                context.transporter.on(TransporterEventTypes.SEND_CHUNK, e => {
-                  buffer.add(e.chunk);
-                  if (buffer.cursor > e.chunk.id) {
+
+                context.transporter.on(TransporterEventTypes.SEND, ({ payload }) => {
+                  const sort = Array.isArray(payload) ? payload : [payload];
+
+                  buffer.add(sort);
+
+                  const ids = sort.filter(c => c.id >= buffer.cursor - 1).map(c => c.id);
+
+                  if (ids.length > 0) {
                     context.transporter.send({
-                      event: TransporterEventTypes.ACK_CHUNK,
-                      id: e.chunk.id
+                      event: TransporterEventTypes.ACK,
+                      ids
                     });
                   }
                 });
