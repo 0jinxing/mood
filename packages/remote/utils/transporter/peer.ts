@@ -8,23 +8,42 @@ import {
 
 export type PeerTransporterOptions = {
   id: string;
-  role: 'client' | 'embed';
+  role: 'mirror' | 'embed';
 } & Exclude<PeerOptions, 'id' | 'role'>;
 
 export class PeerTransporter implements Transporter {
   peer: Peer;
-  connection: DataConnection;
+  connection: DataConnection | null = null;
 
   ready$$: Promise<void>;
 
   constructor(private options: PeerTransporterOptions) {
+    this.messageHandler = this.messageHandler.bind(this);
+    this.connectionHandler = this.connectionHandler.bind(this);
+
     this.peer = new Peer(this.uid, options);
-    this.connection = this.peer.connect(this.target);
+    this.peer.on('connection', this.connectionHandler);
+
+    this.connectionHandler(this.peer.connect(this.target));
+  }
+
+  private connectionHandler(connection: DataConnection) {
+    console.log('connectionListener');
+
+    this.connection?.off('data');
+    this.connection?.close();
+
+    this.connection = connection;
+    this.connection.on('data', this.messageHandler);
 
     this.ready$$ = new Promise((resolve, reject) => {
-      this.connection.once('open', resolve);
-      this.connection.once('error', reject);
+      this.connection?.once('open', resolve);
+      this.connection?.once('error', reject);
     });
+  }
+
+  private messageHandler(data: TransporterEvent) {
+    this.handlers.get(data.event)?.forEach(h => h(data));
   }
 
   get uid(): string {
@@ -33,15 +52,18 @@ export class PeerTransporter implements Transporter {
 
   get target(): string {
     if (this.options.role === 'embed') {
-      return 'client-' + this.options.id;
+      return 'mirror-' + this.options.id;
     }
     return 'embed-' + this.options.id;
   }
 
   async send(data: TransporterEvent) {
-    if (!this.connection.open) await this.ready$$;
+    if (!this.connection) {
+      console.log('no connection');
+      return;
+    } else if (!this.connection.open) await this.ready$$;
 
-    this.connection.send(data);
+    this.connection?.send(data);
   }
 
   handlers = new Map<TransporterEventTypes, TransporterEventHandler[]>();
@@ -73,7 +95,8 @@ export class PeerTransporter implements Transporter {
   }
 
   dispose(): void {
-    this.connection.close();
+    this.connection?.off('data');
+    this.connection?.close();
     this.peer.disconnect();
   }
 }

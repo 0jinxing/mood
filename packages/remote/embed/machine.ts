@@ -63,6 +63,9 @@ export const createEmbedService = (context: EmbedContext) => {
         actions: {
           [EmbedSignal.READY]: assign(({ transporter, dispose }) => {
             dispose?.[EmbedSignal.READY]?.();
+
+            console.log('EmbedSignal.READY');
+
             const removeListener = transporter.on(
               TransporterEventTypes.REQUEST_CONNECTION,
               ({ id }) => {

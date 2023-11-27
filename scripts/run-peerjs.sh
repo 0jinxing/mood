@@ -1,0 +1,1 @@
+peerjs --port 8080 --key peerjs --path /myapp

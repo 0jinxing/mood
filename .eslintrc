@@ -20,7 +20,6 @@
     "node/no-callback-literal": "off",
 
     "semi": ["error", "always"],
-    "comma-dangle": ["error", "never"],
-    "quotes": ["error", "single"]
+    "comma-dangle": ["error", "never"]
   }
 }
