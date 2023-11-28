@@ -1,14 +1,9 @@
-import {
-  TransporterEventHandler,
-  Transporter,
-  TransporterEvent,
-  TransporterEventTypes
-} from './types';
+import { Transporter } from './common';
+import { TransporterEvent } from './types';
 
-export class LocalStorageTransporter implements Transporter {
-  handlers = new Map<TransporterEventTypes, TransporterEventHandler[]>();
-
+export class LocalStorageTransporter extends Transporter {
   constructor(private storageKey: string) {
+    super();
     localStorage.removeItem(storageKey);
 
     this.storageListener = this.storageListener.bind(this);
@@ -28,35 +23,6 @@ export class LocalStorageTransporter implements Transporter {
     localStorage.setItem(this.storageKey, JSON.stringify(data));
 
     return Promise.resolve();
-  }
-
-  on<E extends TransporterEventTypes>(event: E, handler: TransporterEventHandler<E>): () => void {
-    const store = this.handlers.get(event) || [];
-
-    if (!store.includes(handler)) {
-      store.push(handler);
-    }
-
-    this.handlers.set(event, store);
-
-    return () => {
-      store.splice(store.indexOf(handler), 1);
-      this.handlers.set(event, store);
-    };
-  }
-
-  off<E extends TransporterEventTypes>(
-    event: E,
-    handler?: TransporterEventHandler<E> | undefined
-  ): void {
-    const store = this.handlers.get(event) || [];
-
-    if (handler) {
-      store.splice(store.indexOf(handler), 1);
-      this.handlers.set(event, store);
-    } else {
-      this.handlers.set(event, []);
-    }
   }
 
   dispose(): void {

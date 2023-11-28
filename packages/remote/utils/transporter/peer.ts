@@ -1,37 +1,30 @@
 import Peer, { DataConnection, PeerOptions } from 'peerjs';
-import {
-  Transporter,
-  TransporterEvent,
-  TransporterEventHandler,
-  TransporterEventTypes
-} from './types';
+import { TransporterEvent, TransporterEventHandler, TransporterEventTypes } from './types';
+import { Transporter } from './common';
 
 export type PeerTransporterOptions = {
   id: string;
   role: 'mirror' | 'embed';
 } & Exclude<PeerOptions, 'id' | 'role'>;
 
-export class PeerTransporter implements Transporter {
+export class PeerTransporter extends Transporter {
   peer: Peer;
   connection: DataConnection | null = null;
 
   ready$$: Promise<void>;
 
-  handlers = new Map<TransporterEventTypes, TransporterEventHandler[]>();
-
   constructor(private options: PeerTransporterOptions) {
+    super();
     this.messageHandler = this.messageHandler.bind(this);
-    this.connectionHandler = this.connectionHandler.bind(this);
+    this.setup = this.setup.bind(this);
 
     this.peer = new Peer(this.uid, options);
-    this.peer.on('connection', this.connectionHandler);
+    this.peer.on('connection', this.setup);
 
-    this.connectionHandler(this.peer.connect(this.target));
+    this.setup(this.peer.connect(this.target));
   }
 
-  private connectionHandler(connection: DataConnection) {
-    console.log('connectionListener');
-
+  private setup(connection: DataConnection) {
     this.connection?.off('data');
     this.connection?.close();
 
@@ -60,38 +53,10 @@ export class PeerTransporter implements Transporter {
   }
 
   async send(data: TransporterEvent) {
-    if (!this.connection) {
-      console.log('no connection');
-      return;
-    } else if (!this.connection.open) await this.ready$$;
-
+    if (!this.connection?.open) {
+      await this.ready$$;
+    }
     this.connection?.send(data);
-  }
-
-  on<E extends TransporterEventTypes>(e: E, handler: TransporterEventHandler<E>) {
-    const store = this.handlers.get(e) || [];
-
-    if (!store.includes(handler)) {
-      store.push(handler);
-    }
-
-    this.handlers.set(e, store);
-
-    return () => {
-      store.splice(store.indexOf(handler), 1);
-      this.handlers.set(e, store);
-    };
-  }
-
-  off<E extends TransporterEventTypes>(e: E, handler?: TransporterEventHandler<E>): void {
-    const store = this.handlers.get(e) || [];
-
-    if (handler) {
-      store.splice(store.indexOf(handler), 1);
-      this.handlers.set(e, store);
-    } else {
-      this.handlers.set(e, []);
-    }
   }
 
   dispose(): void {

@@ -45,12 +45,3 @@ export type TransporterEvent =
 export type TransporterEventHandler<E extends TransporterEventTypes = any> = (
   payload: Extract<TransporterEvent, { event: E }>
 ) => void;
-
-export interface Transporter {
-  send(data: TransporterEvent): Promise<void>;
-
-  on<E extends TransporterEventTypes>(event: E, handler: TransporterEventHandler<E>): () => unknown;
-  off<E extends TransporterEventTypes>(event: E, handler?: TransporterEventHandler<E>): unknown;
-
-  dispose(): unknown;
-}
