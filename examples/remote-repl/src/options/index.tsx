@@ -1,4 +1,4 @@
-import { MirrorSignal, createMirrorService, createPeerTransporter } from '@mood/remote';
+import { MirrorSignal, createMirrorService, createAgoraRTMTransporter } from '@mood/remote';
 import { useRef } from 'react';
 import '../style.css';
 
@@ -10,15 +10,12 @@ export const Options = () => {
     if (!ref) return;
     playerContainer.current = ref;
     service.current = createMirrorService({
-      transporter: createPeerTransporter({
-        host: 'localhost',
-        port: 8080,
-        id: 'remote-repl',
-        role: 'mirror',
-        path: '/myapp',
-        key: 'peerjs',
-        debug: 3
-      })
+      transporter: createAgoraRTMTransporter(
+        '2b6ebe7258ae455ab7911fe7f247b026',
+        '007eJxTYHjst13cdtkFRs0Mvxn66htkpmf/WNr8POH731vT1r1v+WOrwJBmYGFmYZGWnGKcZmBilmpgkWpqamlobmSYnGZulGZpstA7NbUhkJFBudaNmZGBiYERCEF8IYbczKKi/CLdotTc/JJUIFWQAwBPhCW7',
+        'remote-repl',
+        'mirror'
+      )
     });
 
     service.current.start();

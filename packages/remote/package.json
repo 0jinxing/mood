@@ -17,6 +17,7 @@
     "@mood/snapshot": "workspace:^",
     "@mood/utils": "workspace:^",
     "@xstate/fsm": "^2.1.0",
+    "agora-rtm-sdk": "^1.5.1",
     "nanoid": "^5.0.3",
     "peerjs": "^1.5.1"
   }

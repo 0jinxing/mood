@@ -17,6 +17,8 @@ export class PeerTransporter implements Transporter {
 
   ready$$: Promise<void>;
 
+  handlers = new Map<TransporterEventTypes, TransporterEventHandler[]>();
+
   constructor(private options: PeerTransporterOptions) {
     this.messageHandler = this.messageHandler.bind(this);
     this.connectionHandler = this.connectionHandler.bind(this);
@@ -65,8 +67,6 @@ export class PeerTransporter implements Transporter {
 
     this.connection?.send(data);
   }
-
-  handlers = new Map<TransporterEventTypes, TransporterEventHandler[]>();
 
   on<E extends TransporterEventTypes>(e: E, handler: TransporterEventHandler<E>) {
     const store = this.handlers.get(e) || [];
