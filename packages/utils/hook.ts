@@ -7,10 +7,10 @@ export function hook<T extends object>(target: T, key: keyof T, descriptor: Prop
   return () => Object.defineProperty(target, key, original || {});
 }
 
-export function hookProp<T extends object>(
+export function hookProp<T extends object, K extends NonFunctionKeys<T>, V extends T[K]>(
   target: T,
-  key: NonFunctionKeys<T>,
-  setter: (val: any) => void
+  key: K,
+  setter: (val: V) => void
 ) {
   const raw = Object.getOwnPropertyDescriptor(target, key);
 
@@ -22,7 +22,11 @@ export function hookProp<T extends object>(
   return hook(target, key, { set });
 }
 
-export function hookMethod<T extends object>(target: T, key: FunctionKeys<T>, hoc: Function) {
+export function hookMethod<T extends object, K extends FunctionKeys<T>, F extends T[K]>(
+  target: T,
+  key: K,
+  hoc: F extends (...args: unknown[]) => void ? (...args: Parameters<F>) => unknown : never
+) {
   const raw = Object.getOwnPropertyDescriptor(target, key);
   const fn: Function = raw?.value;
 
