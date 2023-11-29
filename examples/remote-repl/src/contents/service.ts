@@ -5,7 +5,7 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
     const service = createEmbedService({
       transporter: createAgoraRTMTransporter(
         '2b6ebe7258ae455ab7911fe7f247b026',
-        '007eJxTYMj8n+g9V+VD5cNrM1auXWTZu5Lp29TZbXwrJJv4K93m7LBSYEgzsDCzsEhLTjFOMzAxSzWwSDU1tTQ0NzJMTjM3SrM0YfBJTW0IZGSYcPUKMyMDEwMjEIL4ggypuUmpKbpFqbn5JalAqiAHAAPPJKs=',
+        '007eJxTYFhnnnMkbssa883BH7cbLrVyenjsRYG8db2G8MNvlu9OBVooMKQZWJhZWKQlpxinGZiYpRpYpJqaWhqaGxkmp5kbpVmaBM1LS20IZGSweiTPwsjAxMAIhCC+IENqblJqim5Ram5+SSqQKsgBAPgOJHI=',
         'remote-repl',
         'embed'
       )
