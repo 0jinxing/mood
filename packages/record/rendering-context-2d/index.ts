@@ -1,10 +1,17 @@
+import { hookMethod } from '@mood/utils';
 import { NonFunctionKeys, FunctionKeys } from 'utility-types';
+import { serializeArgs } from './serialize';
 
 export const CanvasRenderingContext2DMethods: FunctionKeys<CanvasRenderingContext2D>[] = [
+  // arc(x: number, y: number, radius: number, startAngle: number, endAngle: number, anticlockwise?: number);
   'arc',
+  // arcTo(x1: number, y1: number, x2: number, y2: number, radius: number);
   'arcTo',
+  // beginPath();
   'beginPath',
+  /** bezierCurveTo(cp1x: number, cp1y: number, cp2x: number, cp2y: number, x: number, y: number); */
   'bezierCurveTo',
+  // clearRect(x: number, y: number, width: number, height: number);
   'clearRect',
   'clip',
   'closePath',
@@ -19,15 +26,15 @@ export const CanvasRenderingContext2DMethods: FunctionKeys<CanvasRenderingContex
   'fill',
   'fillRect',
   'fillText',
-  'getContextAttributes',
-  'getImageData',
-  'getLineDash',
-  'getTransform',
+  // 'getContextAttributes',
+  // 'getImageData',
+  // 'getLineDash',
+  // 'getTransform',
   // 'isContextLost',
-  'isPointInPath',
-  'isPointInStroke',
+  // 'isPointInPath',
+  // 'isPointInStroke',
   'lineTo',
-  'measureText',
+  // 'measureText',
   'moveTo',
   'putImageData',
   'quadraticCurveTo',
@@ -50,7 +57,7 @@ export const CanvasRenderingContext2DMethods: FunctionKeys<CanvasRenderingContex
 ];
 
 export const CanvasRenderingContext2DProperties: NonFunctionKeys<CanvasRenderingContext2D>[] = [
-  'canvas',
+  // 'canvas',
   'direction',
   'fillStyle',
   'filter',
@@ -77,3 +84,12 @@ export const CanvasRenderingContext2DProperties: NonFunctionKeys<CanvasRendering
   // 'textRendering',
   // 'wordSpacing'
 ];
+
+export function subscribeToRenderingContext2D(cb: Function) {
+  CanvasRenderingContext2DMethods.map(key => {
+    return hookMethod(CanvasRenderingContext2D.prototype, key, (...args: unknown[]) => {
+      const values = serializeArgs(args);
+      cb({ type: '2d', method: key, args: values });
+    });
+  });
+}

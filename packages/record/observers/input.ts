@@ -13,7 +13,7 @@ export type SubscribeToInputArg = {
 
 export type SubscribeToInputEmit = (arg: SubscribeToInputArg) => void;
 
-const cache: WeakMap<EventTarget, SubscribeToInputValue> = new WeakMap();
+const store: WeakMap<EventTarget, SubscribeToInputValue> = new WeakMap();
 
 function isInputElement(
   $el: HTMLElement | EventTarget | Node
@@ -30,11 +30,11 @@ export function subscribeToInput(cb: SubscribeToInputEmit, doc?: Document) {
     $target: HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement,
     value: SubscribeToInputValue
   ) => {
-    const oldValue = cache.get($target);
+    const oldValue = store.get($target);
 
     if (oldValue && oldValue === value) return;
 
-    cache.set($target, value);
+    store.set($target, value);
     const id = mirror.getId($target);
     cb({ source: SourceTypes.INPUT, value, id });
   };
