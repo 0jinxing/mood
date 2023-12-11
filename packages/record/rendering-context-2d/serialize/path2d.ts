@@ -2,16 +2,27 @@ import { hookMethod } from '@mood/utils';
 import { FunctionKeys } from 'utility-types';
 
 export const Path2DMethods: FunctionKeys<Path2D>[] = [
+  // addPath(path: Path2D [, transform?: DOMMatrix]);
   'addPath',
+  // arc(x: number, y: number, radius: number, startAngle: number, endAngle: number, anticlockwise?: number);
   'arc',
+  // arcTo(x1: number, y1: number, x2: number, y2: number, radius: number);
   'arcTo',
+  /** bezierCurveTo(cp1x: number, cp1y: number, cp2x: number, cp2y: number, x: number, y: number); */
   'bezierCurveTo',
+  // closePath();
   'closePath',
+  // ellipse(x: number, y: number, radiusX: number, radiusY: number, rotation: number, startAngle: number, endAngle: number, anticlockwise?: number);
   'ellipse',
+  // lineTo(x: number, y: number)
   'lineTo',
+  // moveTo(x: number, y: number)
   'moveTo',
+  // quadraticCurveTo(cpx: number, cpy: number, x: number, y: number);
   'quadraticCurveTo',
+  // rect(x: number, y: number, width: number, height: number);
   'rect',
+  // roundRect(x: number, y: number, width: number, height: number, radii: number | number[])
   'roundRect'
 ];
 
