@@ -1,6 +1,6 @@
 import { hookMethod } from '@mood/utils';
 import { NonFunctionKeys, FunctionKeys } from 'utility-types';
-import { serializeArgs } from './serialize';
+import { encodeArgs } from './encode';
 
 export const CanvasRenderingContext2DMethods: FunctionKeys<CanvasRenderingContext2D>[] = [
   // arc(x: number, y: number, radius: number, startAngle: number, endAngle: number, anticlockwise?: number);
@@ -153,10 +153,10 @@ export const CanvasRenderingContext2DProperties: NonFunctionKeys<CanvasRendering
   // 'wordSpacing'
 ];
 
-export function subscribeToRenderingContext2D(cb: Function) {
+export function makeCanvasRenderingContext2DObservable(cb: Function) {
   CanvasRenderingContext2DMethods.map(key => {
     return hookMethod(CanvasRenderingContext2D.prototype, key, (...args: unknown[]) => {
-      const values = serializeArgs(args);
+      const values = encodeArgs(args);
       cb({ type: '2d', method: key, args: values });
     });
   });
