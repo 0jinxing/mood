@@ -9,6 +9,7 @@ import { receiveToViewportResize } from './viewport-resize';
 import { receiveToScroll } from './scroll';
 import { receiveToStyleSheet } from './style-sheet';
 import { receiveToSelection } from './selection';
+import { receiveToRenderingContext2D } from '../rendering-context-2d';
 
 export function applyIncremental(event: SubscribeEmitArg, context: ReceiveContext, sync: boolean) {
   const handlerMap: { [key in SourceTypes]?: ReceiveHandler<unknown> } = {
@@ -21,7 +22,8 @@ export function applyIncremental(event: SubscribeEmitArg, context: ReceiveContex
     [SourceTypes.TOUCH_MOVE]: receiveToMouseMove,
     [SourceTypes.MEDIA_INTERACTION]: receiveToMediaInteraction,
     [SourceTypes.STYLE_SHEETRULE]: receiveToStyleSheet,
-    [SourceTypes.SELECTION]: receiveToSelection
+    [SourceTypes.SELECTION]: receiveToSelection,
+    [SourceTypes.CONTEXT2D]: receiveToRenderingContext2D
   };
 
   handlerMap[event.source]?.(event, context, sync);

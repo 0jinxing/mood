@@ -1,30 +1,32 @@
-import { subscribeToInput } from './input';
-import { subscribeToScroll } from './scroll';
-import { subscribeToViewportResize } from './viewport-resize';
-import { subscribeToMouseInteraction } from './mouse-interaction';
-import { subscribeToMouseMove } from './mouse-move';
-import { subscribeToMediaInteraction } from './media-interaction';
-import { subscribeToStyleSheet } from './style-sheet';
-import { subscribeToMutation } from './mutation';
-import { subscribeToSelection } from './selection';
+import { $$input } from './input';
+import { $$scroll } from './scroll';
+import { $$viewportResize } from './viewport-resize';
+import { $$mouseInteraction } from './mouse-interaction';
+import { $$ouseMove } from './mouse-move';
+import { $$mediaInteraction } from './media-interaction';
+import { $$styleSheet } from './style-sheet';
+import { $$mutation } from './mutation';
+import { $$selection } from './selection';
+import { $$renderingContext2D } from '../rendering-context-2d';
 
 import { EmitHandler } from '../types';
 import { each } from '@mood/utils';
 
 export function subscribe(emit: EmitHandler) {
-  const unsubscribes = [
-    subscribeToMutation,
-    subscribeToMouseMove,
-    subscribeToMouseInteraction,
-    subscribeToScroll,
-    subscribeToViewportResize,
-    subscribeToInput,
-    subscribeToMediaInteraction,
-    subscribeToStyleSheet,
-    subscribeToSelection
+  const unsubscribe = [
+    $$mutation,
+    $$ouseMove,
+    $$mouseInteraction,
+    $$scroll,
+    $$viewportResize,
+    $$input,
+    $$mediaInteraction,
+    $$styleSheet,
+    $$selection,
+    $$renderingContext2D
   ].map(o => o(emit));
 
-  return () => each(unsubscribes, u => u());
+  return () => each(unsubscribe, u => u());
 }
 
 export * from './input';
@@ -36,3 +38,4 @@ export * from './scroll';
 export * from './style-sheet';
 export * from './viewport-resize';
 export * from './selection';
+export * from '../rendering-context-2d';

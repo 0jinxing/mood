@@ -11,7 +11,7 @@ export type SubscribeToInputArg = {
   value: SubscribeToInputValue;
 };
 
-export type SubscribeToInputEmit = (arg: SubscribeToInputArg) => void;
+export type SubscribeToInputHandler = (arg: SubscribeToInputArg) => void;
 
 const store: WeakMap<EventTarget, SubscribeToInputValue> = new WeakMap();
 
@@ -25,7 +25,7 @@ function isInputElement(
   );
 }
 
-export function subscribeToInput(cb: SubscribeToInputEmit, doc?: Document) {
+export function $$input(cb: SubscribeToInputHandler, doc?: Document) {
   const cbWithDedup = (
     $target: HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement,
     value: SubscribeToInputValue

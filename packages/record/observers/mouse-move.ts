@@ -9,9 +9,9 @@ export type SubscribeToMouseMoveArg = {
   ps: MousePositions;
 };
 
-export type SubscribeToMousemoveEmit = (arg: SubscribeToMouseMoveArg) => void;
+export type SubscribeToMousemoveHandler = (arg: SubscribeToMouseMoveArg) => void;
 
-export function subscribeToMouseMove(cb: SubscribeToMousemoveEmit) {
+export function $$ouseMove(cb: SubscribeToMousemoveHandler) {
   let ps: MousePositions = [];
   const throttleCb = throttle((touch: boolean) => {
     cb({ ps, source: touch ? SourceTypes.TOUCH_MOVE : SourceTypes.MOUSE_MOVE });

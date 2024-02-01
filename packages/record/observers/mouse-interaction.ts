@@ -14,7 +14,7 @@ const actions = <const>[
   'touchend'
 ];
 
-export type SubscribeToMouseInteraction = typeof actions[number];
+export type SubscribeToMouseInteraction = (typeof actions)[number];
 
 export type SubscribeToMouseInteractionArg = {
   source: SourceTypes.MOUSE_INTERACTION;
@@ -24,9 +24,9 @@ export type SubscribeToMouseInteractionArg = {
   y: number;
 };
 
-export type SubscribeToMouseInteractionEmit = (arg: SubscribeToMouseInteractionArg) => void;
+export type SubscribeToMouseInteractionHandler = (arg: SubscribeToMouseInteractionArg) => void;
 
-export function subscribeToMouseInteraction(cb: SubscribeToMouseInteractionEmit) {
+export function $$mouseInteraction(cb: SubscribeToMouseInteractionHandler) {
   const getHandler = (action: SubscribeToMouseInteraction) => {
     return (event: MouseEvent | TouchEvent) => {
       const id = mirror.getId(event.target);

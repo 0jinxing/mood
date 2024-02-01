@@ -18,18 +18,18 @@ export type SubscribeToStyleSheetArg = {
   adds?: StyleSheetAddRule[];
 };
 
-export type SubscribeToStyleSheetEmit = (arg: SubscribeToStyleSheetArg) => void;
+export type SubscribeToStyleSheetHandler = (arg: SubscribeToStyleSheetArg) => void;
 
-export function subscribeToStyleSheet(cb: SubscribeToStyleSheetEmit) {
+export function $$styleSheet(cb: SubscribeToStyleSheetHandler) {
   const proto = CSSStyleSheet.prototype;
 
-  const insertHoc = hookMethod(proto, 'insertRule', (rule: string, index?: number) => {
+  const insertHoc = hookMethod(proto, 'insertRule', (_, rule: string, index?: number) => {
     const id = mirror.getId(this.ownerNode);
     if (!id) return;
     cb({ id, source: SourceTypes.STYLE_SHEETRULE, adds: [{ rule, index }] });
   });
 
-  const deleteHoc = hookMethod(proto, 'deleteRule', (index: number) => {
+  const deleteHoc = hookMethod(proto, 'deleteRule', (_, index: number) => {
     const id = mirror.getId(this.ownerNode);
     if (!id) return;
 

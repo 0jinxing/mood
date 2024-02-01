@@ -25,7 +25,9 @@ export function hookProp<T extends object, K extends NonFunctionKeys<T>, V exten
 export function hookMethod<T extends object, K extends FunctionKeys<T>, F extends T[K]>(
   target: T,
   key: K,
-  hoc: F extends (...args: unknown[]) => void ? (...args: Parameters<F>) => unknown : never
+  hoc: F extends (...args: unknown[]) => void
+    ? (result: ReturnType<F>, ...args: Parameters<F>) => unknown
+    : never
 ) {
   const raw = Object.getOwnPropertyDescriptor(target, key);
   const fn: Function = raw?.value;
@@ -35,8 +37,8 @@ export function hookMethod<T extends object, K extends FunctionKeys<T>, F extend
   }
 
   const value = function (...args: unknown[]) {
-    const result = fn(...args);
-    hoc(...args);
+    const result = fn.apply(this, args);
+    hoc.apply(this, [result, ...args]);
     return result;
   };
 

@@ -1,12 +1,30 @@
-export const encodeImageData = (value: ImageData) => {
+import { constructorValidate } from '../utils';
+
+export type ImageDataEncoded = {
+  constructor: 'ImageData';
+
+  height: number;
+  width: number;
+
+  data: number[];
+};
+
+export function isImageDataEncoded(value: any): value is ImageDataEncoded {
+  return value && value.constructor === 'ImageData';
+}
+
+export const encodeImageData = (value: ImageData): ImageDataEncoded => {
+  constructorValidate(value, ImageData);
+
   return {
     constructor: 'ImageData',
     height: value.height,
     width: value.width,
+
     data: Object.values(value.data)
   };
 };
 
-export const decodeImageData = (value: any) => {
-  return new ImageData(new Uint8ClampedArray(value.data), value.width, value.height);
+export const decodeImageData = (encoded: ImageDataEncoded) => {
+  return new ImageData(new Uint8ClampedArray(encoded.data), encoded.width, encoded.height);
 };

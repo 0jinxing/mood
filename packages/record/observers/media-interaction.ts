@@ -2,9 +2,9 @@ import { mirror } from '@mood/snapshot';
 import { each, on } from '@mood/utils';
 import { SourceTypes } from '../types';
 
-const actions = <const>['play', 'pause'];
+const ACTIONS = <const>['play', 'pause'];
 
-export type SubscribeToMediaInteraction = typeof actions[number];
+export type SubscribeToMediaInteraction = (typeof ACTIONS)[number];
 
 export type SubscribeToMediaInteractionArg = {
   source: SourceTypes.MEDIA_INTERACTION;
@@ -12,9 +12,9 @@ export type SubscribeToMediaInteractionArg = {
   id: number;
 };
 
-export type SubscribeToMediaInteractionEmit = (arg: SubscribeToMediaInteractionArg) => void;
+export type SubscribeToMediaInteractionHandler = (arg: SubscribeToMediaInteractionArg) => void;
 
-export function subscribeToMediaInteraction(cb: SubscribeToMediaInteractionEmit, doc?: Document) {
+export function $$mediaInteraction(cb: SubscribeToMediaInteractionHandler, doc?: Document) {
   const handler = (act: SubscribeToMediaInteraction) => (event: Event) => {
     const { target } = event;
     if (target) {
@@ -22,7 +22,7 @@ export function subscribeToMediaInteraction(cb: SubscribeToMediaInteractionEmit,
     }
   };
 
-  const unsubscribes = actions.map(k => on(doc || document, k, handler(k)));
+  const unsubscribes = ACTIONS.map(k => on(doc || document, k, handler(k)));
 
   return () => each(unsubscribes, u => u());
 }

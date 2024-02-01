@@ -9,9 +9,9 @@ export type SubscribeToScrollArg = {
   y: number;
 };
 
-export type SubscribeToScrollEmit = (arg: SubscribeToScrollArg) => void;
+export type SubscribeToScrollHandler = (arg: SubscribeToScrollArg) => void;
 
-export function subscribeToScroll(cb: SubscribeToScrollEmit) {
+export function $$scroll(cb: SubscribeToScrollHandler) {
   const throttleCb = throttle<UIEvent>(({ target }) => {
     if (!target) return;
 

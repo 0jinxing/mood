@@ -20,11 +20,11 @@ export type SubscribeToMutationArg = {
   adds: AddedNodeMutation[];
 };
 
-export type SubscribeToMutationEmit = (arg: SubscribeToMutationArg) => void;
+export type SubscribeToMutationHandler = (arg: SubscribeToMutationArg) => void;
 
 const genKey = (id: number, pId: number) => `${id}@${pId}`;
 
-export function subscribeToMutation(cb: SubscribeToMutationEmit, doc = document) {
+export function $$mutation(cb: SubscribeToMutationHandler, doc = document) {
   const observer = new MutationObserver(mutations => {
     const attrs: AttrCursor[] = [];
     const texts: Array<{ value: string | null; $el: Node }> = [];

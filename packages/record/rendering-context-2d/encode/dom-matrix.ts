@@ -1,4 +1,5 @@
 import { NonFunctionKeys } from 'utility-types';
+import { constructorValidate } from '../utils';
 
 export const DOMMatrixProps: Exclude<NonFunctionKeys<DOMMatrix>, 'is2D' | 'isIdentity'>[] = [
   // 2D 👇
@@ -28,13 +29,19 @@ export const DOMMatrixProps: Exclude<NonFunctionKeys<DOMMatrix>, 'is2D' | 'isIde
   'm44'
 ];
 
-export type DOMMatrixSerialized = {
+export type DOMMatrixEncoded = {
   constructor: 'DOMMatrix';
-  props: Partial<Record<NonFunctionKeys<DOMMatrix>, DOMMatrix[NonFunctionKeys<DOMMatrix>]>>;
+  props: Partial<Record<(typeof DOMMatrixProps)[number], number>>;
 };
 
-export function encodeDOMMatrix(matrix: DOMMatrix): DOMMatrixSerialized {
-  const props: DOMMatrixSerialized['props'] = {};
+export function isDOMMatrixEncoded(value: any): value is DOMMatrixEncoded {
+  return value && value.constructor === 'DOMMatrix';
+}
+
+export function encodeDOMMatrix(matrix: DOMMatrix): DOMMatrixEncoded {
+  constructorValidate(matrix, DOMMatrix);
+
+  const props: DOMMatrixEncoded['props'] = {};
 
   DOMMatrixProps.forEach(key => {
     props[key] = matrix[key];
@@ -43,11 +50,11 @@ export function encodeDOMMatrix(matrix: DOMMatrix): DOMMatrixSerialized {
   return { constructor: 'DOMMatrix', props };
 }
 
-export const decodeDOMMatrix = (value: any) => {
+export const decodeDOMMatrix = (encoded: DOMMatrixEncoded) => {
   const matrix = new DOMMatrix();
 
   DOMMatrixProps.forEach(key => {
-    matrix[key] = value.props[key];
+    matrix[key] = encoded.props[key] || matrix[key];
   });
 
   return matrix;

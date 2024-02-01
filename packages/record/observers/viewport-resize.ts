@@ -8,9 +8,9 @@ export type SubscribeToViewportResizeArg = {
   height: number;
 };
 
-export type SubscribeToViewportResizeEmit = (arg: SubscribeToViewportResizeArg) => void;
+export type SubscribeToViewportResizeHandler = (arg: SubscribeToViewportResizeArg) => void;
 
-export function subscribeToViewportResize(cb: SubscribeToViewportResizeEmit) {
+export function $$viewportResize(cb: SubscribeToViewportResizeHandler) {
   const source = SourceTypes.VIEWPORT_RESIZE;
 
   const updateDimension = throttle(() => cb({ source, ...queryViewport() }), 200);

@@ -7,9 +7,9 @@ export type SubscribeToSelectionArg = {
   ranges: number[];
 };
 
-export type SubscribeToSelectionEmit = (arg: SubscribeToSelectionArg) => void;
+export type SubscribeToSelectionHandler = (arg: SubscribeToSelectionArg) => void;
 
-export function subscribeToSelection(cb: SubscribeToSelectionEmit) {
+export function $$selection(cb: SubscribeToSelectionHandler) {
   let collapsed = true;
 
   const updateSelection = () => {
