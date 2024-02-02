@@ -57,7 +57,8 @@ export class Player {
     this.$cursor.classList.add('mood-cursor');
 
     this.$iframe = document.createElement('iframe');
-    this.$iframe.setAttribute('sandbox', 'allow-same-origin');
+    // @TODO 这么保证回放安全？
+    this.$iframe.setAttribute('sandbox', 'allow-same-origin allow-scripts');
     this.$iframe.setAttribute('scrolling', 'no');
     this.$iframe.setAttribute('style', 'pointer-events: none');
 
