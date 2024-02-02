@@ -28,12 +28,12 @@ import {
 } from './typed-array';
 
 export type Decodeable =
+  | Primitive
   | ArrayBufferEncoded
   | DataViewEncoded
   | DOMMatrixEncoded
   | ImageDataEncoded
   | TypedArrayEncoded
-  | Primitive
   | Array<Decodeable>;
 
 export function isDecodeable(value: unknown): value is Decodeable {
@@ -109,15 +109,3 @@ export function decode(value: Decodeable): Encodeable {
   }
   throw new TypeError('Unknown encoded value');
 }
-
-encode.unsafe = (value: unknown) => {
-  try {
-    return encode(value as any);
-  } catch {}
-};
-
-decode.unsafe = (value: unknown) => {
-  try {
-    return decode(value as any);
-  } catch {}
-};

@@ -1,5 +1,4 @@
 import { NonFunctionKeys } from 'utility-types';
-import { constructorValidate } from '../utils';
 
 export const DOMMatrixProps: Exclude<NonFunctionKeys<DOMMatrix>, 'is2D' | 'isIdentity'>[] = [
   // 2D 👇
@@ -39,8 +38,6 @@ export function isDOMMatrixEncoded(value: any): value is DOMMatrixEncoded {
 }
 
 export function encodeDOMMatrix(matrix: DOMMatrix): DOMMatrixEncoded {
-  constructorValidate(matrix, DOMMatrix);
-
   const props: DOMMatrixEncoded['props'] = {};
 
   DOMMatrixProps.forEach(key => {

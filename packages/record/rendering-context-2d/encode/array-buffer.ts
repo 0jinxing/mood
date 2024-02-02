@@ -1,5 +1,3 @@
-import { constructorValidate } from '../utils';
-
 export type ArrayBufferEncoded = {
   constructor: 'ArrayBuffer';
   byteLength: number;
@@ -12,8 +10,6 @@ export function isArrayBufferEncoded(value: any): value is ArrayBufferEncoded {
 }
 
 export const encodeArrayBuffer = (decoded: ArrayBuffer): ArrayBufferEncoded => {
-  constructorValidate(decoded, ArrayBuffer);
-
   return {
     constructor: 'ArrayBuffer',
     buffer: Object.values(new Uint8Array(decoded)),

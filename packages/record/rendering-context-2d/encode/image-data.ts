@@ -1,5 +1,3 @@
-import { constructorValidate } from '../utils';
-
 export type ImageDataEncoded = {
   constructor: 'ImageData';
 
@@ -14,8 +12,6 @@ export function isImageDataEncoded(value: any): value is ImageDataEncoded {
 }
 
 export const encodeImageData = (value: ImageData): ImageDataEncoded => {
-  constructorValidate(value, ImageData);
-
   return {
     constructor: 'ImageData',
     height: value.height,

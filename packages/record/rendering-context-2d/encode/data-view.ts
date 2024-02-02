@@ -1,5 +1,3 @@
-import { constructorValidate } from '../utils';
-
 export type DataViewEncoded = {
   constructor: 'DataView';
   byteLength: number;
@@ -13,8 +11,6 @@ export function isDataViewEncoded(value: any): value is DataViewEncoded {
 }
 
 export const encodeDataView = (decoded: DataView): DataViewEncoded => {
-  constructorValidate(decoded, DataView);
-
   return {
     constructor: 'DataView',
     byteLength: decoded.byteLength,

@@ -5,6 +5,7 @@
   "scripts": {
     "lint": "eslint --fix --ext .js,.ts .",
     "build": "npm run cleanup && npm run types && NODE_OPTIONS=\"--experimental-loader ts-node/esm --no-warnings\" node ./scripts/build.ts",
+    "repl": "cd ./examples/repl && npm run start && cd -",
     "cleanup": "NODE_OPTIONS=\"--experimental-loader ts-node/esm --no-warnings\" node ./scripts/cleanup.ts",
     "types": "pnpm -r --filter=@mood/* run types",
     "prepare": "husky install"

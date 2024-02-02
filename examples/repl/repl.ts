@@ -20,8 +20,9 @@ function getCode(): string {
       {
         type: 'input',
         name: 'url',
-        message: 'Enter the url you want to record, e.g https://react-redux.realworld.io: ',
-        default: 'https://react-redux.realworld.io'
+        message:
+          'Enter the url you want to record, e.g https://g2.antv.antgroup.com/examples/general/interval/#bar-basic: ',
+        default: 'https://g2.antv.antgroup.com/examples/general/interval/#bar-basic'
       }
     ]);
 
@@ -61,11 +62,11 @@ function getCode(): string {
   async function record(url: string) {
     const browser = await chromium.launch({
       headless: false,
-      devtools: true,
+      devtools: false,
       args: ['--start-maximized']
     });
 
-    const page = await browser.newPage();
+    const page = await browser.newPage({ viewport: null });
 
     await page.goto(url, { waitUntil: 'domcontentloaded' });
 

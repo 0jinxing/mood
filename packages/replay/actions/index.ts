@@ -23,7 +23,7 @@ export function applyIncremental(event: SubscribeEmitArg, context: ReceiveContex
     [SourceTypes.MEDIA_INTERACTION]: receiveToMediaInteraction,
     [SourceTypes.STYLE_SHEETRULE]: receiveToStyleSheet,
     [SourceTypes.SELECTION]: receiveToSelection,
-    [SourceTypes.CONTEXT2D]: receiveToRenderingContext2D
+    [SourceTypes.CONTEXT_2D]: receiveToRenderingContext2D
   };
 
   handlerMap[event.source]?.(event, context, sync);
