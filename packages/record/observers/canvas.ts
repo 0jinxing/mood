@@ -1,6 +1,10 @@
+import { Decodeable, decode, encode } from '@mood/rendering-context';
 import { FunctionKeys, NonFunctionKeys } from 'utility-types';
+import { hookMethod, hookProp, throttle } from '@mood/utils';
+import { mirror } from '@mood/snapshot';
+import { SourceTypes } from '../types';
 
-export const CanvasRenderingContext2DMethods: FunctionKeys<CanvasRenderingContext2D>[] = [
+export const RenderingContext2DMethods: FunctionKeys<CanvasRenderingContext2D>[] = [
   // arc(x: number, y: number, radius: number, startAngle: number, endAngle: number, anticlockwise?: number);
   'arc',
   // arcTo(x1: number, y1: number, x2: number, y2: number, radius: number);
@@ -93,7 +97,7 @@ export const CanvasRenderingContext2DMethods: FunctionKeys<CanvasRenderingContex
   'translate'
 ];
 
-export const CanvasRenderingContext2DProperties: NonFunctionKeys<CanvasRenderingContext2D>[] = [
+export const RenderingContext2DProperties: NonFunctionKeys<CanvasRenderingContext2D>[] = [
   // 'canvas',
   // direction = "ltr" || "rtl" || "inherit";
   'direction',
@@ -150,3 +154,73 @@ export const CanvasRenderingContext2DProperties: NonFunctionKeys<CanvasRendering
   // 'textRendering',
   // 'wordSpacing'
 ];
+
+export type SubscribeToCanvas2DArg = {
+  id: number;
+  source: SourceTypes.CANVAS;
+  ops: Array<{
+    key: FunctionKeys<CanvasRenderingContext2D> | NonFunctionKeys<CanvasRenderingContext2D>;
+    value: Decodeable;
+  }>;
+};
+
+export type SubscribeToCanvas2DHandler = (arg: SubscribeToCanvas2DArg) => void;
+
+export function $$canvas2D(cb: SubscribeToCanvas2DHandler) {
+  const store = new WeakMap<CanvasRenderingContext2D, SubscribeToCanvas2DArg['ops']>();
+
+  const maybeEmit = throttle(async (context: CanvasRenderingContext2D) => {
+    const id = mirror.getId(context.canvas);
+    const ops = store.get(context);
+
+    const width = context.canvas.width;
+    const height = context.canvas.height;
+
+    const start =
+      ops?.findIndex(o => {
+        if (o.key !== 'clearRect') return false;
+
+        const [x, y, w, h] = decode(o.value as Parameters<typeof decode>) as Parameters<
+          typeof CanvasRenderingContext2D.prototype.clearRect
+        >;
+        return x <= 0 && y <= 0 && w >= width && h >= height;
+      }) || 0;
+
+    if (ops?.length && id && start < ops.length) {
+      cb({ id, source: SourceTypes.CANVAS, ops: ops.slice(start) });
+      store.delete(context);
+    }
+  }, 40);
+
+  const unsubscribes = [
+    RenderingContext2DMethods.map(key =>
+      hookMethod(
+        CanvasRenderingContext2D.prototype,
+        key,
+        async function (_: unknown, ...args: unknown[]) {
+          const context = this as CanvasRenderingContext2D;
+          const ops = store.get(context) || [];
+          try {
+            ops.push({ key: key, value: encode(args as Parameters<typeof encode>) });
+            store.set(context, ops);
+            maybeEmit(context);
+          } catch {}
+        }
+      )
+    ),
+
+    RenderingContext2DProperties.map(key =>
+      hookProp(CanvasRenderingContext2D.prototype, key, function (value: unknown) {
+        const context = this as CanvasRenderingContext2D;
+        const ops = store.get(context) || [];
+        try {
+          ops.push({ key: key, value: encode(value as Parameters<typeof encode>) });
+          store.set(context, ops);
+          maybeEmit(context);
+        } catch {}
+      })
+    )
+  ].flat();
+
+  return () => unsubscribes.forEach(fn => fn());
+}

@@ -180,6 +180,9 @@ importers:
 
   packages/record:
     dependencies:
+      '@mood/rendering-context':
+        specifier: workspace:^
+        version: link:../rendering-context
       '@mood/snapshot':
         specifier: workspace:^
         version: link:../snapshot
@@ -224,11 +227,29 @@ importers:
         specifier: ^1.5.1
         version: 1.5.1
 
+  packages/rendering-context:
+    dependencies:
+      '@mood/snapshot':
+        specifier: workspace:^
+        version: link:../snapshot
+      '@mood/utils':
+        specifier: workspace:^
+        version: link:../utils
+      base64-arraybuffer:
+        specifier: ^1.0.2
+        version: 1.0.2
+      utility-types:
+        specifier: ^3.10.0
+        version: 3.10.0
+
   packages/replay:
     dependencies:
       '@mood/record':
         specifier: 0.0.1
         version: link:../record
+      '@mood/rendering-context':
+        specifier: workspace:^
+        version: link:../rendering-context
       '@mood/snapshot':
         specifier: 0.0.1
         version: link:../snapshot

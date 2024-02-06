@@ -3,7 +3,6 @@ export type ImageDataEncoded = {
 
   height: number;
   width: number;
-
   data: number[];
 };
 

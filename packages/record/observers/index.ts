@@ -7,7 +7,7 @@ import { $$mediaInteraction } from './media-interaction';
 import { $$styleSheet } from './style-sheet';
 import { $$mutation } from './mutation';
 import { $$selection } from './selection';
-import { $$renderingContext2D } from '../rendering-context-2d';
+import { $$canvas2D } from './canvas';
 
 import { EmitHandler } from '../types';
 import { each } from '@mood/utils';
@@ -23,7 +23,7 @@ export function subscribe(emit: EmitHandler) {
     $$mediaInteraction,
     $$styleSheet,
     $$selection,
-    $$renderingContext2D
+    $$canvas2D
   ].map(o => o(emit));
 
   return () => each(unsubscribe, u => u());
@@ -38,4 +38,4 @@ export * from './scroll';
 export * from './style-sheet';
 export * from './viewport-resize';
 export * from './selection';
-export * from '../rendering-context-2d';
+export * from './canvas';

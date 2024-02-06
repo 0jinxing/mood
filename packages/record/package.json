@@ -12,6 +12,7 @@
   "author": "",
   "license": "MIT",
   "dependencies": {
+    "@mood/rendering-context": "workspace:^",
     "@mood/snapshot": "workspace:^",
     "@mood/utils": "workspace:^",
     "base64-arraybuffer": "^1.0.2",

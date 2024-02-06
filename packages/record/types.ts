@@ -5,7 +5,7 @@ import {
   SubscribeToMouseInteractionArg,
   SubscribeToMouseMoveArg,
   SubscribeToMutationArg,
-  SubscribeToRenderingContext2DArg,
+  SubscribeToCanvas2DArg,
   SubscribeToScrollArg,
   SubscribeToSelectionArg,
   SubscribeToStyleSheetArg,
@@ -32,7 +32,7 @@ export enum SourceTypes {
   MEDIA_INTERACTION = 'MEDIA_INTERACTION',
   STYLE_SHEETRULE = 'STYLE_SHEETRULE',
   SELECTION = 'SELECTION',
-  CONTEXT_2D = 'CONTEXT_2D'
+  CANVAS = 'CANVAS'
 }
 
 export type SubscribeEmitArg =
@@ -45,7 +45,7 @@ export type SubscribeEmitArg =
   | SubscribeToMediaInteractionArg
   | SubscribeToStyleSheetArg
   | SubscribeToSelectionArg
-  | SubscribeToRenderingContext2DArg;
+  | SubscribeToCanvas2DArg;
 
 export type DomContentLoadedEvent = {
   type: EventTypes.DOM_CONTENT_LOADED;
