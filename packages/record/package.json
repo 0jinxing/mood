@@ -14,6 +14,7 @@
   "dependencies": {
     "@mood/snapshot": "workspace:^",
     "@mood/utils": "workspace:^",
+    "base64-arraybuffer": "^1.0.2",
     "utility-types": "^3.10.0"
   },
   "devDependencies": {

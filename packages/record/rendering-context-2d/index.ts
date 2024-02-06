@@ -5,6 +5,8 @@ import { SourceTypes } from '../types';
 import { FunctionKeys, NonFunctionKeys } from 'utility-types';
 import { throttle } from '@mood/utils';
 import { mirror } from '@mood/snapshot';
+import Worker from '../workers/image-bitmap.worker?worker';
+import type { ImageBitmapWorker } from '../workers/image-bitmap.worker';
 
 export type Rendering2DOp = {
   key: FunctionKeys<CanvasRenderingContext2D> | NonFunctionKeys<CanvasRenderingContext2D>;
@@ -22,7 +24,9 @@ export type SubscribeToRenderingContext2DHandler = (arg: SubscribeToRenderingCon
 export function $$renderingContext2D(cb: SubscribeToRenderingContext2DHandler) {
   const store = new WeakMap<CanvasRenderingContext2D, Rendering2DOp[]>();
 
-  const maybeEmit = throttle((context: CanvasRenderingContext2D) => {
+  const dataURLWorker = new Worker() as ImageBitmapWorker;
+
+  const maybeEmit = throttle(async (context: CanvasRenderingContext2D) => {
     const ops = store.get(context);
     const id = mirror.getId(context.canvas);
 
@@ -43,14 +47,28 @@ export function $$renderingContext2D(cb: SubscribeToRenderingContext2DHandler) {
       cb({ id, source: SourceTypes.CONTEXT_2D, ops: ops.slice(start) });
       store.delete(context);
     }
-  }, 1000 / 24);
+    dataURLWorker.onerror = function (e) {
+      console.log(e);
+      debugger;
+    };
+    dataURLWorker.onmessageerror = function (e) {
+      console.log(e);
+      debugger;
+    };
+    dataURLWorker.onmessage = function (e) {
+      console.log(e);
+      debugger;
+    };
+    dataURLWorker.postMessage({ bitmap: await createImageBitmap(context.canvas) });
+    debugger;
+  }, 1000);
 
   const unsubscribes = [
     CanvasRenderingContext2DMethods.map(key =>
       hookMethod(
         CanvasRenderingContext2D.prototype,
         key,
-        function (_: unknown, ...args: unknown[]) {
+        async function (_: unknown, ...args: unknown[]) {
           const context = this as CanvasRenderingContext2D;
           const ops = store.get(context) || [];
           try {

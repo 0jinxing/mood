@@ -12,6 +12,7 @@
   },
   "devDependencies": {
     "@esbuild-plugins/node-resolve": "^0.2.2",
+    "@types/glob": "^8.1.0",
     "@typescript-eslint/eslint-plugin": "^6.11.0",
     "@typescript-eslint/parser": "^6.11.0",
     "esbuild": "^0.19.5",
@@ -34,6 +35,6 @@
     "*.{js,jsx,ts,tsx,css,md}": "prettier --write"
   },
   "dependencies": {
-    "@types/glob": "^8.1.0"
+    "esbuild-plugin-inline-import": "^1.0.4"
   }
 }

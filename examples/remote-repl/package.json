@@ -12,6 +12,7 @@
   "dependencies": {
     "@mood/remote": "workspace:^",
     "@mood/remote-repl": "workspace:^",
+    "agora-token": "^2.0.3",
     "plasmo": "0.84.0",
     "react": "18.2.0",
     "react-dom": "18.2.0",

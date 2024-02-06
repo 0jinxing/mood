@@ -1,5 +1,6 @@
 import esbuild from 'esbuild';
 import path from 'path';
+import { inlineWorker } from './inline-worker';
 import pkgs from './pkgs';
 
 const formats = ['esm', 'cjs', 'iife'] as const;
@@ -13,7 +14,8 @@ async function build(pkg: string, format: (typeof formats)[number]) {
     bundle: true,
     sourcemap: true,
     format,
-    globalName: '$$mood'
+    globalName: '$$mood',
+    plugins: [inlineWorker()]
   });
 }
 
