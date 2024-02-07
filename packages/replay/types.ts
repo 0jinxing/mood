@@ -1,4 +1,3 @@
-import { SubscribeEmitArg } from '@mood/record';
 import { Scheduler } from './model/scheduler';
 
 export type ReceiveContext = {

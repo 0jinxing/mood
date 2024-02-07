@@ -2,14 +2,14 @@ import { mirror } from '@mood/snapshot';
 import { on, throttle } from '@mood/utils';
 import { SourceTypes } from '../types';
 
-export type SubscribeToScrollArg = {
+export type ScrollEmitArg = {
   source: SourceTypes.SCROLL;
   id: number;
   x: number;
   y: number;
 };
 
-export type SubscribeToScrollHandler = (arg: SubscribeToScrollArg) => void;
+export type SubscribeToScrollHandler = (arg: ScrollEmitArg) => void;
 
 export function $$scroll(cb: SubscribeToScrollHandler) {
   const throttleCb = throttle<UIEvent>(({ target }) => {

@@ -2,10 +2,7 @@
   "compilerOptions": {
     "module": "ESNext",
     "target": "ES5",
-    "lib": [
-      "ES2018",
-      "DOM"
-    ],
+    "lib": ["ES2018", "DOM"],
     "moduleResolution": "Node",
     "noImplicitAny": true,
     "strictNullChecks": true,
@@ -16,11 +13,8 @@
     "allowSyntheticDefaultImports": true,
     "skipLibCheck": true,
     "declaration": true,
-    "esModuleInterop": true,
+    "esModuleInterop": true
   },
   "compileOnSave": false,
-  "include": [
-    ".",
-    "node_modules/@types/mocha"
-  ]
+  "include": [".", "node_modules/@types/mocha"]
 }

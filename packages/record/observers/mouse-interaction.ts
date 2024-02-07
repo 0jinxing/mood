@@ -16,7 +16,7 @@ const actions = <const>[
 
 export type SubscribeToMouseInteraction = (typeof actions)[number];
 
-export type SubscribeToMouseInteractionArg = {
+export type MouseInteractionEmitArg = {
   source: SourceTypes.MOUSE_INTERACTION;
   action: SubscribeToMouseInteraction;
   id: number;
@@ -24,7 +24,7 @@ export type SubscribeToMouseInteractionArg = {
   y: number;
 };
 
-export type SubscribeToMouseInteractionHandler = (arg: SubscribeToMouseInteractionArg) => void;
+export type SubscribeToMouseInteractionHandler = (arg: MouseInteractionEmitArg) => void;
 
 export function $$mouseInteraction(cb: SubscribeToMouseInteractionHandler) {
   const getHandler = (action: SubscribeToMouseInteraction) => {

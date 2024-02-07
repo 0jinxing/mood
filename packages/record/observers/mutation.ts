@@ -12,7 +12,7 @@ export type RemovedNodeMutation = { id: number; pId: number };
 export type TextMutation = { id: number; value: string | null };
 export type AttrMutation = { id: number; attrs: Attrs };
 
-export type SubscribeToMutationArg = {
+export type MutationEmitArg = {
   source: SourceTypes.MUTATION;
   texts: TextMutation[];
   attrs: AttrMutation[];
@@ -20,7 +20,7 @@ export type SubscribeToMutationArg = {
   adds: AddedNodeMutation[];
 };
 
-export type SubscribeToMutationHandler = (arg: SubscribeToMutationArg) => void;
+export type SubscribeToMutationHandler = (arg: MutationEmitArg) => void;
 
 const genKey = (id: number, pId: number) => `${id}@${pId}`;
 
@@ -151,7 +151,7 @@ export function $$mutation(cb: SubscribeToMutationHandler, doc = document) {
       pushAdd(addQueue.shift()!);
     }
 
-    const arg: SubscribeToMutationArg = {
+    const arg: MutationEmitArg = {
       source: SourceTypes.MUTATION,
 
       texts: texts

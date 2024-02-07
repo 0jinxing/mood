@@ -11,14 +11,14 @@ export type StyleSheetAddRule = {
   index?: number;
 };
 
-export type SubscribeToStyleSheetArg = {
+export type StyleSheetEmitArg = {
   id: number;
   source: SourceTypes.STYLE_SHEETRULE;
   removes?: StyleSheetDeleteRule[];
   adds?: StyleSheetAddRule[];
 };
 
-export type SubscribeToStyleSheetHandler = (arg: SubscribeToStyleSheetArg) => void;
+export type SubscribeToStyleSheetHandler = (arg: StyleSheetEmitArg) => void;
 
 export function $$styleSheet(cb: SubscribeToStyleSheetHandler) {
   const proto = CSSStyleSheet.prototype;

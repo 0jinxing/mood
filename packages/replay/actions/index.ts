@@ -1,4 +1,4 @@
-import { SubscribeEmitArg, SourceTypes } from '@mood/record';
+import { EmitArg, SourceTypes } from '@mood/record';
 import { ReceiveContext, ReceiveHandler } from '../types';
 import { receiveToInput } from './input';
 import { receiveToMediaInteraction } from './media-interaction';
@@ -11,7 +11,7 @@ import { receiveToStyleSheet } from './style-sheet';
 import { receiveToSelection } from './selection';
 import { receiveToRenderingContext2D } from './canvas';
 
-export function applyIncremental(event: SubscribeEmitArg, context: ReceiveContext, sync: boolean) {
+export function applyIncremental(event: EmitArg, context: ReceiveContext, sync: boolean) {
   const handlerMap: { [key in SourceTypes]?: ReceiveHandler<unknown> } = {
     [SourceTypes.MUTATION]: receiveToMutation,
     [SourceTypes.MOUSE_MOVE]: receiveToMouseMove,

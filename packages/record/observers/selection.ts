@@ -2,12 +2,12 @@ import { mirror } from '@mood/snapshot';
 import { on } from '@mood/utils';
 import { SourceTypes } from '../types';
 
-export type SubscribeToSelectionArg = {
+export type SelectionEmitArg = {
   source: SourceTypes.SELECTION;
   ranges: number[];
 };
 
-export type SubscribeToSelectionHandler = (arg: SubscribeToSelectionArg) => void;
+export type SubscribeToSelectionHandler = (arg: SelectionEmitArg) => void;
 
 export function $$selection(cb: SubscribeToSelectionHandler) {
   let collapsed = true;

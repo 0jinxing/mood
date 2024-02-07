@@ -1,15 +1,15 @@
 import { SNWithId } from '@mood/snapshot';
 import {
-  SubscribeToInputArg,
-  SubscribeToMediaInteractionArg,
-  SubscribeToMouseInteractionArg,
-  SubscribeToMouseMoveArg,
-  SubscribeToMutationArg,
-  SubscribeToCanvas2DArg,
-  SubscribeToScrollArg,
-  SubscribeToSelectionArg,
-  SubscribeToStyleSheetArg,
-  SubscribeToViewportResizeArg
+  InputEmitArg,
+  MediaInteractionEmitArg,
+  MouseInteractionEmitArg,
+  MouseMoveEmitArg,
+  MutationEmitArg,
+  CanvasEmitArg,
+  ScrollEmitArg,
+  SelectionEmitArg,
+  StyleSheetEmitArg,
+  ViewportResizeEmitArg
 } from './observers';
 
 export enum EventTypes {
@@ -35,17 +35,17 @@ export enum SourceTypes {
   CANVAS = 'CANVAS'
 }
 
-export type SubscribeEmitArg =
-  | SubscribeToMutationArg
-  | SubscribeToMouseMoveArg
-  | SubscribeToMouseInteractionArg
-  | SubscribeToScrollArg
-  | SubscribeToViewportResizeArg
-  | SubscribeToInputArg
-  | SubscribeToMediaInteractionArg
-  | SubscribeToStyleSheetArg
-  | SubscribeToSelectionArg
-  | SubscribeToCanvas2DArg;
+export type EmitArg =
+  | MutationEmitArg
+  | MouseMoveEmitArg
+  | MouseInteractionEmitArg
+  | ScrollEmitArg
+  | ViewportResizeEmitArg
+  | InputEmitArg
+  | MediaInteractionEmitArg
+  | StyleSheetEmitArg
+  | SelectionEmitArg
+  | CanvasEmitArg;
 
 export type DomContentLoadedEvent = {
   type: EventTypes.DOM_CONTENT_LOADED;
@@ -63,7 +63,7 @@ export type FullSnapshotEvent = {
 
 export type IncrementalSnapshotEvent = {
   type: EventTypes.INCREMENTAL_SNAPSHOT;
-} & SubscribeEmitArg;
+} & EmitArg;
 
 export type MetaEvent = {
   type: EventTypes.META;
@@ -88,4 +88,4 @@ export type RecordEvent =
 
 export type RecordEventWithTime = RecordEvent & { timestamp: number };
 
-export type EmitHandler = (data: SubscribeEmitArg) => void;
+export type EmitHandler = (data: EmitArg) => void;

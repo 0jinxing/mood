@@ -1,9 +1,9 @@
-import { SubscribeToCanvas2DArg } from '@mood/record';
+import { CanvasEmitArg } from '@mood/record';
 import { ReceiveHandler } from '../types';
 import { mirror } from '@mood/snapshot';
 import { decode } from '@mood/rendering-context';
 
-export const receiveToRenderingContext2D: ReceiveHandler<SubscribeToCanvas2DArg> = event => {
+export const receiveToRenderingContext2D: ReceiveHandler<CanvasEmitArg> = event => {
   const context = (mirror.getNode(event.id) as HTMLCanvasElement)?.getContext('2d');
 
   for (const op of event.ops) {

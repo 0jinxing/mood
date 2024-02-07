@@ -1,9 +1,9 @@
-import { SubscribeToStyleSheetArg } from '@mood/record';
+import { StyleSheetEmitArg } from '@mood/record';
 import { mirror } from '@mood/snapshot';
 import { each } from '@mood/utils';
 import { ReceiveHandler } from '../types';
 
-export const receiveToStyleSheet: ReceiveHandler<SubscribeToStyleSheetArg> = event => {
+export const receiveToStyleSheet: ReceiveHandler<StyleSheetEmitArg> = event => {
   const $target = mirror.getNode<HTMLStyleElement>(event.id);
   if (!$target) return;
 

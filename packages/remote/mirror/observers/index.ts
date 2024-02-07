@@ -1,10 +1,10 @@
 import {
-  SubscribeToMediaInteractionArg,
-  SubscribeToInputArg,
-  SubscribeToMouseInteractionArg,
-  SubscribeToMouseMoveArg,
-  SubscribeToScrollArg,
-  SubscribeToSelectionArg,
+  MediaInteractionEmitArg,
+  InputEmitArg,
+  MouseInteractionEmitArg,
+  MouseMoveEmitArg,
+  ScrollEmitArg,
+  SelectionEmitArg,
   $$input,
   $$mediaInteraction
 } from '@mood/record';
@@ -12,12 +12,12 @@ import { Mirror } from '@mood/snapshot';
 import { SubscribeToDndArg, subscribeToDragAndDrop } from './dnd';
 
 export type DispatchArg =
-  | SubscribeToMouseMoveArg
-  | SubscribeToMouseInteractionArg
-  | SubscribeToScrollArg
-  | SubscribeToInputArg
-  | SubscribeToMediaInteractionArg
-  | SubscribeToSelectionArg
+  | MouseMoveEmitArg
+  | MouseInteractionEmitArg
+  | ScrollEmitArg
+  | InputEmitArg
+  | MediaInteractionEmitArg
+  | SelectionEmitArg
   | SubscribeToDndArg;
 
 export type DispatchHandler = (arg: DispatchArg) => void;

@@ -5,13 +5,13 @@ import { SourceTypes } from '../types';
 
 export type SubscribeToInputValue = string | boolean;
 
-export type SubscribeToInputArg = {
+export type InputEmitArg = {
   source: SourceTypes.INPUT;
   id: number;
   value: SubscribeToInputValue;
 };
 
-export type SubscribeToInputHandler = (arg: SubscribeToInputArg) => void;
+export type SubscribeToInputHandler = (arg: InputEmitArg) => void;
 
 const store: WeakMap<EventTarget, SubscribeToInputValue> = new WeakMap();
 

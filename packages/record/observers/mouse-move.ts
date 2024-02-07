@@ -4,12 +4,12 @@ import { SourceTypes } from '../types';
 
 export type MousePositions = number[];
 
-export type SubscribeToMouseMoveArg = {
+export type MouseMoveEmitArg = {
   source: SourceTypes.MOUSE_MOVE | SourceTypes.TOUCH_MOVE;
   ps: MousePositions;
 };
 
-export type SubscribeToMousemoveHandler = (arg: SubscribeToMouseMoveArg) => void;
+export type SubscribeToMousemoveHandler = (arg: MouseMoveEmitArg) => void;
 
 export function $$ouseMove(cb: SubscribeToMousemoveHandler) {
   let ps: MousePositions = [];

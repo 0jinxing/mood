@@ -1,8 +1,8 @@
-import { SubscribeToScrollArg } from '@mood/record';
+import { ScrollEmitArg } from '@mood/record';
 import { mirror } from '@mood/snapshot';
 import { ReceiveHandler } from '../types';
 
-export const receiveToScroll: ReceiveHandler<SubscribeToScrollArg> = (event, context, sync) => {
+export const receiveToScroll: ReceiveHandler<ScrollEmitArg> = (event, context, sync) => {
   const $target = mirror.getNode<HTMLElement>(event.id);
   if (!$target) return;
 

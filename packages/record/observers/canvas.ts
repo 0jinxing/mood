@@ -155,7 +155,7 @@ export const RenderingContext2DProperties: NonFunctionKeys<CanvasRenderingContex
   // 'wordSpacing'
 ];
 
-export type SubscribeToCanvas2DArg = {
+export type CanvasEmitArg = {
   id: number;
   source: SourceTypes.CANVAS;
   ops: Array<{
@@ -164,10 +164,10 @@ export type SubscribeToCanvas2DArg = {
   }>;
 };
 
-export type SubscribeToCanvas2DHandler = (arg: SubscribeToCanvas2DArg) => void;
+export type SubscribeToCanvas2DHandler = (arg: CanvasEmitArg) => void;
 
 export function $$canvas2D(cb: SubscribeToCanvas2DHandler) {
-  const store = new WeakMap<CanvasRenderingContext2D, SubscribeToCanvas2DArg['ops']>();
+  const store = new WeakMap<CanvasRenderingContext2D, CanvasEmitArg['ops']>();
 
   const maybeEmit = throttle(async (context: CanvasRenderingContext2D) => {
     const id = mirror.getId(context.canvas);

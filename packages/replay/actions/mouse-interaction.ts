@@ -1,9 +1,9 @@
-import { SubscribeToMouseInteractionArg } from '@mood/record';
+import { MouseInteractionEmitArg } from '@mood/record';
 import { mirror } from '@mood/snapshot';
 import { ReceiveHandler } from '../types';
 import { moveAndHover } from '../utils/hover';
 
-export const receiveToMouseInteraction: ReceiveHandler<SubscribeToMouseInteractionArg> = (
+export const receiveToMouseInteraction: ReceiveHandler<MouseInteractionEmitArg> = (
   event,
   { $iframe, $cursor },
   sync

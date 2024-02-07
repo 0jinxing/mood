@@ -2,13 +2,13 @@ import { on, throttle } from '@mood/utils';
 import { SourceTypes } from '../types';
 import { queryViewport } from '../utils';
 
-export type SubscribeToViewportResizeArg = {
+export type ViewportResizeEmitArg = {
   source: SourceTypes.VIEWPORT_RESIZE;
   width: number;
   height: number;
 };
 
-export type SubscribeToViewportResizeHandler = (arg: SubscribeToViewportResizeArg) => void;
+export type SubscribeToViewportResizeHandler = (arg: ViewportResizeEmitArg) => void;
 
 export function $$viewportResize(cb: SubscribeToViewportResizeHandler) {
   const source = SourceTypes.VIEWPORT_RESIZE;

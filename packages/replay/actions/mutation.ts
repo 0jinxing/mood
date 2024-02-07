@@ -1,9 +1,9 @@
-import { AddedNodeMutation, SubscribeToMutationArg } from '@mood/record';
+import { AddedNodeMutation, MutationEmitArg } from '@mood/record';
 import { buildNodeWithSN, mirror } from '@mood/snapshot';
 import { each } from '@mood/utils';
 import { ReceiveHandler } from '../types';
 
-export const receiveToMutation: ReceiveHandler<SubscribeToMutationArg> = (event, context) => {
+export const receiveToMutation: ReceiveHandler<MutationEmitArg> = (event, context) => {
   each(event.removes, rm => {
     const $el = mirror.getNode(rm.id);
     const $parent = mirror.getNode(rm.pId);
