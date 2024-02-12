@@ -1,4 +1,4 @@
-import { SNWithId } from '@mood/snapshot';
+import { Mirror, SNWithId } from '@mood/snapshot';
 import {
   InputEmitArg,
   MediaInteractionEmitArg,
@@ -10,7 +10,8 @@ import {
   SelectionEmitArg,
   StyleSheetEmitArg,
   ViewportResizeEmitArg
-} from './observers';
+} from './observe';
+import { WebGLEmitArg } from './observe/webgl';
 
 export enum EventTypes {
   META = 'META',
@@ -32,7 +33,8 @@ export enum SourceTypes {
   MEDIA_INTERACTION = 'MEDIA_INTERACTION',
   STYLE_SHEETRULE = 'STYLE_SHEETRULE',
   SELECTION = 'SELECTION',
-  CANVAS = 'CANVAS'
+  CANVAS = 'CANVAS',
+  WEBGL = 'WEBGL'
 }
 
 export type EmitArg =
@@ -45,7 +47,8 @@ export type EmitArg =
   | MediaInteractionEmitArg
   | StyleSheetEmitArg
   | SelectionEmitArg
-  | CanvasEmitArg;
+  | CanvasEmitArg
+  | WebGLEmitArg;
 
 export type DomContentLoadedEvent = {
   type: EventTypes.DOM_CONTENT_LOADED;
@@ -88,4 +91,11 @@ export type RecordEvent =
 
 export type RecordEventWithTime = RecordEvent & { timestamp: number };
 
-export type EmitHandler = (data: EmitArg) => void;
+export type EmitHandler<T = EmitArg> = (data: T) => void;
+
+export type ObserverOptions = { mirror: Mirror; doc: Document };
+
+export type ObserveHandler<T extends EmitArg = EmitArg> = (
+  emit: EmitHandler<T>,
+  options: ObserverOptions
+) => () => void;

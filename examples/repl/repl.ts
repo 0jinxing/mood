@@ -62,7 +62,7 @@ function getCode(): string {
   async function record(url: string) {
     const browser = await chromium.launch({
       headless: false,
-      devtools: false,
+      devtools: true,
       args: ['--start-maximized']
     });
 

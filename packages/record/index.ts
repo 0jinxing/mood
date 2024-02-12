@@ -1,5 +1,5 @@
-import { snapshot } from '@mood/snapshot';
-import { subscribe } from './observers';
+import { Mirror, snapshot } from '@mood/snapshot';
+import { observe } from './observe';
 import { queryViewport } from './utils';
 import { RecordEvent, RecordEventWithTime, EmitHandler, EventTypes } from './types';
 import { each, on } from '@mood/utils';
@@ -24,6 +24,7 @@ export function record(options: RecordOptions) {
 
   let lastFullSnapshotEvent: RecordEventWithTime;
   let incrementalSnapshotCount = 0;
+  const mirror = new Mirror();
 
   wrappedEmit = (event: RecordEventWithTime, checkout?: true) => {
     emit(event, checkout);
@@ -62,7 +63,7 @@ export function record(options: RecordOptions) {
       },
       checkout
     );
-    const adds = snapshot(doc);
+    const adds = snapshot(doc, mirror);
 
     if (!adds) {
       throw new Error('Failed to snapshot the document');
@@ -88,7 +89,7 @@ export function record(options: RecordOptions) {
 
   const initial = () => {
     takeFullSnapshot();
-    unsubscribes.push(subscribe(incEmitWithTime));
+    unsubscribes.push(observe(incEmitWithTime, doc, mirror));
     customHandler && unsubscribes.push(customHandler(incEmitWithTime));
   };
 
@@ -96,7 +97,7 @@ export function record(options: RecordOptions) {
     initial();
   } else {
     unsubscribes.push(
-      on(window, 'load', () => {
+      on(doc, 'DOMContentLoaded', () => {
         wrappedEmitWithTime({ type: EventTypes.LOADED });
         initial();
       })
@@ -114,5 +115,5 @@ export function addCustomEvent<T>(tag: string, payload: T) {
 }
 
 export * from './types';
-export * from './observers';
+export * from './observe';
 export * from './utils';

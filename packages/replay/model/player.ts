@@ -1,4 +1,4 @@
-import { rebuild } from '@mood/snapshot';
+import { Mirror, rebuild } from '@mood/snapshot';
 import {
   RecordEventWithTime,
   FullSnapshotEvent,
@@ -8,15 +8,15 @@ import {
 } from '@mood/record';
 
 import { createScheduler, Scheduler } from './scheduler';
-import { applyIncremental } from '../actions';
-import { ReceiveContext } from '../types';
+import { handleEmit } from '../handle';
+import { EmitHandlerContext } from '../types';
 
 export type PlayerConfig = {
   speed: number;
   root: HTMLElement | Element;
   styleRules: string[];
   live?: boolean;
-  customApplyIncremental?: typeof applyIncremental;
+  customApplyIncremental?: typeof handleEmit;
 };
 
 const defaultConfig: PlayerConfig = {
@@ -35,6 +35,8 @@ export class Player {
   private prev: RecordEventWithTime;
 
   private config: PlayerConfig = defaultConfig;
+
+  private mirror = new Mirror();
 
   scheduler: Scheduler;
 
@@ -96,22 +98,23 @@ export class Player {
   }
 
   private apply(event: IncrementalSnapshotEvent, sync: boolean) {
-    const { $iframe, $cursor, baseline, scheduler } = this;
+    const { $iframe, $cursor, baseline, scheduler, mirror } = this;
 
-    const context: ReceiveContext = {
+    const context: EmitHandlerContext = {
       $iframe,
       $cursor,
       baseline,
-      scheduler
+      scheduler,
+      mirror
     };
-    applyIncremental(event, context, sync);
+    handleEmit(event, context, sync);
     this.config.customApplyIncremental?.(event, context, sync);
   }
 
   private rebuild(event: RecordEventWithTime & FullSnapshotEvent) {
     const contentDocument = this.$iframe.contentDocument!;
 
-    rebuild(event.adds, contentDocument);
+    rebuild(event.adds, contentDocument, this.mirror);
 
     const $style = contentDocument.createElement('style');
     const { documentElement, head } = contentDocument;

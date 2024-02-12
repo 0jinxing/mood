@@ -1,8 +1,7 @@
-import { mirror } from '@mood/snapshot';
 import { InputEmitArg } from '@mood/record';
-import { ReceiveHandler } from '../types';
+import { EmitHandler } from '../types';
 
-export const receiveToInput: ReceiveHandler<InputEmitArg> = event => {
+export const handleInputEmit: EmitHandler<InputEmitArg> = (event, { mirror }) => {
   const $target = mirror.getNode<HTMLInputElement>(event.id);
 
   if (!$target) return;

@@ -1,9 +1,9 @@
-import { serialize, rAttr, mirror, Attrs, SNWithId } from '@mood/snapshot';
+import { serialize, rAttr, Attrs, SNWithId } from '@mood/snapshot';
 
 import { deepDelete, isAncestorRemoved, isAncestorInSet, isParentRemoved } from '../utils';
 
 import { each } from '@mood/utils';
-import { SourceTypes } from '../types';
+import { ObserveHandler, SourceTypes } from '../types';
 
 export type AttrCursor = { $el: Node; attrs: Attrs };
 
@@ -20,11 +20,9 @@ export type MutationEmitArg = {
   adds: AddedNodeMutation[];
 };
 
-export type SubscribeToMutationHandler = (arg: MutationEmitArg) => void;
-
 const genKey = (id: number, pId: number) => `${id}@${pId}`;
 
-export function $$mutation(cb: SubscribeToMutationHandler, doc = document) {
+export const observeMutation: ObserveHandler<MutationEmitArg> = (cb, { doc, mirror }) => {
   const observer = new MutationObserver(mutations => {
     const attrs: AttrCursor[] = [];
     const texts: Array<{ value: string | null; $el: Node }> = [];
@@ -95,7 +93,7 @@ export function $$mutation(cb: SubscribeToMutationHandler, doc = document) {
              * before callback fired, so we can ignore it because
              * newly added node will be serialized without child nodes.
              */
-          } else if (isAncestorRemoved(target)) {
+          } else if (isAncestorRemoved(target, mirror)) {
             /**
              * If parent id was not in the mirror map any more, it
              * means the parent node has already been removed. So
@@ -124,13 +122,13 @@ export function $$mutation(cb: SubscribeToMutationHandler, doc = document) {
         return;
       }
 
-      each(serialize($node, document), item => adds.push({ pId: pId, nId: nId, ...item }));
+      each(serialize($node, document, mirror), item => adds.push({ pId: pId, nId: nId, ...item }));
     };
 
     movedSet.forEach($node => pushAdd($node));
 
     for (const $node of addedSet) {
-      if (!isAncestorInSet(removedSet, $node) && !isParentRemoved(removes, $node)) {
+      if (!isAncestorInSet(removedSet, $node) && !isParentRemoved(removes, $node, mirror)) {
         pushAdd($node);
       } else if (isAncestorInSet(movedSet, $node)) {
         pushAdd($node);
@@ -188,4 +186,4 @@ export function $$mutation(cb: SubscribeToMutationHandler, doc = document) {
   return () => {
     observer.disconnect();
   };
-}
+};

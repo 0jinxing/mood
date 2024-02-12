@@ -1,18 +1,17 @@
 import { CanvasEmitArg } from '@mood/record';
-import { ReceiveHandler } from '../types';
-import { mirror } from '@mood/snapshot';
+import { EmitHandler } from '../types';
 import { decode } from '@mood/rendering-context';
 
-export const receiveToRenderingContext2D: ReceiveHandler<CanvasEmitArg> = event => {
+export const handleRenderingContext2DEmit: EmitHandler<CanvasEmitArg> = (event, { mirror }) => {
   const context = (mirror.getNode(event.id) as HTMLCanvasElement)?.getContext('2d');
 
   for (const op of event.ops) {
     const prop = context?.[op.key];
     try {
       if (prop && typeof prop === 'function') {
-        prop.apply(context, decode(op.value));
+        prop.apply(context, decode(op.value, mirror));
       } else if (context) {
-        Object.assign(context, { [op.key]: decode(op.value) });
+        Object.assign(context, { [op.key]: decode(op.value, mirror) });
       }
     } catch {}
   }

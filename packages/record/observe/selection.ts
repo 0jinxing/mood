@@ -1,15 +1,12 @@
-import { mirror } from '@mood/snapshot';
 import { on } from '@mood/utils';
-import { SourceTypes } from '../types';
+import { ObserveHandler, SourceTypes } from '../types';
 
 export type SelectionEmitArg = {
   source: SourceTypes.SELECTION;
   ranges: number[];
 };
 
-export type SubscribeToSelectionHandler = (arg: SelectionEmitArg) => void;
-
-export function $$selection(cb: SubscribeToSelectionHandler) {
+export const observeSelection: ObserveHandler<SelectionEmitArg> = (cb, { mirror }) => {
   let collapsed = true;
 
   const updateSelection = () => {
@@ -34,4 +31,4 @@ export function $$selection(cb: SubscribeToSelectionHandler) {
   };
 
   return on(document, 'selectionchange', updateSelection);
-}
+};

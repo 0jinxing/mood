@@ -1,6 +1,5 @@
-import { mirror } from '@mood/snapshot';
 import { each, on } from '@mood/utils';
-import { SourceTypes } from '../types';
+import { ObserveHandler, SourceTypes } from '../types';
 
 const actions = <const>[
   'mouseup',
@@ -24,9 +23,10 @@ export type MouseInteractionEmitArg = {
   y: number;
 };
 
-export type SubscribeToMouseInteractionHandler = (arg: MouseInteractionEmitArg) => void;
-
-export function $$mouseInteraction(cb: SubscribeToMouseInteractionHandler) {
+export const observeMouseInteraction: ObserveHandler<MouseInteractionEmitArg> = (
+  cb,
+  { mirror }
+) => {
   const getHandler = (action: SubscribeToMouseInteraction) => {
     return (event: MouseEvent | TouchEvent) => {
       const id = mirror.getId(event.target);
@@ -43,4 +43,4 @@ export function $$mouseInteraction(cb: SubscribeToMouseInteractionHandler) {
   });
 
   return () => each(unsubscribes, u => u());
-}
+};

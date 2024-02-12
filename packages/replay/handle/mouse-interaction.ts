@@ -1,11 +1,10 @@
 import { MouseInteractionEmitArg } from '@mood/record';
-import { mirror } from '@mood/snapshot';
-import { ReceiveHandler } from '../types';
+import { EmitHandler } from '../types';
 import { moveAndHover } from '../utils/hover';
 
-export const receiveToMouseInteraction: ReceiveHandler<MouseInteractionEmitArg> = (
+export const handleMouseInteractionEmit: EmitHandler<MouseInteractionEmitArg> = (
   event,
-  { $iframe, $cursor },
+  { $iframe, $cursor, mirror },
   sync
 ) => {
   const $target = mirror.getNode<HTMLElement>(event.id);
@@ -24,7 +23,7 @@ export const receiveToMouseInteraction: ReceiveHandler<MouseInteractionEmitArg> 
     case 'touchend':
     case 'touchstart': {
       if (!sync) {
-        moveAndHover(event.x, event.y, event.id, $cursor, $iframe.contentDocument!);
+        moveAndHover(event.x, event.y, event.id, mirror, $cursor, $iframe.contentDocument!);
 
         $cursor.classList.remove('active');
         setTimeout(() => $cursor.classList.add('active'));

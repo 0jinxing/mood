@@ -1,6 +1,5 @@
-import { mirror } from '@mood/snapshot';
 import { each, on, throttle } from '@mood/utils';
-import { SourceTypes } from '../types';
+import { ObserveHandler, SourceTypes } from '../types';
 
 export type MousePositions = number[];
 
@@ -9,9 +8,7 @@ export type MouseMoveEmitArg = {
   ps: MousePositions;
 };
 
-export type SubscribeToMousemoveHandler = (arg: MouseMoveEmitArg) => void;
-
-export function $$ouseMove(cb: SubscribeToMousemoveHandler) {
+export const observeMouseMove: ObserveHandler<MouseMoveEmitArg> = (cb, { mirror }) => {
   let ps: MousePositions = [];
   const throttleCb = throttle((touch: boolean) => {
     cb({ ps, source: touch ? SourceTypes.TOUCH_MOVE : SourceTypes.MOUSE_MOVE });
@@ -33,4 +30,4 @@ export function $$ouseMove(cb: SubscribeToMousemoveHandler) {
   ];
 
   return () => each(unsubscribes, u => u());
-}
+};

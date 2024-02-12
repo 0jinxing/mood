@@ -3,7 +3,7 @@ import { each } from '@mood/utils';
 type WithId<T> = T & { ['@@id']?: number };
 
 export class Mirror {
-  private readonly pool: Record<number, EventTarget | undefined> = {};
+  readonly pool: Record<number, EventTarget | undefined> = {};
 
   set(id: number, $node: WithId<Node>) {
     if ($node['@@id'] === id) return;
@@ -35,5 +35,3 @@ export class Mirror {
     return !!this.pool[id];
   }
 }
-
-export const mirror = new Mirror();

@@ -1,9 +1,9 @@
 import { AddedNodeMutation, MutationEmitArg } from '@mood/record';
-import { buildNodeWithSN, mirror } from '@mood/snapshot';
+import { buildNodeWithSN } from '@mood/snapshot';
 import { each } from '@mood/utils';
-import { ReceiveHandler } from '../types';
+import { EmitHandler } from '../types';
 
-export const receiveToMutation: ReceiveHandler<MutationEmitArg> = (event, context) => {
+export const handleMutationEmit: EmitHandler<MutationEmitArg> = (event, { $iframe, mirror }) => {
   each(event.removes, rm => {
     const $el = mirror.getNode(rm.id);
     const $parent = mirror.getNode(rm.pId);
@@ -15,14 +15,14 @@ export const receiveToMutation: ReceiveHandler<MutationEmitArg> = (event, contex
     mirror.remove($el);
   });
 
-  const $doc = context.$iframe.contentDocument!;
+  const $doc = $iframe.contentDocument!;
 
   const append = (add: AddedNodeMutation) => {
     const $parent = add.pId ? mirror.getNode(add.pId) : undefined;
 
     let $next = add.nId ? mirror.getNode(add.nId) : undefined;
 
-    const $target = $doc ? buildNodeWithSN(add, $doc) : null;
+    const $target = $doc ? buildNodeWithSN(add, $doc, mirror) : null;
 
     if (!$target) return;
 

@@ -1,4 +1,4 @@
-import { mirror } from '@mood/snapshot';
+import { Mirror } from '@mood/snapshot';
 import { each } from '@mood/utils';
 
 export function hover($el: Element, $doc?: Document) {
@@ -18,6 +18,7 @@ export function moveAndHover(
   x: number,
   y: number,
   id: number,
+  mirror: Mirror,
   $cursor: HTMLElement,
   $doc?: Document
 ) {

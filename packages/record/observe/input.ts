@@ -1,7 +1,6 @@
 import { NonFunctionKeys } from 'utility-types';
-import { mirror } from '@mood/snapshot';
 import { hookProp, on, each } from '@mood/utils';
-import { SourceTypes } from '../types';
+import { ObserveHandler, SourceTypes } from '../types';
 
 export type SubscribeToInputValue = string | boolean;
 
@@ -10,10 +9,6 @@ export type InputEmitArg = {
   id: number;
   value: SubscribeToInputValue;
 };
-
-export type SubscribeToInputHandler = (arg: InputEmitArg) => void;
-
-const store: WeakMap<EventTarget, SubscribeToInputValue> = new WeakMap();
 
 function isInputElement(
   $el: HTMLElement | EventTarget | Node
@@ -25,16 +20,11 @@ function isInputElement(
   );
 }
 
-export function $$input(cb: SubscribeToInputHandler, doc?: Document) {
+export const observeInput: ObserveHandler<InputEmitArg> = (cb, { doc, mirror }) => {
   const cbWithDedup = (
     $target: HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement,
     value: SubscribeToInputValue
   ) => {
-    const oldValue = store.get($target);
-
-    if (oldValue && oldValue === value) return;
-
-    store.set($target, value);
     const id = mirror.getId($target);
     cb({ source: SourceTypes.INPUT, value, id });
   };
@@ -86,4 +76,4 @@ export function $$input(cb: SubscribeToInputHandler, doc?: Document) {
   unsubscribes.push(...hookHandlers);
 
   return () => each(unsubscribes, u => u());
-}
+};

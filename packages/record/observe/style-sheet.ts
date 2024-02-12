@@ -1,6 +1,5 @@
-import { mirror } from '@mood/snapshot';
 import { hookMethod } from '@mood/utils';
-import { SourceTypes } from '../types';
+import { ObserveHandler, SourceTypes } from '../types';
 
 export type StyleSheetDeleteRule = {
   index: number;
@@ -18,18 +17,16 @@ export type StyleSheetEmitArg = {
   adds?: StyleSheetAddRule[];
 };
 
-export type SubscribeToStyleSheetHandler = (arg: StyleSheetEmitArg) => void;
-
-export function $$styleSheet(cb: SubscribeToStyleSheetHandler) {
+export const observeStyleSheet: ObserveHandler<StyleSheetEmitArg> = (cb, { mirror }) => {
   const proto = CSSStyleSheet.prototype;
 
-  const insertHoc = hookMethod(proto, 'insertRule', (_, rule: string, index?: number) => {
+  const insertHoc = hookMethod(proto, 'insertRule', function (_, rule: string, index?: number) {
     const id = mirror.getId(this.ownerNode);
     if (!id) return;
     cb({ id, source: SourceTypes.STYLE_SHEETRULE, adds: [{ rule, index }] });
   });
 
-  const deleteHoc = hookMethod(proto, 'deleteRule', (_, index: number) => {
+  const deleteHoc = hookMethod(proto, 'deleteRule', function (_, index: number) {
     const id = mirror.getId(this.ownerNode);
     if (!id) return;
 
@@ -40,4 +37,4 @@ export function $$styleSheet(cb: SubscribeToStyleSheetHandler) {
     insertHoc();
     deleteHoc();
   };
-}
+};

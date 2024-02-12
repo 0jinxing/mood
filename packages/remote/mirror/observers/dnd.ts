@@ -1,6 +1,6 @@
 import { on } from '@mood/utils';
 import { DispatchType } from './types';
-import { mirror } from '@mood/snapshot';
+import { Mirror } from '@mood/snapshot';
 
 export enum DragAndDropAction {
   DragStart,
@@ -32,7 +32,10 @@ const DND_LISTENER_MAP = {
   dragend: DragAndDropAction.DragEnd
 } as const;
 
-export function subscribeToDragAndDrop(cb: SubscribeToDndEmit, doc?: Document) {
+export const $$dragAndDrop = (
+  cb: SubscribeToDndEmit,
+  { doc, mirror }: { doc: Document; mirror: Mirror }
+) => {
   const keys = Object.keys(DND_LISTENER_MAP) as Array<keyof typeof DND_LISTENER_MAP>;
 
   keys.map(key => {
@@ -46,4 +49,4 @@ export function subscribeToDragAndDrop(cb: SubscribeToDndEmit, doc?: Document) {
       });
     });
   });
-}
+};

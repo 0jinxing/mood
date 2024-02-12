@@ -1,6 +1,59 @@
-[
-  'WebGLRenderingContext',
-  'WebGL2RenderingContext',
+import { Mirror } from '@mood/snapshot';
+
+export const webGLVars = new WeakMap<RenderingContext, Record<string, WebGLObject[]>>();
+
+export type WebGLObject =
+  | WebGLActiveInfo
+  | WebGLBuffer
+  | WebGLContextEvent
+  | WebGLFramebuffer
+  | WebGLProgram
+  | WebGLQuery
+  | WebGLRenderbuffer
+  | WebGLSampler
+  | WebGLShader
+  | WebGLShaderPrecisionFormat
+  | WebGLSync
+  | WebGLTexture
+  | WebGLTransformFeedback
+  | WebGLUniformLocation
+  | WebGLVertexArrayObject;
+
+export type WebGLObjectEncoded = {
+  id: number;
+  type: 'WebGLObjectEncoded';
+  constructor: string;
+  index: number;
+  webgl2: boolean;
+};
+
+export function isWebGLObjectEncoded(value: any): value is WebGLObjectEncoded {
+  return Boolean(value && typeof value === 'object' && value.type === 'WebGLObjectEncoded');
+}
+
+export function encodeWebGLObject(
+  value: WebGLObject,
+  mirror: Mirror,
+  context: RenderingContext
+): WebGLObjectEncoded {
+  return {
+    id: mirror.getId(context.canvas),
+    webgl2: context instanceof WebGL2RenderingContext,
+    type: 'WebGLObjectEncoded',
+    constructor: value.constructor.name,
+    index: contextVarList(context, value.constructor.name).indexOf(value)
+  };
+}
+
+export function decodeWebGLObject(value: WebGLObjectEncoded, mirror: Mirror) {
+  const context = mirror
+    .getNode<HTMLCanvasElement>(value.id)
+    ?.getContext(value.webgl2 ? 'webgl2' : 'webgl');
+
+  return webGLVars.get(context!)?.[value.constructor]?.[value.index];
+}
+
+export const WebGLConstructorNames: string[] = [
   'WebGLActiveInfo',
   'WebGLBuffer',
   'WebGLContextEvent',
@@ -15,42 +68,38 @@
   'WebGLTexture',
   'WebGLTransformFeedback',
   'WebGLUniformLocation',
-  'WebGLVertexArrayObject'
+  'WebGLVertexArrayObject',
+  // In old Chrome versions, value won't be an instanceof WebGLVertexArrayObject.
+  'WebGLVertexArrayObjectOES'
 ];
 
-[
-  'ANGLE_instanced_arrays',
-  'EXT_blend_minmax',
-  'EXT_color_buffer_float',
-  'EXT_color_buffer_half_float',
-  'EXT_disjoint_timer_query',
-  'EXT_float_blend',
-  'EXT_frag_depth',
-  'EXT_sRGB',
-  'EXT_shader_texture_lod',
-  'EXT_texture_compression_bptc',
-  'EXT_texture_compression_rgtc',
-  'EXT_texture_filter_anisotropic',
-  'OES_element_index_uint',
-  'OES_fbo_render_mipmap',
-  'OES_standard_derivatives',
-  'OES_texture_float',
-  'OES_texture_float_linear',
-  'OES_texture_half_float',
-  'OES_texture_half_float_linear',
-  'OES_vertex_array_object',
-  'OVR_multiview2',
-  'WEBGL_color_buffer_float',
-  'WEBGL_compressed_texture_astc',
-  'WEBGL_compressed_texture_atc',
-  'WEBGL_compressed_texture_etc',
-  'WEBGL_compressed_texture_etc1',
-  'WEBGL_compressed_texture_pvrtc',
-  'WEBGL_compressed_texture_s3tc',
-  'WEBGL_compressed_texture_s3tc_srgb',
-  'WEBGL_debug_renderer_info',
-  'WEBGL_debug_shaders',
-  'WEBGL_depth_texture',
-  'WEBGL_draw_buffers',
-  'WEBGL_lose_context'
-];
+export function contextVarList(context: RenderingContext, constructor: string) {
+  const map = webGLVars.get(context) || {};
+
+  webGLVars.set(
+    context,
+    Object.assign(map, {
+      [constructor]: map[constructor] || []
+    })
+  );
+
+  return map[constructor];
+}
+
+export function saveWebGLObjectIfValid(context: RenderingContext, value: unknown) {
+  if (isWebGLObject(value)) {
+    const list = contextVarList(context, value.constructor.name);
+
+    list.includes(value) || list.push(value);
+  }
+}
+
+export function isWebGLObject(value: unknown): value is WebGLObject {
+  try {
+    return Boolean(
+      value && WebGLConstructorNames.some((name: string) => value.constructor.name === name)
+    );
+  } catch {
+    return false;
+  }
+}

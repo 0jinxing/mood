@@ -1,6 +1,5 @@
-import { mirror } from '@mood/snapshot';
 import { each, on } from '@mood/utils';
-import { SourceTypes } from '../types';
+import { ObserveHandler, SourceTypes } from '../types';
 
 const ACTIONS = <const>['play', 'pause'];
 
@@ -12,9 +11,10 @@ export type MediaInteractionEmitArg = {
   id: number;
 };
 
-export type SubscribeToMediaInteractionHandler = (arg: MediaInteractionEmitArg) => void;
-
-export function $$mediaInteraction(cb: SubscribeToMediaInteractionHandler, doc?: Document) {
+export const observeMediaInteraction: ObserveHandler<MediaInteractionEmitArg> = (
+  cb,
+  { doc, mirror }
+) => {
   const handler = (act: SubscribeToMediaInteraction) => (event: Event) => {
     const { target } = event;
     if (target) {
@@ -25,4 +25,4 @@ export function $$mediaInteraction(cb: SubscribeToMediaInteractionHandler, doc?:
   const unsubscribes = ACTIONS.map(k => on(doc || document, k, handler(k)));
 
   return () => each(unsubscribes, u => u());
-}
+};

@@ -1,4 +1,4 @@
-import { mirror, rAttr, rStyle } from './utils';
+import { Mirror, rAttr, rStyle } from './utils';
 import { NodeTypes, Attrs, SNWithId } from './types';
 import { reduce } from '@mood/utils';
 
@@ -29,7 +29,7 @@ function isHTMLElement($el: Node): $el is Element {
   return $el instanceof Element;
 }
 
-export function serialize($node: Node, $doc: Document): SNWithId[] {
+export function serialize($node: Node, $doc: Document, mirror: Mirror): SNWithId[] {
   const id = mirror.getId($node) || genId();
   mirror.set(id, $node);
 

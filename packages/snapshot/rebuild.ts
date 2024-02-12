@@ -1,5 +1,5 @@
 import { SNWithId, NodeTypes } from './types';
-import { mirror } from './utils';
+import { Mirror } from './utils';
 
 const HOVER_MATCH = /([^{}]+):hover([^{}]*{[^{}]+})/gi;
 
@@ -64,7 +64,7 @@ export function buildNode(node: SNWithId, $doc: Document): Node | null {
   return null;
 }
 
-export function buildNodeWithSN(node: SNWithId, $doc: Document): Node | null {
+export function buildNodeWithSN(node: SNWithId, $doc: Document, mirror: Mirror): Node | null {
   let $el = buildNode(node, $doc);
 
   if (!$el) return null;
@@ -80,14 +80,14 @@ export function buildNodeWithSN(node: SNWithId, $doc: Document): Node | null {
   return $el;
 }
 
-export function rebuild(adds: SNWithId[], $doc: Document) {
+export function rebuild(adds: SNWithId[], $doc: Document, mirror: Mirror) {
   adds.forEach(({ pId, nId, ...node }) => {
-    const $el = buildNodeWithSN(node, $doc)!;
+    const $el = buildNodeWithSN(node, $doc, mirror);
 
     const $parent = pId ? mirror.getNode(pId) : undefined;
     const $next = nId ? mirror.getNode(nId) : undefined;
 
-    if (node.type === NodeTypes.DOC_NODE || node.type === NodeTypes.DOC_TYPE_NODE) {
+    if (!$el || node.type === NodeTypes.DOC_NODE || node.type === NodeTypes.DOC_TYPE_NODE) {
       /**
        * ignore
        */

@@ -1,7 +1,7 @@
 import { ViewportResizeEmitArg } from '@mood/record';
-import { ReceiveHandler } from '../types';
+import { EmitHandler } from '../types';
 
-export const receiveToViewportResize: ReceiveHandler<ViewportResizeEmitArg> = (enevt, context) => {
+export const handleViewportResizeEmit: EmitHandler<ViewportResizeEmitArg> = (enevt, context) => {
   context.$iframe.width = `${enevt.width}px`;
   context.$iframe.height = `${enevt.height}px`;
 };
