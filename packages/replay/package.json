@@ -15,7 +15,6 @@
     "@mood/record": "0.0.1",
     "@mood/rendering-context": "workspace:^",
     "@mood/snapshot": "0.0.1",
-    "@mood/utils": "workspace:^0.0.1",
-    "@xstate/fsm": "^2.1.0"
+    "@mood/utils": "workspace:^0.0.1"
   }
 }

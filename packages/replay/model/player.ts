@@ -2,7 +2,6 @@ import { Mirror, rebuild } from '@mood/snapshot';
 import {
   RecordEventWithTime,
   FullSnapshotEvent,
-  SourceTypes,
   EventTypes,
   IncrementalSnapshotEvent
 } from '@mood/record';
@@ -10,20 +9,24 @@ import {
 import { createScheduler, Scheduler } from './scheduler';
 import { handleEmit } from '../handle';
 import { EmitHandlerContext } from '../types';
+import { lastIndexOf } from '@mood/utils';
 
 export type PlayerConfig = {
   speed: number;
   root: HTMLElement | Element;
-  styleRules: string[];
+  iframe?: HTMLIFrameElement;
+  styleRules?: string[];
   live?: boolean;
-  customApplyIncremental?: typeof handleEmit;
+
+  onLoaded?: (meta: { totalTime: number }) => void;
+  onPlay?: () => void;
+  onProgress?: (percent: number) => void;
+  onPause?: () => void;
+  onSeeked?: (time: number) => void;
+  onEnded?: () => void;
 };
 
-const defaultConfig: PlayerConfig = {
-  speed: 1,
-  root: document.body,
-  styleRules: []
-};
+const defaultConfig: PlayerConfig = { speed: 1, root: document.body };
 
 export class Player {
   private $iframe: HTMLIFrameElement;
@@ -34,7 +37,7 @@ export class Player {
 
   private prev: RecordEventWithTime;
 
-  private config: PlayerConfig = defaultConfig;
+  private config: PlayerConfig = { ...defaultConfig };
 
   private mirror = new Mirror();
 
@@ -58,11 +61,10 @@ export class Player {
     this.$cursor = document.createElement('div');
     this.$cursor.classList.add('mood-cursor');
 
-    this.$iframe = document.createElement('iframe');
-    // @TODO 这么保证回放安全？
+    this.$iframe = this.config.iframe || document.createElement('iframe');
     this.$iframe.setAttribute('sandbox', 'allow-same-origin allow-scripts');
     this.$iframe.setAttribute('scrolling', 'no');
-    this.$iframe.setAttribute('style', 'pointer-events: none');
+    this.$iframe.style.pointerEvents = 'none';
 
     this.$container.appendChild(this.$iframe);
     this.$container.appendChild(this.$cursor);
@@ -77,6 +79,7 @@ export class Player {
       const handler = this.pickHandler(event, true);
       handler();
     }
+    this.config.onLoaded?.(this.metaData);
   }
 
   private setConfig(config: Partial<PlayerConfig>) {
@@ -85,30 +88,14 @@ export class Player {
   }
 
   private getDelay(event: RecordEventWithTime, baseline: number): number {
-    if (event.type !== EventTypes.INCREMENTAL_SNAPSHOT) {
-      return event.timestamp - baseline;
-    }
-
-    if (event.source === SourceTypes.MOUSE_MOVE || event.source === SourceTypes.TOUCH_MOVE) {
-      const [, , , timestamp] = event.ps;
-      return timestamp - baseline;
-    }
-
     return event.timestamp - baseline;
   }
 
   private apply(event: IncrementalSnapshotEvent, sync: boolean) {
     const { $iframe, $cursor, baseline, scheduler, mirror } = this;
 
-    const context: EmitHandlerContext = {
-      $iframe,
-      $cursor,
-      baseline,
-      scheduler,
-      mirror
-    };
+    const context: EmitHandlerContext = { $iframe, $cursor, baseline, scheduler, mirror };
     handleEmit(event, context, sync);
-    this.config.customApplyIncremental?.(event, context, sync);
   }
 
   private rebuild(event: RecordEventWithTime & FullSnapshotEvent) {
@@ -120,11 +107,11 @@ export class Player {
     const { documentElement, head } = contentDocument;
     documentElement.insertBefore($style, head);
 
-    const styleRules = ['noscript { display: none !important; }'].concat(this.config.styleRules);
+    const styleRules = ['noscript { display: none !important; }'].concat(
+      this.config.styleRules || []
+    );
 
-    for (let i = 0; i < styleRules.length && $style.sheet; i++) {
-      $style.sheet.insertRule(styleRules[i], i);
-    }
+    styleRules.forEach((rule, index) => $style.sheet?.insertRule(rule, index));
   }
 
   private pickHandler(event: RecordEventWithTime, sync = false) {
@@ -157,7 +144,7 @@ export class Player {
     const wrapped = () => {
       handler();
       this.prev = event;
-
+      this.config.onProgress?.(this.currentTime / this.metaData.totalTime);
       const index = this.events.indexOf(event);
 
       if (index !== this.events.length - 1) return;
@@ -184,8 +171,13 @@ export class Player {
     return this.prev?.timestamp - this.baseline;
   }
 
+  get playing() {
+    return Boolean(this.scheduler.raf);
+  }
+
   public pause() {
     this.scheduler.clear();
+    this.config.onPause?.();
   }
 
   public play() {
@@ -198,22 +190,19 @@ export class Player {
       this.scheduler.push({ exec: this.pickHandler(event), delay: this.getDelay(event, baseline) });
     }
     this.scheduler.start();
+    this.config.onPlay?.();
   }
 
   public seek(offset = 0) {
     const events = this.events;
     this.scheduler.clear();
 
-    const slice =
-      events.length -
-      events
-        .reverse()
-        .findIndex(
-          event =>
-            event.type === EventTypes.FULL_SNAPSHOT && event.timestamp < this.baseline + offset
-        ) -
-      1;
+    const lastIndex = lastIndexOf(
+      events,
+      event => event.type === EventTypes.FULL_SNAPSHOT && event.timestamp < this.baseline + offset
+    );
 
+    const slice = lastIndex - 1;
     const baseline = this.baseline + offset;
 
     for (let event of events.slice(slice)) {
@@ -226,6 +215,8 @@ export class Player {
       }
       this.scheduler.push({ exec, delay });
     }
+
+    this.config?.onSeeked?.(offset);
   }
 
   public pushEvent(event: RecordEventWithTime) {

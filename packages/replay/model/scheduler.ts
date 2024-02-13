@@ -6,7 +6,7 @@ export type ActionWithDelay = {
 export class Scheduler {
   public offset: number = 0;
 
-  private raf: number | true = 0;
+  raf: number | true = 0;
 
   constructor(
     public speed: number = 1,
