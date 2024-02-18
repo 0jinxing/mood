@@ -1,4 +1,5 @@
 import { RecordEventWithTime } from '@mood/record';
+import { DispatchArg } from '../../mirror';
 
 export enum TransporterEventTypes {
   REQUEST_CONNECTION = 'REQUEST_CONNECTION',
@@ -7,7 +8,9 @@ export enum TransporterEventTypes {
   CONNECTION_REJECTED = 'CONNECTION_REJECTED',
 
   SEND = 'SEND',
-  ACK = 'ACK'
+  ACK = 'ACK',
+
+  DISPATCH = 'DISPATCH'
 }
 
 export type Chunk<D> = {
@@ -31,12 +34,22 @@ export type SendEvent = {
   payload: Chunk<RecordEventWithTime> | Array<Chunk<RecordEventWithTime>>;
 };
 
+export type DispatchEvent = {
+  event: TransporterEventTypes.DISPATCH;
+  payload: DispatchArg;
+};
+
 export type AckEvent = {
   event: TransporterEventTypes.ACK;
   ids: Array<number>;
 };
 
-type PayloadEvent = RequestConnectionEvent | ConnectionAcceptEvent | SendEvent | AckEvent;
+type PayloadEvent =
+  | RequestConnectionEvent
+  | ConnectionAcceptEvent
+  | SendEvent
+  | AckEvent
+  | DispatchEvent;
 
 export type TransporterEvent =
   | PayloadEvent

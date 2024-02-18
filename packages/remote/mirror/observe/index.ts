@@ -6,7 +6,8 @@ import {
   ScrollEmitArg,
   SelectionEmitArg,
   observeInput,
-  observeMediaInteraction
+  observeMediaInteraction,
+  observeScroll
 } from '@mood/record';
 import { Mirror } from '@mood/snapshot';
 import { SubscribeToDndArg, $$dragAndDrop } from './dnd';
@@ -23,7 +24,5 @@ export type DispatchArg =
 export type DispatchHandler = (arg: DispatchArg) => void;
 
 export const onDispatch = (mirror: Mirror, doc: Document, cb: DispatchHandler) => {
-  observeInput(cb, { doc, mirror });
-  observeMediaInteraction(cb, { doc, mirror });
-  $$dragAndDrop(cb, { doc, mirror });
+  observeScroll(cb, { doc, mirror });
 };

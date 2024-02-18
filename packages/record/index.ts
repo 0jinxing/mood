@@ -1,12 +1,42 @@
-import { Mirror, snapshot } from '@mood/snapshot';
-import { observe } from './observe';
+import { Mirror, SNWithId, snapshot } from '@mood/snapshot';
+import { ObserveEmitArg, observe } from './observe';
+import { ET } from './types';
 import { queryViewport } from './utils';
-import { RecordEvent, RecordEventWithTime, EmitHandler, EventTypes } from './types';
 import { each, on } from '@mood/utils';
 
+export type DomContentLoadedEvent = { type: ET.DOM_CONTENT_LOADED };
+
+export type LoadedEvent = { type: ET.LOADED };
+
+export type SnapshotEvent = {
+  type: ET.SNAPSHOT;
+  width: number;
+  height: number;
+  adds: SNWithId[];
+  offset: [top: number, left: number];
+};
+
+export type DeltaEvent = { type: ET.DELTA } & ObserveEmitArg;
+
+export type MetaEvent = {
+  type: ET.META;
+  href: string;
+  width: number;
+  height: number;
+};
+
+export type RecordEvent =
+  | DomContentLoadedEvent
+  | LoadedEvent
+  | SnapshotEvent
+  | DeltaEvent
+  | MetaEvent;
+
+export type RecordEventWithTime = RecordEvent & { timestamp: number };
+
 export type RecordOptions = {
+  mirror: Mirror;
   emit: (e: RecordEventWithTime, checkout?: true) => void;
-  customHandler?: (emit: EmitHandler) => () => void;
   checkoutEveryNth?: number;
   checkoutEveryNms?: number;
   doc?: Document;
@@ -20,28 +50,27 @@ let wrappedEmit: (e: RecordEventWithTime, checkout?: true) => void;
 let wrappedEmitWithTime: (e: RecordEvent, checkout?: true) => void;
 
 export function record(options: RecordOptions) {
-  const { emit, customHandler, checkoutEveryNms, checkoutEveryNth, doc = document } = options;
+  const { emit, checkoutEveryNms, checkoutEveryNth, doc = document } = options;
 
-  let lastFullSnapshotEvent: RecordEventWithTime;
-  let incrementalSnapshotCount = 0;
-  const mirror = new Mirror();
+  let lastSnapshotEvent: RecordEventWithTime;
+  let deltaCount = 0;
 
   wrappedEmit = (event: RecordEventWithTime, checkout?: true) => {
     emit(event, checkout);
 
-    if (event.type === EventTypes.FULL_SNAPSHOT) {
-      lastFullSnapshotEvent = event;
-      incrementalSnapshotCount = 0;
+    if (event.type === ET.SNAPSHOT) {
+      lastSnapshotEvent = event;
+      deltaCount = 0;
     }
 
-    if (event.type === EventTypes.INCREMENTAL_SNAPSHOT) {
-      incrementalSnapshotCount += 1;
-      const exceedCount = checkoutEveryNth && incrementalSnapshotCount >= checkoutEveryNth;
+    if (event.type === ET.DELTA) {
+      deltaCount += 1;
+      const exceedCount = checkoutEveryNth && deltaCount >= checkoutEveryNth;
       const exceedTime =
-        checkoutEveryNms && event.timestamp - lastFullSnapshotEvent.timestamp > checkoutEveryNms;
+        checkoutEveryNms && event.timestamp - lastSnapshotEvent.timestamp > checkoutEveryNms;
 
       if (exceedCount || exceedTime) {
-        takeFullSnapshot(true);
+        takeSnapshot(true);
       }
     }
   };
@@ -50,20 +79,13 @@ export function record(options: RecordOptions) {
     wrappedEmit(withTimestamp(event), checkout);
   };
 
-  const incEmitWithTime: EmitHandler = data => {
-    wrappedEmitWithTime({ type: EventTypes.INCREMENTAL_SNAPSHOT, ...data });
+  const incEmitWithTime = (data: ObserveEmitArg) => {
+    wrappedEmitWithTime({ type: ET.DELTA, ...data });
   };
 
-  const takeFullSnapshot = (checkout?: true) => {
-    wrappedEmitWithTime(
-      {
-        type: EventTypes.META,
-        href: location.href,
-        ...queryViewport()
-      },
-      checkout
-    );
-    const adds = snapshot(doc, mirror);
+  const takeSnapshot = (checkout?: true) => {
+    wrappedEmitWithTime({ type: ET.META, href: location.href, ...queryViewport(doc) }, checkout);
+    const adds = snapshot(doc, options.mirror);
 
     if (!adds) {
       throw new Error('Failed to snapshot the document');
@@ -73,7 +95,8 @@ export function record(options: RecordOptions) {
     const left = doc.documentElement.scrollLeft || 0;
 
     wrappedEmitWithTime({
-      type: EventTypes.FULL_SNAPSHOT,
+      type: ET.SNAPSHOT,
+      ...queryViewport(doc),
       adds,
       offset: [top, left]
     });
@@ -83,14 +106,13 @@ export function record(options: RecordOptions) {
 
   unsubscribes.push(
     on(doc, 'DOMContentLoaded', () => {
-      wrappedEmitWithTime({ type: EventTypes.DOM_CONTENT_LOADED });
+      wrappedEmitWithTime({ type: ET.DOM_CONTENT_LOADED });
     })
   );
 
   const initial = () => {
-    takeFullSnapshot();
-    unsubscribes.push(observe(incEmitWithTime, doc, mirror));
-    customHandler && unsubscribes.push(customHandler(incEmitWithTime));
+    takeSnapshot();
+    unsubscribes.push(observe(incEmitWithTime, { doc, mirror: options.mirror }));
   };
 
   if (doc.readyState === 'interactive' || doc.readyState === 'complete') {
@@ -98,7 +120,7 @@ export function record(options: RecordOptions) {
   } else {
     unsubscribes.push(
       on(doc, 'DOMContentLoaded', () => {
-        wrappedEmitWithTime({ type: EventTypes.LOADED });
+        wrappedEmitWithTime({ type: ET.LOADED });
         initial();
       })
     );
@@ -107,13 +129,8 @@ export function record(options: RecordOptions) {
   return () => each(unsubscribes, u => u());
 }
 
-export function addCustomEvent<T>(tag: string, payload: T) {
-  if (!wrappedEmitWithTime) {
-    throw new Error('please add custom event after start recording');
-  }
-  wrappedEmitWithTime({ type: EventTypes.CUSTOM, tag, payload });
-}
-
 export * from './types';
 export * from './observe';
 export * from './utils';
+
+export * from '@mood/snapshot';

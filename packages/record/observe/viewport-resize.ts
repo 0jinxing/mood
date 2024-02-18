@@ -1,17 +1,17 @@
 import { on, throttle } from '@mood/utils';
-import { ObserveHandler, SourceTypes } from '../types';
+import { ObserveFunc, ST } from '../types';
 import { queryViewport } from '../utils';
 
 export type ViewportResizeEmitArg = {
-  source: SourceTypes.VIEWPORT_RESIZE;
+  source: ST.VIEWPORT_RESIZE;
   width: number;
   height: number;
 };
 
-export const observeViewportResize: ObserveHandler<ViewportResizeEmitArg> = cb => {
-  const source = SourceTypes.VIEWPORT_RESIZE;
+export const observeViewportResize: ObserveFunc<ViewportResizeEmitArg> = (cb, { doc }) => {
+  const source = ST.VIEWPORT_RESIZE;
 
-  const updateDimension = throttle(() => cb({ source, ...queryViewport() }), 200);
+  const updateDimension = throttle(() => cb({ source, ...queryViewport(doc) }), 200);
 
   return on(window, 'resize', updateDimension);
 };

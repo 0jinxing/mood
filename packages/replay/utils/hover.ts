@@ -1,7 +1,7 @@
 import { Mirror } from '@mood/snapshot';
 import { each } from '@mood/utils';
 
-export function hover($el: Element, $doc?: Document) {
+export function addHoverClass($el: Element, $doc?: Document) {
   each($doc?.querySelectorAll('.\\:hover') || [], $node => $node.classList.remove(':hover'));
 
   let $current: Element | null = $el;
@@ -19,15 +19,15 @@ export function moveAndHover(
   y: number,
   id: number,
   mirror: Mirror,
-  $cursor: HTMLElement,
-  $doc?: Document
+  cursor: HTMLElement,
+  doc?: Document
 ) {
-  $cursor.style.left = `${x}px`;
-  $cursor.style.top = `${y}px`;
+  cursor.style.left = `${x}px`;
+  cursor.style.top = `${y}px`;
 
   const $target = mirror.getNode<Element>(id);
 
   if ($target) {
-    hover($target, $doc);
+    addHoverClass($target, doc);
   }
 }

@@ -1,20 +1,31 @@
-import { observeInput } from './input';
-import { observeScroll } from './scroll';
-import { observeViewportResize } from './viewport-resize';
-import { observeMouseInteraction } from './mouse-interaction';
-import { observeMouseMove } from './mouse-move';
-import { observeMediaInteraction } from './media-interaction';
-import { observeStyleSheet } from './style-sheet';
-import { observeMutation } from './mutation';
-import { observeSelection } from './selection';
-import { observeCanvas } from './canvas';
-import { observeWebGL } from './webgl';
-
-import { EmitHandler } from '../types';
+import { InputEmitArg, observeInput } from './input';
+import { ScrollEmitArg, observeScroll } from './scroll';
+import { ViewportResizeEmitArg, observeViewportResize } from './viewport-resize';
+import { MouseInteractionEmitArg, observeMouseInteraction } from './mouse-interaction';
+import { MouseMoveEmitArg, observeMouseMove } from './mouse-move';
+import { MediaInteractionEmitArg, observeMediaInteraction } from './media-interaction';
+import { StyleSheetEmitArg, observeStyleSheet } from './style-sheet';
+import { MutationEmitArg, observeMutation } from './mutation';
+import { SelectionEmitArg, observeSelection } from './selection';
+import { CanvasEmitArg, observeCanvas } from './canvas';
+import { WebGLEmitArg, observeWebGL } from './webgl';
 import { each } from '@mood/utils';
-import { Mirror } from '@mood/snapshot';
+import { ObserveFunc } from '../types';
 
-export function observe(emit: EmitHandler, doc: Document, mirror: Mirror) {
+export type ObserveEmitArg =
+  | MutationEmitArg
+  | MouseMoveEmitArg
+  | MouseInteractionEmitArg
+  | ScrollEmitArg
+  | ViewportResizeEmitArg
+  | InputEmitArg
+  | MediaInteractionEmitArg
+  | StyleSheetEmitArg
+  | SelectionEmitArg
+  | CanvasEmitArg
+  | WebGLEmitArg;
+
+export const observe: ObserveFunc<ObserveEmitArg> = (...args) => {
   const unsubscribes = [
     observeMutation,
     observeMouseMove,
@@ -27,10 +38,10 @@ export function observe(emit: EmitHandler, doc: Document, mirror: Mirror) {
     observeSelection,
     observeCanvas,
     observeWebGL
-  ].map(o => o(emit, { doc, mirror }));
+  ].map(o => o(...args));
 
   return () => each(unsubscribes, u => u());
-}
+};
 
 export * from './input';
 export * from './media-interaction';

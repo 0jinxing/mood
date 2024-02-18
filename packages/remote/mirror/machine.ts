@@ -2,6 +2,7 @@ import { assign, createMachine, interpret } from '@xstate/fsm';
 import { MirrorBuffer, Transporter, TransporterEventTypes, PeerTransporter } from '../utils';
 import { RecordEventWithTime } from '@mood/record';
 import { Player, PlayerConfig } from '@mood/replay';
+import { onDispatch } from './observe';
 
 export enum MirrorSignal {
   READY = 'READY',
@@ -20,11 +21,11 @@ export type MirrorContext = {
   dispose?: Partial<Record<string, undefined | (() => void)>>;
   player?: Player;
 
-  playerConfig?: Partial<PlayerConfig>;
+  playerConfig: PlayerConfig;
 };
 
 export const createMirrorService = (context: Exclude<MirrorContext, 'player'>) => {
-  const player: Player = new Player([], { speed: 1, ...context.playerConfig, live: true });
+  const player: Player = new Player([], { ...context.playerConfig, live: true });
 
   const buffer = new MirrorBuffer<RecordEventWithTime>({
     onEmit(chunk) {
@@ -70,6 +71,15 @@ export const createMirrorService = (context: Exclude<MirrorContext, 'player'>) =
                 removeListener();
                 service.send(MirrorSignal.READY);
                 player.play();
+
+                setTimeout(() => {
+                  onDispatch(context.playerConfig.mirror, player.iframe.contentDocument!, event => {
+                    context.transporter.send({
+                      event: TransporterEventTypes.DISPATCH,
+                      payload: event
+                    });
+                  });
+                }, 1000);
 
                 context.transporter.on(TransporterEventTypes.SEND, ({ payload }) => {
                   const sort = Array.isArray(payload) ? payload : [payload];

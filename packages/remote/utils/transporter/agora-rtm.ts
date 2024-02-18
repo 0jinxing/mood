@@ -46,12 +46,16 @@ export class AgoraRTMTransporter extends Transporter {
 
     this.client = AgoraRTM.createInstance(appId, config);
     this.client.on('MessageFromPeer', this.messageHandler);
-    this.ready$$ = this.client.login({ uid: this.uid, token });
+    this.ready$$ = this.client.login({ uid: this.uid, token }).catch(e => {
+      console.log(appId, this.uid, token);
+      console.log(e);
+    });
   }
 
   messageHandler(message: RtmMessage) {
     const text =
       message.messageType === 'TEXT' ? message.text : new TextDecoder().decode(message.rawMessage);
+    console.log('rec', text);
 
     if (!text) return;
 
@@ -102,6 +106,7 @@ export class AgoraRTMTransporter extends Transporter {
       );
       this.seq++;
     } else {
+      console.log('send', text);
       await this.client.sendMessageToPeer({ text }, this.target);
     }
   }

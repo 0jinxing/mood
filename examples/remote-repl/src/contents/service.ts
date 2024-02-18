@@ -1,14 +1,12 @@
 import { EmbedSignal, createEmbedService, createAgoraRTMTransporter } from '@mood/remote';
 
-chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
+chrome.runtime.onMessage.addListener(async (message, sender, sendResponse) => {
   if (message.type === 'create-embed-service') {
+    const resp = await fetch('https://remote-ui-token.172601673.workers.dev/embed-remote-repl');
+    const { token, appId } = await resp.json();
+
     const service = createEmbedService({
-      transporter: createAgoraRTMTransporter(
-        'f08688fcd3f046e08e5591721cf72f94',
-        '007eJxTYPi5/Nw91wsHMr79MVN75p66he3Ukji5SPaMuzN4Hn7Q17qlwJBmYGFmYZGWnGKcZmBilmpgkWpqamlobmSYnGZulGZpEuO2O7UhkJHB7ZgnCyMDEwMjEIL43AxFqbn5Jam6RakFOQCOhyNP',
-        'remote-repl',
-        'embed'
-      )
+      transporter: createAgoraRTMTransporter(appId, token, 'remote-repl', 'embed')
     });
 
     service.start();

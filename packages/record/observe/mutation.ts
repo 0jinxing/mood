@@ -3,7 +3,7 @@ import { serialize, rAttr, Attrs, SNWithId } from '@mood/snapshot';
 import { deepDelete, isAncestorRemoved, isAncestorInSet, isParentRemoved } from '../utils';
 
 import { each } from '@mood/utils';
-import { ObserveHandler, SourceTypes } from '../types';
+import { ObserveFunc, ST } from '../types';
 
 export type AttrCursor = { $el: Node; attrs: Attrs };
 
@@ -13,7 +13,7 @@ export type TextMutation = { id: number; value: string | null };
 export type AttrMutation = { id: number; attrs: Attrs };
 
 export type MutationEmitArg = {
-  source: SourceTypes.MUTATION;
+  source: ST.MUTATION;
   texts: TextMutation[];
   attrs: AttrMutation[];
   removes: RemovedNodeMutation[];
@@ -22,7 +22,7 @@ export type MutationEmitArg = {
 
 const genKey = (id: number, pId: number) => `${id}@${pId}`;
 
-export const observeMutation: ObserveHandler<MutationEmitArg> = (cb, { doc, mirror }) => {
+export const observeMutation: ObserveFunc<MutationEmitArg> = (cb, { doc, mirror }) => {
   const observer = new MutationObserver(mutations => {
     const attrs: AttrCursor[] = [];
     const texts: Array<{ value: string | null; $el: Node }> = [];
@@ -150,7 +150,7 @@ export const observeMutation: ObserveHandler<MutationEmitArg> = (cb, { doc, mirr
     }
 
     const arg: MutationEmitArg = {
-      source: SourceTypes.MUTATION,
+      source: ST.MUTATION,
 
       texts: texts
         .map(text => ({

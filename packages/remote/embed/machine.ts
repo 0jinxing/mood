@@ -1,6 +1,7 @@
 import { assign, createMachine, interpret } from '@xstate/fsm';
 import { EmbedBuffer, Transporter, TransporterEventTypes } from '../utils';
-import { RecordEventWithTime, record } from '@mood/record';
+import { RecordEventWithTime, ST, record } from '@mood/record';
+import { Mirror } from '@mood/snapshot';
 
 export enum EmbedSignal {
   READY = 'READY',
@@ -28,6 +29,8 @@ export const createEmbedService = (context: EmbedContext) => {
       transporter.send({ event: TransporterEventTypes.SEND, payload: data });
     }
   });
+
+  const mirror = new Mirror();
 
   const service = interpret(
     createMachine(
@@ -80,6 +83,19 @@ export const createEmbedService = (context: EmbedContext) => {
               }
             );
 
+            transporter.on(TransporterEventTypes.DISPATCH, e => {
+              if (e.payload.source === ST.SCROLL) {
+                const el = mirror.getNode<HTMLElement | Document>(e.payload.id);
+                const scrollingElement = el instanceof Document ? el.scrollingElement : el;
+                if (el) {
+                  scrollingElement!.scrollTop = e.payload.y;
+                  scrollingElement!.scrollLeft = e.payload.x;
+                } else {
+                  debugger;
+                }
+              }
+            });
+
             return {
               transporter,
               dispose: { ...dispose, [EmbedSignal.READY]: removeListener }
@@ -92,7 +108,8 @@ export const createEmbedService = (context: EmbedContext) => {
               emit(e) {
                 const chunk = buffer.model[buffer.add(e) - 1];
                 transporter.send({ event: TransporterEventTypes.SEND, payload: chunk });
-              }
+              },
+              mirror
             });
             return { transporter, dispose: { ...dispose, [EmbedSignal.CONNECT]: stopRecord } };
           }),

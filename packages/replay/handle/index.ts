@@ -1,4 +1,4 @@
-import { EmitArg, SourceTypes } from '@mood/record';
+import { ObserveEmitArg, ST } from '@mood/record';
 import { EmitHandlerContext, EmitHandler } from '../types';
 import { handleInputEmit } from './input';
 import { handleMediaInteractionEmit } from './media-interaction';
@@ -12,20 +12,20 @@ import { handleSelectionEmit } from './selection';
 import { handleRenderingContext2DEmit } from './canvas';
 import { handleWebGLEmit } from './webgl';
 
-export function handleEmit(e: EmitArg, context: EmitHandlerContext, sync: boolean) {
-  const handlerMap: { [key in SourceTypes]?: EmitHandler<unknown> } = {
-    [SourceTypes.MUTATION]: handleMutationEmit,
-    [SourceTypes.MOUSE_MOVE]: handleMouseMoveEmit,
-    [SourceTypes.MOUSE_INTERACTION]: handleMouseInteractionEmit,
-    [SourceTypes.SCROLL]: handleScrollEmit,
-    [SourceTypes.VIEWPORT_RESIZE]: handleViewportResizeEmit,
-    [SourceTypes.INPUT]: handleInputEmit,
-    [SourceTypes.TOUCH_MOVE]: handleMouseMoveEmit,
-    [SourceTypes.MEDIA_INTERACTION]: handleMediaInteractionEmit,
-    [SourceTypes.STYLE_SHEETRULE]: handleStyleSheetEmit,
-    [SourceTypes.SELECTION]: handleSelectionEmit,
-    [SourceTypes.CANVAS]: handleRenderingContext2DEmit,
-    [SourceTypes.WEBGL]: handleWebGLEmit
+export function handleEmit(e: ObserveEmitArg, context: EmitHandlerContext, sync: boolean) {
+  const handlerMap: { [key in ST]?: EmitHandler<unknown> } = {
+    [ST.MUTATION]: handleMutationEmit,
+    [ST.MOUSE_MOVE]: handleMouseMoveEmit,
+    [ST.MOUSE_INTERACTION]: handleMouseInteractionEmit,
+    [ST.SCROLL]: handleScrollEmit,
+    [ST.VIEWPORT_RESIZE]: handleViewportResizeEmit,
+    [ST.INPUT]: handleInputEmit,
+    [ST.TOUCH_MOVE]: handleMouseMoveEmit,
+    [ST.MEDIA_INTERACTION]: handleMediaInteractionEmit,
+    [ST.STYLE_SHEETRULE]: handleStyleSheetEmit,
+    [ST.SELECTION]: handleSelectionEmit,
+    [ST.CANVAS]: handleRenderingContext2DEmit,
+    [ST.WEBGL]: handleWebGLEmit
   };
 
   handlerMap[e.source]?.(e, context, sync);

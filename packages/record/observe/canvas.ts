@@ -1,12 +1,12 @@
 import { Decodeable, decode, encode } from '@mood/rendering-context';
 import { FunctionKeys, NonFunctionKeys } from 'utility-types';
 import { hookMethod, hookProp, throttle } from '@mood/utils';
-import { ObserveHandler, SourceTypes } from '../types';
+import { ObserveFunc, ST } from '../types';
 import { canvas2DFuncs, canvas2DProps } from '../utils';
 
 export type CanvasEmitArg = {
   id: number;
-  source: SourceTypes.CANVAS;
+  source: ST.CANVAS;
   ops: Array<{
     key: FunctionKeys<CanvasRenderingContext2D> | NonFunctionKeys<CanvasRenderingContext2D>;
     value: Decodeable;
@@ -14,7 +14,7 @@ export type CanvasEmitArg = {
   }>;
 };
 
-export const observeCanvas: ObserveHandler<CanvasEmitArg> = (cb, { mirror }) => {
+export const observeCanvas: ObserveFunc<CanvasEmitArg> = (cb, { mirror }) => {
   const buffer = new WeakMap<CanvasRenderingContext2D, CanvasEmitArg['ops']>();
 
   const maybeEmit = throttle(async (context: CanvasRenderingContext2D) => {
@@ -35,7 +35,7 @@ export const observeCanvas: ObserveHandler<CanvasEmitArg> = (cb, { mirror }) => 
       }) || 0;
 
     if (ops?.length && id && start < ops.length) {
-      cb({ id, source: SourceTypes.CANVAS, ops: ops.slice(start) });
+      cb({ id, source: ST.CANVAS, ops: ops.slice(start) });
       buffer.delete(context);
     }
   }, 40);

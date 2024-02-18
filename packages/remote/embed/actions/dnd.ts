@@ -1,5 +1,5 @@
 import { EmitHandler } from '@mood/replay';
-import { SubscribeToDndArg } from '../../mirror/observers/dnd';
+import { SubscribeToDndArg } from '../../mirror/observe/dnd';
 import { createEvent } from '../../utils/event';
 
 export const receiveToDnd: EmitHandler<SubscribeToDndArg> = (ev, { mirror, $iframe }) => {

@@ -1,11 +1,11 @@
 import { NonFunctionKeys } from 'utility-types';
 import { hookProp, on, each } from '@mood/utils';
-import { ObserveHandler, SourceTypes } from '../types';
+import { ObserveFunc, ST } from '../types';
 
 export type SubscribeToInputValue = string | boolean;
 
 export type InputEmitArg = {
-  source: SourceTypes.INPUT;
+  source: ST.INPUT;
   id: number;
   value: SubscribeToInputValue;
 };
@@ -20,13 +20,13 @@ function isInputElement(
   );
 }
 
-export const observeInput: ObserveHandler<InputEmitArg> = (cb, { doc, mirror }) => {
+export const observeInput: ObserveFunc<InputEmitArg> = (cb, { doc, mirror }) => {
   const cbWithDedup = (
     $target: HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement,
     value: SubscribeToInputValue
   ) => {
     const id = mirror.getId($target);
-    cb({ source: SourceTypes.INPUT, value, id });
+    cb({ source: ST.INPUT, value, id });
   };
 
   const eventHandler = (event: Pick<Event, 'target'>) => {

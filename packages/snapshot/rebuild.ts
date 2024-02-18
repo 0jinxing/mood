@@ -64,25 +64,25 @@ export function buildNode(node: SNWithId, $doc: Document): Node | null {
   return null;
 }
 
-export function buildNodeWithSN(node: SNWithId, $doc: Document, mirror: Mirror): Node | null {
-  let $el = buildNode(node, $doc);
+export function buildNodeWithSN(node: SNWithId, doc: Document, mirror: Mirror): Node | null {
+  let $el = buildNode(node, doc);
 
   if (!$el) return null;
 
   if (node.type === NodeTypes.DOC_NODE) {
-    $el = $doc;
+    $el = doc;
     // Close before open to make sure document was closed
-    $doc.close();
-    $doc.open();
+    doc.close();
+    doc.open();
   }
   mirror.set(node.id, $el);
 
   return $el;
 }
 
-export function rebuild(adds: SNWithId[], $doc: Document, mirror: Mirror) {
+export function rebuild(adds: SNWithId[], doc: Document, mirror: Mirror) {
   adds.forEach(({ pId, nId, ...node }) => {
-    const $el = buildNodeWithSN(node, $doc, mirror);
+    const $el = buildNodeWithSN(node, doc, mirror);
 
     const $parent = pId ? mirror.getNode(pId) : undefined;
     const $next = nId ? mirror.getNode(nId) : undefined;
@@ -92,8 +92,8 @@ export function rebuild(adds: SNWithId[], $doc: Document, mirror: Mirror) {
        * ignore
        */
     } else if (!$parent) {
-      $doc.appendChild($el);
-      $doc.close();
+      doc.appendChild($el);
+      doc.close();
     } else if ($parent && $next && $parent.contains($next)) {
       $parent.insertBefore($el, $next);
     } else {

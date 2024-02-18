@@ -75,7 +75,8 @@ function getCode(): string {
     await page.evaluate(`;${code}
       window.__IS_RECORDING__ = true
       $$mood.record({
-        emit: event => window._replLog(event)
+        emit: event => window._replLog(event),
+        mirror: new $$mood.Mirror()
       });
      `);
 
@@ -85,7 +86,8 @@ function getCode(): string {
         await page.evaluate(`;${code}
           window.__IS_RECORDING__ = true
           $$mood.record({
-            emit: event => window._replLog(event)
+            emit: event => window._replLog(event),
+            mirror: new $$mood.Mirror()
           });
         `);
       }
@@ -110,12 +112,13 @@ function getCode(): string {
           <link rel="stylesheet" href="../../../packages/replay/styles/index.css" />
         </head>
         <body>
+          <div id="app"></div>
           <script src="../../../packages/replay/dist/index.iife.js"></script>
           <script>
             /*<!--*/
             const events = ${JSON.stringify(events).replace(/<\/script>/g, '<\\/script>')};
             /*-->*/
-            const replayer = $$mood.createPlayer(events);
+            const replayer = $$mood.createPlayer(events, { speed: 1, container: document.getElementById('app'), mirror: new $$mood.Mirror() });
             replayer.play();
           </script>
         </body>

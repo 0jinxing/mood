@@ -1,17 +1,17 @@
 import { each, on, throttle } from '@mood/utils';
-import { ObserveHandler, SourceTypes } from '../types';
+import { ObserveFunc, ST } from '../types';
 
 export type MousePositions = number[];
 
 export type MouseMoveEmitArg = {
-  source: SourceTypes.MOUSE_MOVE | SourceTypes.TOUCH_MOVE;
+  source: ST.MOUSE_MOVE | ST.TOUCH_MOVE;
   ps: MousePositions;
 };
 
-export const observeMouseMove: ObserveHandler<MouseMoveEmitArg> = (cb, { mirror }) => {
+export const observeMouseMove: ObserveFunc<MouseMoveEmitArg> = (cb, { mirror }) => {
   let ps: MousePositions = [];
   const throttleCb = throttle((touch: boolean) => {
-    cb({ ps, source: touch ? SourceTypes.TOUCH_MOVE : SourceTypes.MOUSE_MOVE });
+    cb({ ps, source: touch ? ST.TOUCH_MOVE : ST.MOUSE_MOVE });
 
     ps = [];
   }, 500);

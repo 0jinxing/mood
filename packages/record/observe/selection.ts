@@ -1,12 +1,12 @@
 import { on } from '@mood/utils';
-import { ObserveHandler, SourceTypes } from '../types';
+import { ObserveFunc, ST } from '../types';
 
 export type SelectionEmitArg = {
-  source: SourceTypes.SELECTION;
+  source: ST.SELECTION;
   ranges: number[];
 };
 
-export const observeSelection: ObserveHandler<SelectionEmitArg> = (cb, { mirror }) => {
+export const observeSelection: ObserveFunc<SelectionEmitArg> = (cb, { mirror }) => {
   let collapsed = true;
 
   const updateSelection = () => {
@@ -27,7 +27,7 @@ export const observeSelection: ObserveHandler<SelectionEmitArg> = (cb, { mirror 
       ranges.push(mirror.getId(startContainer), startOffset, mirror.getId(endContainer), endOffset);
     }
 
-    cb({ source: SourceTypes.SELECTION, ranges });
+    cb({ source: ST.SELECTION, ranges });
   };
 
   return on(document, 'selectionchange', updateSelection);

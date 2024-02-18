@@ -2,10 +2,6 @@
 
 import { eventMap } from './event-map';
 
-export function fireEvent(elm: EventTarget, event: Event) {
-  return elm.dispatchEvent(event);
-}
-
 export function createEvent(
   elm: EventTarget,
   eventName: keyof typeof eventMap,

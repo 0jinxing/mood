@@ -1,7 +1,7 @@
-export function queryViewport() {
-  const width = window.innerWidth || document.documentElement?.clientWidth || document.body?.clientWidth;
+export function queryViewport(doc: Document) {
+  const width = doc.documentElement?.clientWidth || doc.body?.clientWidth;
 
-  const height = window.innerHeight || document.documentElement?.clientHeight || document.body?.clientHeight;
+  const height = doc.documentElement?.clientHeight || doc.body?.clientHeight;
 
   return { width, height };
 }

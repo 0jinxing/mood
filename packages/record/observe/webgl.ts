@@ -1,16 +1,16 @@
-import { ObserveHandler, SourceTypes } from '../types';
+import { ObserveFunc, ST } from '../types';
 import { Decodeable, encode, saveWebGLObjectIfValid } from '@mood/rendering-context';
 import { hookMethod, hookProp, throttle } from '@mood/utils';
 import { webGL2Funcs, webGL2Props, webGLFuncs, webGLProps } from '../utils';
 
 export type WebGLEmitArg = {
   id: number;
-  source: SourceTypes.WEBGL;
+  source: ST.WEBGL;
   webgl2: boolean;
   ops: Array<{ key: string; value: Decodeable; setter: boolean }>;
 };
 
-export const observeWebGL: ObserveHandler<WebGLEmitArg> = (cb, { mirror }) => {
+export const observeWebGL: ObserveFunc<WebGLEmitArg> = (cb, { mirror }) => {
   const buffer = new WeakMap<RenderingContext, WebGLEmitArg['ops']>();
 
   const maybeEmit = throttle(function (context: RenderingContext) {
@@ -19,7 +19,7 @@ export const observeWebGL: ObserveHandler<WebGLEmitArg> = (cb, { mirror }) => {
     const webgl2 = context instanceof WebGL2RenderingContext;
 
     if (ops?.length && id) {
-      cb({ webgl2, id, source: SourceTypes.WEBGL, ops });
+      cb({ webgl2, id, source: ST.WEBGL, ops });
       buffer.delete(context);
     }
   }, 40);

@@ -1,2 +1,2 @@
-export * from './observers';
+export * from './observe';
 export * from './machine';

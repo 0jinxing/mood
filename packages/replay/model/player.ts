@@ -1,10 +1,5 @@
 import { Mirror, rebuild } from '@mood/snapshot';
-import {
-  RecordEventWithTime,
-  FullSnapshotEvent,
-  EventTypes,
-  IncrementalSnapshotEvent
-} from '@mood/record';
+import { RecordEventWithTime, SnapshotEvent, ET, DeltaEvent } from '@mood/record';
 
 import { createScheduler, Scheduler } from './scheduler';
 import { handleEmit } from '../handle';
@@ -12,11 +7,14 @@ import { EmitHandlerContext } from '../types';
 import { lastIndexOf } from '@mood/utils';
 
 export type PlayerConfig = {
+  container: HTMLElement;
   speed: number;
-  root: HTMLElement | Element;
+  mirror: Mirror;
+
   iframe?: HTMLIFrameElement;
   styleRules?: string[];
   live?: boolean;
+  interact?: boolean;
 
   onLoaded?: (meta: { totalTime: number }) => void;
   onPlay?: () => void;
@@ -26,26 +24,22 @@ export type PlayerConfig = {
   onEnded?: () => void;
 };
 
-const defaultConfig: PlayerConfig = { speed: 1, root: document.body };
-
 export class Player {
-  private $iframe: HTMLIFrameElement;
+  iframe: HTMLIFrameElement;
 
-  private $container: HTMLElement;
+  private container: HTMLElement;
 
-  private $cursor: HTMLElement;
+  private cursor: HTMLElement;
 
   private prev: RecordEventWithTime;
 
-  private config: PlayerConfig = { ...defaultConfig };
-
-  private mirror = new Mirror();
+  private config: PlayerConfig;
 
   scheduler: Scheduler;
 
   constructor(
     private events: RecordEventWithTime[],
-    config: Partial<PlayerConfig> = {}
+    config: PlayerConfig
   ) {
     this.scheduler = createScheduler();
 
@@ -55,26 +49,24 @@ export class Player {
   }
 
   private setup() {
-    this.$container = document.createElement('div');
-    this.$container.classList.add('mood-container');
+    this.container = this.config.container;
+    this.container.classList.add('mood-container');
 
-    this.$cursor = document.createElement('div');
-    this.$cursor.classList.add('mood-cursor');
+    this.cursor = document.createElement('div');
+    this.cursor.classList.add('mood-cursor');
 
-    this.$iframe = this.config.iframe || document.createElement('iframe');
-    this.$iframe.setAttribute('sandbox', 'allow-same-origin allow-scripts');
-    this.$iframe.setAttribute('scrolling', 'no');
-    this.$iframe.style.pointerEvents = 'none';
+    this.iframe = this.config.iframe || document.createElement('iframe');
+    this.iframe.setAttribute('sandbox', 'allow-same-origin allow-scripts');
+    this.iframe.setAttribute('scrolling', this.config.interact ? 'auto' : 'no');
+    this.iframe.style.pointerEvents = this.config.interact ? 'auto' : 'none';
 
-    this.$container.appendChild(this.$iframe);
-    this.$container.appendChild(this.$cursor);
-
-    this.config.root.appendChild(this.$container);
+    this.container.appendChild(this.iframe);
+    this.container.appendChild(this.cursor);
 
     // apply meta event
     for (const event of this.events.slice(
       0,
-      this.events.findIndex(i => i.type === EventTypes.FULL_SNAPSHOT) + 1
+      this.events.findIndex(i => i.type === ET.SNAPSHOT) + 1
     )) {
       const handler = this.pickHandler(event, true);
       handler();
@@ -91,17 +83,23 @@ export class Player {
     return event.timestamp - baseline;
   }
 
-  private apply(event: IncrementalSnapshotEvent, sync: boolean) {
-    const { $iframe, $cursor, baseline, scheduler, mirror } = this;
+  private apply(event: DeltaEvent, sync: boolean) {
+    const { iframe: iframe, cursor: cursor, baseline, scheduler } = this;
 
-    const context: EmitHandlerContext = { $iframe, $cursor, baseline, scheduler, mirror };
+    const context: EmitHandlerContext = {
+      $iframe: iframe,
+      $cursor: cursor,
+      baseline,
+      scheduler,
+      mirror: this.config.mirror
+    };
     handleEmit(event, context, sync);
   }
 
-  private rebuild(event: RecordEventWithTime & FullSnapshotEvent) {
-    const contentDocument = this.$iframe.contentDocument!;
+  private rebuild(event: RecordEventWithTime & SnapshotEvent) {
+    const contentDocument = this.iframe.contentDocument!;
 
-    rebuild(event.adds, contentDocument, this.mirror);
+    rebuild(event.adds, contentDocument, this.config.mirror);
 
     const $style = contentDocument.createElement('style');
     const { documentElement, head } = contentDocument;
@@ -117,24 +115,28 @@ export class Player {
   private pickHandler(event: RecordEventWithTime, sync = false) {
     const handler = () => {
       switch (event.type) {
-        case EventTypes.DOM_CONTENT_LOADED:
-        case EventTypes.LOADED:
+        case ET.DOM_CONTENT_LOADED:
+        case ET.LOADED:
           break;
 
-        case EventTypes.META: {
-          this.$iframe.width = `${event.width}px`;
-          this.$iframe.height = `${event.height}px`;
+        case ET.META: {
+          this.iframe.width = `${event.width}px`;
+          this.iframe.height = `${event.height}px`;
           break;
         }
 
-        case EventTypes.FULL_SNAPSHOT: {
+        case ET.SNAPSHOT: {
           this.rebuild(event);
           const [top, left] = event.offset;
-          this.$iframe.contentWindow?.scrollTo({ top, left });
+          const { width, height } = event;
+          this.iframe.width = `${width}px`;
+          this.iframe.height = `${height}px`;
+
+          this.iframe.contentWindow?.scrollTo({ top, left });
           break;
         }
 
-        case EventTypes.INCREMENTAL_SNAPSHOT: {
+        case ET.DELTA: {
           this.apply(event, sync);
           break;
         }
@@ -154,9 +156,7 @@ export class Player {
   }
 
   get baseline(): number {
-    return (
-      this.events[this.events.findIndex(i => i.type === EventTypes.FULL_SNAPSHOT)]?.timestamp || 0
-    );
+    return this.events[this.events.findIndex(i => i.type === ET.SNAPSHOT)]?.timestamp || 0;
   }
 
   get metaData() {
@@ -199,7 +199,7 @@ export class Player {
 
     const lastIndex = lastIndexOf(
       events,
-      event => event.type === EventTypes.FULL_SNAPSHOT && event.timestamp < this.baseline + offset
+      event => event.type === ET.SNAPSHOT && event.timestamp < this.baseline + offset
     );
 
     const slice = lastIndex - 1;
@@ -227,8 +227,20 @@ export class Player {
       delay: this.getDelay(event, this.prev?.timestamp || this.baseline)
     });
   }
+
+  public enableInteract() {
+    this.config.interact = true;
+    this.iframe.setAttribute('scrolling', 'auto');
+    this.iframe.style.pointerEvents = 'auto';
+  }
+
+  public disableInteract() {
+    this.config.interact = false;
+    this.iframe.setAttribute('scrolling', 'no');
+    this.iframe.style.pointerEvents = 'none';
+  }
 }
 
-export function createPlayer(events: RecordEventWithTime[], config: Partial<PlayerConfig> = {}) {
+export function createPlayer(events: RecordEventWithTime[], config: PlayerConfig) {
   return new Player(events, config);
 }
