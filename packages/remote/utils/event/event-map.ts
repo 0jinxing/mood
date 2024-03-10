@@ -26,15 +26,15 @@ export const eventMap = {
     defaultInit: { bubbles: true, cancelable: true, composed: true }
   },
   // Keyboard Events
-  keyDown: {
+  keydown: {
     EventType: 'KeyboardEvent',
     defaultInit: { bubbles: true, cancelable: true, charCode: 0, composed: true }
   },
-  keyPress: {
+  keypress: {
     EventType: 'KeyboardEvent',
     defaultInit: { bubbles: true, cancelable: true, charCode: 0, composed: true }
   },
-  keyUp: {
+  keyup: {
     EventType: 'KeyboardEvent',
     defaultInit: { bubbles: true, cancelable: true, charCode: 0, composed: true }
   },
@@ -375,9 +375,9 @@ export const eventMap = {
 } as const;
 
 export type EventTypeMap<T extends keyof typeof eventMap> = {
-  [k in T]: typeof eventMap[T]['EventType'];
+  [k in T]: (typeof eventMap)[T]['EventType'];
 }[T];
 
 export type EventTypeInstanceMap<T extends keyof typeof eventMap> = {
-  [k in EventTypeMap<T>]: InstanceType<typeof window[k]>;
+  [k in EventTypeMap<T>]: InstanceType<(typeof window)[k]>;
 }[EventTypeMap<T>];

@@ -1,38 +1,35 @@
-import AgoraRTM, { RtmClient, RtmMessage } from 'agora-rtm-sdk';
+import AgoraRTM, { RtmClient, RtmRawMessage } from 'agora-rtm-sdk';
 import { TransporterEvent } from './types';
 import { Transporter } from './common';
+import { compressSync, decompressSync } from 'fflate';
 
-const AgoraMessageLimit = 32 * 1000;
-const AgoraMessageHead = 10;
-const AgoraMessageLimitWithHead = AgoraMessageLimit - AgoraMessageHead;
-const AgoraMessageSeparator = '@';
+const MessageLimit = 32 * 1000;
+const MessageHead = 8;
 
 type AgoraRTMConfig = Required<Parameters<typeof AgoraRTM.createInstance>>[1];
 
-function byteChunk(text: string, limit: number = AgoraMessageLimitWithHead) {
-  let buffer = Buffer.from(text);
-  const result: string[] = [];
-  while (buffer.length) {
-    let i = buffer.lastIndexOf(32, limit + 1);
-    // If no space found, try forward search
-    if (i < 0) i = buffer.indexOf(32, limit);
-    // If there's no space at all, take the whole string
-    if (i < 0) i = buffer.length;
-    // This is a safe cut-off point; never half-way a multi-byte
-    result.push(buffer.slice(0, i).toString());
-    buffer = buffer.slice(i + 1); // Skip space (if any)
+export function splitByLimit(seq: number, buf: Uint8Array, limit: number) {
+  const length = Math.ceil(buf.byteLength / limit);
+  const result: Uint8Array[] = new Array(length);
+
+  for (let index = 0; index < length; index++) {
+    const head = new Uint8Array(MessageHead);
+    const view = new DataView(head.buffer);
+    result[index] = buf.slice(index * limit, (index + 1) * limit);
+    view.setUint32(0, seq);
+    view.setUint16(4, index);
+    view.setUint16(6, length);
+    result[index] = new Uint8Array([...head, ...result[index]]);
   }
   return result;
 }
-
-type Part = { order: number; data: string };
 
 export class AgoraRTMTransporter extends Transporter {
   private client: RtmClient;
 
   private ready$$: Promise<void>;
 
-  private parts: Record<string, Part[]> = {};
+  private store = new Map<number, Uint8Array[]>();
 
   constructor(
     appId: string,
@@ -46,38 +43,32 @@ export class AgoraRTMTransporter extends Transporter {
 
     this.client = AgoraRTM.createInstance(appId, config);
     this.client.on('MessageFromPeer', this.messageHandler);
-    this.ready$$ = this.client.login({ uid: this.uid, token }).catch(e => {
-      console.log(appId, this.uid, token);
-      console.log(e);
-    });
+    this.ready$$ = this.client.login({ uid: this.uid, token });
   }
 
-  messageHandler(message: RtmMessage) {
-    const text =
-      message.messageType === 'TEXT' ? message.text : new TextDecoder().decode(message.rawMessage);
-    console.log('rec', text);
+  messageHandler({ rawMessage }: RtmRawMessage) {
+    const buf = new Uint8Array(rawMessage);
+    const view = new DataView(buf.buffer);
+    const seq = view.getUint32(0);
+    const index = view.getUint16(4);
+    const length = view.getUint16(6);
 
-    if (!text) return;
+    const received = this.store.get(seq) || Array.from({ length });
+    received[index] = new Uint8Array(buf.slice(MessageHead));
+    this.store.set(seq, received);
 
-    try {
-      const message = JSON.parse(text);
-      this.handlers.get(message.event)?.forEach(h => h(message));
-    } catch {
-      const [seq, sort, ...content] = text.split(AgoraMessageSeparator);
-      this.parts[seq] = this.parts[seq] || [];
-      this.parts[seq].push({ order: +sort, data: content.join(AgoraMessageSeparator) });
+    if (received.length === length && received.every(Boolean)) {
+      this.store.delete(seq);
 
-      const result = this.parts[seq]
-        .sort((a, b) => a.order - b.order)
-        .map(p => p.data)
-        .join('');
-      try {
-        const message = JSON.parse(result);
-        this.handlers.get(message.event)?.forEach(h => h(message));
-        delete this.parts[seq];
-      } catch {
-        // ignore
+      const byteLength = received.reduce((acc, p) => acc + p.byteLength, 0);
+      const result = new Uint8Array(byteLength);
+      for (let i = 0, offset = 0; i < received.length; i++) {
+        result.set(received[i], offset);
+        offset += received[i].byteLength;
       }
+      const text = new TextDecoder().decode(decompressSync(result));
+      const msg = JSON.parse(text);
+      this.handlers.get(msg.event)?.forEach(h => h(msg));
     }
   }
 
@@ -93,21 +84,10 @@ export class AgoraRTMTransporter extends Transporter {
   private seq = 0;
   async send(data: TransporterEvent) {
     await this.ready$$;
-    const text = JSON.stringify(data);
-    const parts = byteChunk(text);
-    if (parts.length > 1) {
-      await Promise.all(
-        parts.map((p, index) =>
-          this.client.sendMessageToPeer(
-            { text: this.seq + AgoraMessageSeparator + index + AgoraMessageSeparator + p },
-            this.target
-          )
-        )
-      );
-      this.seq++;
-    } else {
-      console.log('send', text);
-      await this.client.sendMessageToPeer({ text }, this.target);
+    const buf = compressSync(new TextEncoder().encode(JSON.stringify(data)));
+    const chunks = splitByLimit(this.seq, buf, MessageLimit - MessageHead);
+    for (const rawMessage of chunks) {
+      await this.client.sendMessageToPeer({ rawMessage }, this.target);
     }
   }
 

@@ -1,5 +1,5 @@
 import { assign, createMachine, interpret } from '@xstate/fsm';
-import { MirrorBuffer, Transporter, TransporterEventTypes, PeerTransporter } from '../utils';
+import { MirrorBuffer, Transporter, TransporterEventTypes } from '../utils';
 import { RecordEventWithTime } from '@mood/record';
 import { Player, PlayerConfig } from '@mood/replay';
 import { onDispatch } from './observe';

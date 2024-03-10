@@ -2,6 +2,7 @@ import { assign, createMachine, interpret } from '@xstate/fsm';
 import { EmbedBuffer, Transporter, TransporterEventTypes } from '../utils';
 import { RecordEventWithTime, ST, record } from '@mood/record';
 import { Mirror } from '@mood/snapshot';
+import { createEvent } from '../utils/event';
 
 export enum EmbedSignal {
   READY = 'READY',
@@ -84,15 +85,13 @@ export const createEmbedService = (context: EmbedContext) => {
             );
 
             transporter.on(TransporterEventTypes.DISPATCH, e => {
-              if (e.payload.source === ST.SCROLL) {
-                const el = mirror.getNode<HTMLElement | Document>(e.payload.id);
-                const scrollingElement = el instanceof Document ? el.scrollingElement : el;
-                if (el) {
-                  scrollingElement!.scrollTop = e.payload.y;
-                  scrollingElement!.scrollLeft = e.payload.x;
-                } else {
-                  debugger;
-                }
+              if (e.payload.ctor === 'KeyboardEvent') {
+                const event = createEvent(
+                  mirror.getNode(e.payload.target)!,
+                  e.payload.name,
+                  e.payload
+                );
+                dispatchEvent(event);
               }
             });
 

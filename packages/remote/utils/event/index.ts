@@ -5,7 +5,7 @@ import { eventMap } from './event-map';
 export function createEvent(
   elm: EventTarget,
   eventName: keyof typeof eventMap,
-  init: EventInit = {}
+  init: EventInit & Record<string, unknown> = {}
 ) {
   const { EventType, defaultInit } = eventMap[eventName] || { EventType: 'Event', defaultInit: {} };
   const eventInit: Record<string, unknown> = { ...defaultInit, ...init };
@@ -53,6 +53,8 @@ export function createEvent(
       }
     }
   });
+
+  return event;
 }
 
 // function written after some investigation here:

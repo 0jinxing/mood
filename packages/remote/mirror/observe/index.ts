@@ -1,28 +1,14 @@
-import {
-  MediaInteractionEmitArg,
-  InputEmitArg,
-  MouseInteractionEmitArg,
-  MouseMoveEmitArg,
-  ScrollEmitArg,
-  SelectionEmitArg,
-  observeInput,
-  observeMediaInteraction,
-  observeScroll
-} from '@mood/record';
 import { Mirror } from '@mood/snapshot';
-import { SubscribeToDndArg, $$dragAndDrop } from './dnd';
+import { KeyEvtArg, observeKeyboard } from './keyboard';
+import { MouseEvtArg } from './mouse';
+import { ScrollEvtArg, observeScroll } from './scroll';
 
-export type DispatchArg =
-  | MouseMoveEmitArg
-  | MouseInteractionEmitArg
-  | ScrollEmitArg
-  | InputEmitArg
-  | MediaInteractionEmitArg
-  | SelectionEmitArg
-  | SubscribeToDndArg;
+export type DispatchArg = ScrollEvtArg | KeyEvtArg | MouseEvtArg;
 
 export type DispatchHandler = (arg: DispatchArg) => void;
 
 export const onDispatch = (mirror: Mirror, doc: Document, cb: DispatchHandler) => {
   observeScroll(cb, { doc, mirror });
+  observeKeyboard(cb, { doc, mirror });
+  observeKeyboard(cb, { doc, mirror });
 };
